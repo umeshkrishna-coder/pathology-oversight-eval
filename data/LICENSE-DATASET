@@ -1,0 +1,13 @@
+Dataset licence notice
+
+The dataset in this folder (synthetic reports, planted errors, ground truth,
+taxonomy and related data files) is licensed under the Creative Commons
+Attribution 4.0 International licence (CC BY 4.0).
+
+Full licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+Summary: https://creativecommons.org/licenses/by/4.0/
+
+All reports are synthetic. They describe no real patient.
+
+The dataset is empty at this stage; the notice applies to every file added
+under data/ unless that file states otherwise.

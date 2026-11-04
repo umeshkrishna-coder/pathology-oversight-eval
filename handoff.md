@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-04 by owner (Step 0)
+Last updated: 2026-11-04 by agent (EVAL-01)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
 
 ## Purpose
@@ -60,6 +60,7 @@ Severity: critical = would change patient management; major = would need an amen
 | ID | Date | Title | Status | Label |
 |---|---|---|---|---|
 | Step 0 | 2026-11-04 | Repo, hygiene files, handoff | DONE | OWNER VERIFIED |
+| EVAL-01 | 2026-11-04 | Scaffold, schemas, taxonomy, validator | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===
