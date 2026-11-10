@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 and S1 done.
+Run status: IN PROGRESS — S0 to S2 done.
 
 ## Part 1. Stages
 
@@ -11,6 +11,7 @@ Run status: IN PROGRESS — S0 and S1 done.
 |---|---|---|---|---|---|
 | S0 pre-flight | PASS | none (no commit of its own) | 353 | — | — |
 | S1 EVAL-02c audit (EVAL-02c-fix) | PASS | cccad44 | 417 | 3 | 20 confirmed and fixed; 5 rejected with reasons |
+| S2 EVAL-H1 CLAUDE.md and harness decision | PASS | e85eeb3 | 417 | 2 | 1 fixed in the stage (decision wording); 6 settled in the record; 1 rejected |
 
 ## Part 2. For the owner
 
@@ -21,15 +22,23 @@ Run status: IN PROGRESS — S0 and S1 done.
 1. Dates. The run crossed midnight into 2026-11-11. Decisions keep the label the prompt gives them ("OWNER VERIFIED, 2026-11-10"); task-log rows and "Last updated" carry the actual date of the stage (2026-11-11) [RAN `date`].
 2. Review rounds. The prompt allows three review rounds per stage. Findings of the third round were fixed with a test that failed first, the lead's mutation check and a re-run of the reviewer's own reproduction scripts, without a fourth review round (S1) [RAN].
 3. S1 word count for the five-word minimum: a word is a whitespace-separated token with at least one letter or digit, which matches the scorer's tokens (S1 review finding) [RAN].
+4. S2 decisions 38 and 39 hold the owner's decisions 1 and 2 word for word, with two clarifications by the agent in square brackets: "[EVAL-N1, the overnight build run]" after "this one run" and "[the EVAL-N1 prompt]" after "this prompt", so that a later session does not read "this run" as its own. Removing the bracketed words gives the owner's text exactly (checked by script). The owner may keep or drop them [RAN].
 
 ## Part 4. Left for the owner
 
 1. Confirm the reading of "one block per spec row in id order" for `plant --init` as the spec's row order (histopathology first), which the committed template follows (Part 5 item 2). Sorting by id would put C-001 to C-011 first; the committed template is not regenerated either way.
+2. handoff.md's working rule "No API call unless the prompt authorises it with a model and a cost estimate" is weaker than decision 39 and CLAUDE.md ("a model, an estimate and a hard stop"). They do not contradict (CLAUDE.md is stricter and is read first), but S2 did not authorise editing the rule, so it is left for the owner to align (S2 review) [READ].
+3. CLAUDE.md's "Never" list is narrower than section A of the EVAL-N1 prompt. Compared rule by rule (S2 reviews): A1, tests may run the typed-word actions only in temporary folders with the fake client; A2, never "approve" owner content, and the category map and its approval are owner-only; A3, never run `plant` in its building form; A4, never "open" `.env`, and no secret in any file, log, commit or report; A6, never `git clean`, `git reset --hard` or `git stash drop`, and branch main only; A7, never weaken, skip, xfail or delete a test, never widen or narrow the ruff rule list (decision 29 covers only widening), no new dependencies; A8, nothing copied in from outside the repository. Section A binds this run; whether CLAUDE.md should carry these after the run is the owner's call [READ].
+4. CLAUDE.md says "Evaluation prompts and the taxonomy are the owner's words". prompts/plain.md and prompts/structured_output.md were written by the agent (EVAL-03) and are still "proposed" in prompts/manifest.json; the run treats them as owner-only content (A2) and never edits them (S2 review) [READ].
+5. CLAUDE.md says "Heads, test counts, spend and open items are read from `handoff.md`", but handoff.md has no place for commit heads or test counts (Part 5 item 3). The agent did not change handoff.md's format; they are in this report's Part 1. The owner may want a line or column for them in handoff.md (S2 review) [READ].
 
 ## Part 5. Contradictions between this prompt and the repository, and how each was read
 
 1. S1 says "no code path in plant.py may write under data/drafts/", while the EVAL-02c specification (which S1 audits) requires `pathqc-eval readable <folder>` to write `<folder>/_readable/<id>.md`, and S1's own stage command is `readable data/drafts`; in a699037 that writer lived in plant.py. Round 1 recorded a reading; the round-2 reviews (R1 and R3) showed the conflict was not forced, so it was resolved instead of read: `readable` moved to its own module, src/pathqc_eval/readable.py, with byte-identical output on the 34 drafts, and a test pins that plant.py's only file writer is write_outputs (data/reports/). Both the S1 text and the specification now hold literally [RAN].
 2. EVAL-02c says `plant --init` writes "one block per spec row in id order". Read as the spec's own row order: ids ascending within each modality, histopathology first, which is the order of data/specs/dataset.json, spec-check and `plant --check`. The committed template is in this order and S1 forbids regenerating it; a test now pins that the blocks follow the spec rows [READ; RAN].
+3. CLAUDE.md (S2, copied verbatim) says "Heads, test counts, spend and open items are read from `handoff.md`", but handoff.md holds no commit heads and no test counts; they are in this report (Part 1). Following CLAUDE.md's own rule ("report that first and change nothing"), the agent changed neither file's format and listed it for the owner (Part 4 item 5) [READ].
+4. CLAUDE.md says "bare `python` is not on PATH". A `python` is on PATH, but it is the Windows Store alias that only prints "Python was not found" (exit 49, S0). There is no working bare interpreter, so the instruction holds in effect; recorded rather than changed, since the text is verbatim [RAN].
+5. S9 item 3 asks handoff.md to receive "the decision from the top of this prompt about this run (next free number, OWNER VERIFIED, 2026-11-10)". That is owner decision 1, which S2 recorded as decision 38. Read as already met: S9 will not add a duplicate (S2 review R3 OF-5) [READ].
 
 ## Part 6. API spend, per stage, from the logs
 
@@ -37,6 +46,7 @@ Run status: IN PROGRESS — S0 and S1 done.
 |---|---|---|---|
 | S0 | — | 0 | 0 |
 | S1 | — | 0 | 0 (no API path in S1; R3 checked each round) |
+| S2 | — | 0 | 0 (documents only) |
 
 ## Part 7. Stage records
 
@@ -73,7 +83,7 @@ Commands
 - Baseline: `uv run ruff check .` — exit 0 — `All checks passed!`; `uv run ruff format --check .` — exit 0 — `39 files already formatted` [RAN]
 - Environment: uv 0.13.7, Python 3.12.16, anthropic 2.4.0, pydantic 2.14.2 [RAN]; bare `python` resolves only to the Windows Store stub (`Python was not found`, exit 49) [RAN].
 
-Safety measure used for the whole run [RAN]: review sub-agents run every command with `ANTHROPIC_API_KEY=` set empty in their environment. python-dotenv's `load_dotenv(override=False)` skips a key that is already present in the environment (checked in its source: `if k in os.environ and not self.override: continue`), so no reviewer command can load the key from `.env`, and both real clients refuse to construct without it.
+Safety measure used for the whole run [RAN]: review sub-agents run every command with `ANTHROPIC_API_KEY=` set empty in their environment. python-dotenv's `load_dotenv(override=False)` skips a key that is already present in the environment (checked in its source: `if k in os.environ and not self.override: continue`), so no reviewer command can load the key from `.env`. Corrected at S2 (review R3 OF-6): the anthropic SDK client itself does not refuse an empty key (it then looks for ANTHROPIC_AUTH_TOKEN, ANTHROPIC_PROFILE or a profile on disk); what refuses is the project's own wrapper, which checks ANTHROPIC_API_KEY before it constructs the SDK client (AnthropicDraftClient; S5's evaluation client must do the same) [READ]. Checked by name only at S2: `.env` defines one variable, ANTHROPIC_API_KEY; the process environment defines one ANTHROPIC_ variable, ANTHROPIC_BASE_URL, whose host is api.anthropic.com (the default endpoint; only the scheme and host were printed); no Anthropic profile folder exists [RAN].
 
 ### S1 — EVAL-02c audit: planting sheet tool — PASS
 
@@ -347,6 +357,88 @@ Deviations from the prompt: own uncommitted edits replaced between review rounds
 Claims I could not verify: behaviour with the owner's own editor's encodings (simulated only).
 Questions for the owner: confirm that "id order" for the template means the spec's row order (Part 4).
 handoff.md updated: yes (record commit)
+=== END ===
+```
+
+### S2 — EVAL-H1: CLAUDE.md and harness decision — PASS
+
+Stage commit `e85eeb3` "EVAL-H1: CLAUDE.md and harness decision", pushed; `git rev-parse HEAD` = `git ls-remote origin main` = e85eeb36a46f11c829f2d287426b06cb9280ebd4 [RAN]. Two review rounds (R1, R2, R3 each) [RAN]. From this stage on, CLAUDE.md binds the run as well as the prompt.
+
+#### Checklist (9 items, all met)
+
+1. Every line of CLAUDE.md checked against the code; commands a later stage adds listed as "not yet present" and kept in the text — **met**:
+   - Title and "what this repo is": repository name and purpose match pyproject.toml and README.md [READ]; branch `main` is the source of truth, and origin/main = HEAD [RAN]; the Operating Charter is kept outside the repository and cannot be checked here [READ]; decisions, open items and the task log are sections of handoff.md [READ].
+   - The gate: `uv run pytest`, `uv run ruff check .` and `uv run ruff format --check .` are configured (pyproject.toml dev group, [tool.pytest.ini_options], [tool.ruff]) and run in every stage [RAN]; `validate`, `spec-check`, `plant --check` and `freeze --check` exist (`pathqc-eval <command> --help`, exit 0 each) [RAN].
+   - Typed words: `pathqc-eval freeze` writes the lock and `freeze --replace` replaces it [RAN `freeze --help`]; **`pathqc-eval run --dataset scored …`: not yet present** (`pathqc-eval run --help` exit 2; added in S5) [RAN]; "release preparation" names no command [READ].
+   - Never: `.env` is gitignored and untracked [RAN]; data/ and runs/ exist [RAN]; the owner-file list equals handoff.md's owner-editable areas [READ].
+   - Environment: Windows [RAN]; `uv run` everywhere [RAN]; bare `python` is only the Store alias (Part 5 item 4) [RAN]; LF line endings (.gitattributes `* text=auto eol=lf`) [RAN].
+   - Committing and Reporting: consistent with handoff.md's working rules and report block [READ].
+   - Facts that change: handoff.md holds no commit heads or test counts (Part 5 item 3, Part 4 item 5) [READ].
+   - Other mismatches found by the check and the reviews: Part 4 items 2–5 and Part 5 items 3–5 [READ].
+2. CLAUDE.md in the repository root, exactly the text between the markers — **met**: `cmp` against the prompt's lines exit 0; 59 lines, LF only, no BOM, one final line break; sha256 ad13996e…94cc [RAN].
+3. Labels line — **met** (handoff.md line 3: the stage's text without its closing full stop, like the old line) [RAN by R1].
+4. Owner decisions 1 and 2 as decisions 38 and 39 (OWNER VERIFIED, 2026-11-10, the next free numbers) — **met**: the owner's words exactly, with the agent's clarifications in square brackets (Part 3 item 4); the header now reads "29–39 on 2026-11-10" [RAN].
+5. "Read CLAUDE.md first; it holds the rules that bind this session." added as the first working rule; the other rules kept — **met** [RAN].
+6. CLAUDE.md binds the run from this stage on — **met**: its "Before acting" and "Do only what the prompt asks" rules decided how the round-2 findings were settled (reported, not changed) [READ].
+7. Commit `EVAL-H1: CLAUDE.md and harness decision` — **met** (e85eeb3) [RAN].
+8. Gate: `uv run pytest -q` exit 0, 417 passed; `uv run ruff check .` exit 0; `uv run ruff format --check .` exit 0 (42 files: ruff 0.17.3 counts Markdown files, so CLAUDE.md is the 42nd); explicit staging; status and cached stat quoted below; push; remote = HEAD — **met** [RAN].
+9. No API call; nothing outside the stage's scope — **met** (R3, both rounds) [RAN].
+
+#### Review findings, triage and fixes
+
+| round | finding | verdict | action |
+|---|---|---|---|
+| 1 | CLAUDE.md "Facts that change" points to heads and test counts that handoff.md does not hold (R1, R2 C13a, R3-1) | CONFIRMED (a mismatch in the documents) | CLAUDE.md stays verbatim; Part 5 item 3, Part 4 item 5 |
+| 1 | handoff.md's API rule lacks "hard stop" (R1, R2 C13b, R3-3) | CONFIRMED (a mismatch) | not edited (S2 does not authorise it); Part 4 item 2 |
+| 1 | `python` is on PATH as the Store alias (R1) | CONFIRMED (a nuance) | Part 5 item 4 |
+| 1 | CLAUDE.md's Never list is narrower than section A (R3-2) | CONFIRMED (for the owner) | Part 4 item 3 |
+| 1 | "Evaluation prompts … are the owner's words" against agent-written prompts (R3-6) | CONFIRMED (for the owner) | Part 4 item 4 |
+| 1 | Decisions 38 and 39 reworded the owner's text (R1, R3-4) | CONFIRMED | the owner's words restored, clarifications in brackets (round-2 diff) |
+| 1 | Checklist item 5 said "becomes" where the stage says "add" (R1, R2 C14, R3-5) | CONFIRMED (checklist only; the work was right) | checklist corrected |
+| 1 | No test reads CLAUDE.md, and `ruff format --check` does not check its content (R2) | REJECTED as a defect | S2 asks for no test; exactness was checked by `cmp` and by R1 and R2; a test pinning the owner's rules file would block the owner's own edits |
+| 1 | `cli.main` loads `.env` for every command, so tests that call it load the key unless it is blanked (R3-7) | pre-existing | carried to S5, where the harness tests add a guard |
+| 2 | The record claimed the S1 task-log row "was completed" with commit and test count [RAN], which was false and beyond the stage (R1, R2 C16, R3 OF-1) | CONFIRMED | claim removed; no format change; Part 4 item 5 |
+| 2 | The bracketed words were not explained (R1, R3 OF-2) | CONFIRMED | Part 3 item 4 |
+| 2 | Part 4 item 3's list of section A gaps was incomplete (R1, R3 OF-3) | CONFIRMED | completed |
+| 2 | D9's "open items" were not updated for the new owner questions (R1, R3 OF-4) | CONFIRMED | handoff.md Open items updated in this record commit |
+| 2 | S9 would record owner decision 1 again (R3 OF-5) | CONFIRMED | Part 5 item 5 |
+| 2 | The S0 record overstated the empty-key safeguard (R3 OF-6) | CONFIRMED | S0 record corrected; variable names checked by name only |
+
+#### Files changed (e85eeb3)
+
+`git status --short` and `git diff --cached --stat` before the commit [RAN]:
+```
+A  CLAUDE.md
+ M OVERNIGHT_REPORT.md
+M  handoff.md
+ CLAUDE.md  | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ handoff.md |  7 +++++--
+ 2 files changed, 64 insertions(+), 2 deletions(-)
+```
+OVERNIGHT_REPORT.md was left unstaged; it goes in the record commit.
+
+#### What was not tested
+
+- Whether a new Claude Code session in this folder loads CLAUDE.md automatically [INFERRED from Claude Code's design; not tested].
+
+#### Deviations
+
+- Own uncommitted edit replaced between rounds: decisions 38 and 39 first reworded the owner's text, then restored it with bracketed clarifications [RAN].
+
+```text
+=== EVAL REPORT: EVAL-H1 CLAUDE.md and harness decision (EVAL-N1 S2) ===
+Status: DONE
+What was asked: create CLAUDE.md verbatim after checking it against the code; record owner decisions 1 and 2, the new labels and the first working rule in handoff.md.
+What was done: CLAUDE.md created, byte-identical to the prompt's text [RAN]; every command it names exists except `run`, which S5 adds [RAN]; decisions 38 and 39, Labels and the working rule added [RAN]; four mismatches between the documents recorded for the owner [READ].
+Files changed: CLAUDE.md — new, the harness rules for the session; handoff.md — Labels, decisions 38–39, first working rule.
+Commands run: uv run pytest — 0 — 20 s — 417 passed; ruff check — 0; ruff format --check — 0; pathqc-eval <command> --help — 0 (run: 2, not yet present).
+Checks: pytest 417 passed, 0 failed | ruff check and format clean
+Git: branch main; commit e85eeb3 "EVAL-H1: CLAUDE.md and harness decision"; push ok; remote HEAD matches local HEAD: yes
+API spend this task: no API calls
+Deviations from the prompt: bracketed clarifications inside the owner's decisions (Part 3 item 4).
+Claims I could not verify: the Operating Charter, kept outside the repository.
+Questions for the owner: Part 4 items 2–5.
+handoff.md updated: yes
 === END ===
 ```
 
