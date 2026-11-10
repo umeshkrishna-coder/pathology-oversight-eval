@@ -1,6 +1,6 @@
 # HANDOFF — pathology-oversight-eval
 Last updated: 2026-11-11 by agent (EVAL-N1 S1: EVAL-02c-fix)
-Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
+Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · REPORTED (stated, not checked) · NOT TESTED · PENDING (not yet done)
 
 ## Purpose
 A small research pilot: how well Claude detects deliberately planted errors in synthetic histopathology reports and CBC interpretations, scored against pathologist-verified ground truth. Output: a one-page write-up for the owner's Anthropic Research Residency application, due 18 November 2026. Separate from every other project; its own folder, repo and Claude Code session.
@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–37 on 2026-11-10)
+## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–39 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -48,6 +48,8 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 35. Structured condition (amends decision 13): histopathology reports use the owner's PathQC text verbatim, then the histopathology taxonomy, then the output block. CBC reports use a short CBC review checklist written by the owner, then the CBC taxonomy, then the output block. The plain condition uses one prompt for both modalities.
 36. Drafting (amends decision 25): reasoning effort high; cumulative cost gate $0.50 per run.
 37. Planting is done through data/specs/planting.md, written by the owner. `pathqc-eval plant` applies it deterministically to the drafts and writes data/reports/; drafts are never edited; reports are never edited by hand; no model takes part. The sheet is published with the dataset as the record of what was planted. The tool refuses to build while the taxonomy status is not "final".
+38. For this one run [EVAL-N1, the overnight build run] the rule "one task per prompt, no chaining" is set aside. Stages are chained on condition that every stage passes its own gate and gets its own commit and its own record. Advice noted: bundled work hides which change caused a fault, so a stage that fails its gate is set aside and nothing is built on it.
+39. The Project Harness Kit is adopted for this pilot at Light size. The Operating Charter, the decision register and the roadmap are kept by the orchestrator outside the repo; handoff.md stays the session's notes; the repo gets a CLAUDE.md. Three typed words, each typed by the owner in a session: `freeze approved`, `scored run approved`, `release approved`. Nothing in this prompt [the EVAL-N1 prompt] is one of those words. For small API tasks, pasting a prompt that states model, estimate and hard stop is the owner's yes. Status labels gain REPORTED and NOT TESTED. A fix to existing behaviour ships with a test that fails on the old code and passes on the new.
 
 ## Error taxonomy (OWNER VERIFIED as draft; to be finalised before any error is planted)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -66,6 +68,7 @@ Severity: critical = would change patient management; major = would need an amen
 - CBC: Values table (Hb, RBC, Hct, MCV, MCH, MCHC, RDW, WBC with differential % and absolute counts, platelets, MPV, each with reference range); Interpretation; Comment/recommendation.
 
 ## Working rules for the agent
+- Read CLAUDE.md first; it holds the rules that bind this session.
 - Every reply ends with the report block below. Every claim tagged [RAN] / [READ] / [INFERRED].
 - No API call unless the prompt authorises it with a model and a cost estimate. Never print secrets; names only.
 - Pre-flight: clean tree, remote = HEAD, HEAD is the pinned commit or later with only EVAL- commits since.
