@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-10 by agent (EVAL-01b)
+Last updated: 2026-11-10 by agent (EVAL-02)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
 
 ## Purpose
@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED, 2026-11-04)
+## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–31 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -32,6 +32,16 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 19. A planted error's severity must be one of its type's default severities. An override is allowed only with a non-empty severity_reason; severity_reason is null otherwise.
 20. Licence holder in LICENSE and data/LICENSE-DATASET: Dr. Umesh Krishna Sureshbabu.
 21. Line endings: .gitattributes with `* text=auto eol=lf`; everything is stored and checked out as LF. Freeze hashes (EVAL-03) are computed on LF bytes.
+22. Modality split: 34 reports = 23 histopathology + 11 CBC. Scored 30: 20 histopathology (5 clean) + 10 CBC (3 clean). Dev 4: 2 histopathology planted, 1 CBC planted, 1 histopathology clean.
+23. Each planted report carries 1 to 3 planted errors, the owner's choice per report.
+24. Report briefs: the agent proposes all 34 in data/specs/dataset.json (brief_status proposed); the owner edits and marks each approved; the draft command refuses unapproved rows. Planned error types in the spec are the owner's plan and are never shown to the drafting model.
+25. Drafting: claude-haiku-5-5, one call per report, default temperature, prompts in prompts/drafting/ (outside the freeze); every call logged to data/drafts/_calls.jsonl with usage and cost, no content; cumulative cost gate $0.25 per run.
+26. `render` rewrites the Values text from cbc_values exactly as stored and never recomputes derived indices; derivation happens only at draft time, so a planted C2 error survives a re-render.
+27. Every histopathology Synoptic summary ends with the fixed line "Staging edition: AJCC 8th edition"; staging errors are judged against the stated edition.
+28. The drafting model's isolation (no taxonomy ids or names, no planned error types, no instruction to include errors) is enforced by a test over every spec row.
+29. Lint: ruff with the explicit rule set E, F, I, B; code is fixed, the rule list is not widened.
+30. The summary's `overrides` counts only non-default severities that carry a severity_reason.
+31. Two tracks from EVAL-02 onwards. Owner track: approve the spec, drafts (EVAL-02b), final taxonomy, planting, validation. Agent track: prompts and freeze (EVAL-03), harness (EVAL-04) and scorer with blind adjudication (EVAL-05), built against test fixtures and a fake client. The tracks meet at the dev run. Targets: PathQC prompt text by 12 Nov; dataset final 14 Nov; scored run 15 Nov; adjudication 16 Nov; write-up 16–17 Nov; application due 18 Nov.
 
 ## Error taxonomy (OWNER VERIFIED as draft; to be finalised before any error is planted)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -46,7 +56,7 @@ Severity: critical = would change patient management; major = would need an amen
 - C3 Missed critical finding: a critical value or finding with no flag, comment or recommendation. Critical.
 
 ## Section conventions for synthetic reports (OWNER VERIFIED)
-- Histopathology: Clinical details; Specimen; Gross description; Microscopic description; Immunohistochemistry (when used); Diagnosis; Synoptic summary (size, grade, margins, LVI, PNI, nodes, pT/pN); Comment.
+- Histopathology: Clinical details; Specimen; Gross description; Microscopic description; Immunohistochemistry (when used); Diagnosis; Synoptic summary (size, grade, margins, LVI, PNI, nodes, pT/pN, staging edition); Comment.
 - CBC: Values table (Hb, RBC, Hct, MCV, MCH, MCHC, RDW, WBC with differential % and absolute counts, platelets, MPV, each with reference range); Interpretation; Comment/recommendation.
 
 ## Working rules for the agent
@@ -57,11 +67,14 @@ Severity: critical = would change patient management; major = would need an amen
 - Only what the prompt asks; anything else goes under "Questions for the owner". Reverting own uncommitted edits is allowed but listed under Deviations.
 - Every command is run so that its exit code is visible and quoted in the report — in bash `cmd; echo "exit=$?"`, in PowerShell `cmd; "exit=$LASTEXITCODE"`. "Exit not captured" never appears in a report; re-run any command whose exit code was lost.
 - .venv/ is listed in .gitignore explicitly.
+- The owner may be editing files under data/specs/, data/drafts/ and data/reports/ while tasks run. Pre-flight "clean tree" means `git status --short` shows nothing outside those three folders; list whatever it shows inside them and do not open, edit, stage, revert or commit those files.
+- Never `git add -A` or `git add .`; stage by explicit path, and quote `git status --short` and `git diff --cached --stat` before every commit. Files of the owner's that the agent did not create in the task are never opened for editing, staged, reverted or committed.
 
 ## Open items
-- PENDING — Taxonomy finalised by the owner before planting (target: before EVAL-02 drafts are edited).
+- PENDING — Taxonomy finalised by the owner before any draft is edited (after EVAL-02b).
 - PENDING — PathQC prompt text supplied by the owner (for EVAL-03).
-- PENDING — Key added to `.env` by the owner immediately before EVAL-04.
+- PENDING — Key added to .env by the owner immediately before EVAL-02b (first API use).
+- PENDING — Owner approves every spec row before EVAL-02b.
 
 ## Task log
 | ID | Date | Title | Status | Label |
@@ -69,6 +82,7 @@ Severity: critical = would change patient management; major = would need an amen
 | Step 0 | 2026-11-04 | Repo, hygiene files, handoff | DONE | OWNER VERIFIED |
 | EVAL-01 | 2026-11-04 | Scaffold, schemas, taxonomy, validator | DONE | AGENT VERIFIED |
 | EVAL-01b | 2026-11-10 | Validator rules, CBC renderer, hygiene | DONE | AGENT VERIFIED |
+| EVAL-02 | 2026-11-10 | Dataset spec and drafting tool (dry run) | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

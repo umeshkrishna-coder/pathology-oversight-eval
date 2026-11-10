@@ -347,3 +347,31 @@ def test_summary_counts_overrides(tmp_path, histo, taxonomy):
     result = validate_reports(tmp_path, taxonomy)
     assert result.ok, result.failures
     assert "| overrides 1 | OK" in result.summary
+
+
+def test_summary_override_without_reason_counts_zero_and_fails(tmp_path, histo, taxonomy):
+    histo["errors"][0]["severity"] = "critical"  # H1 default is major; no severity_reason
+    _write(tmp_path, "H-001.json", histo)
+    result = validate_reports(tmp_path, taxonomy)
+    assert len(result.failures) == 1 and "severity_reason is empty" in result.failures[0]
+    assert "| overrides 0 | FAILED (1)" in result.summary
+
+
+# drafts mode relaxes exactly one rule
+
+
+def test_drafts_mode_skips_only_clean_control(histo, taxonomy):
+    histo["errors"] = []  # planted row before the owner plants anything
+    report = _report(histo)
+    assert check_clean_control(report, taxonomy)
+    assert check_report(report, taxonomy, drafts=True) == []
+    histo["sections"]["Addendum"] = "Extra."
+    assert check_report(_report(histo), taxonomy, drafts=True) == ["unknown section 'Addendum'"]
+
+
+def test_drafts_mode_summary_label(tmp_path, histo, taxonomy):
+    histo["errors"] = []
+    _write(tmp_path, "H-001.json", histo)
+    result = validate_reports(tmp_path, taxonomy, drafts=True)
+    assert result.ok, result.failures
+    assert result.summary.startswith("validate (drafts): 1 reports")

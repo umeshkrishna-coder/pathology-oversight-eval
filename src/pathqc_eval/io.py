@@ -1,4 +1,5 @@
-"""Report JSON reading and writing. write_report_json is the package's only JSON writer."""
+"""Report JSON reading and writing. write_report_json is the package's only JSON writer;
+append_jsonl is its only JSON Lines writer."""
 
 from __future__ import annotations
 
@@ -15,3 +16,10 @@ def write_report_json(path: Path | str, data: Any) -> None:
     """Indented UTF-8 JSON with LF line endings and exactly one trailing newline."""
     text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
     Path(path).write_text(text, encoding="utf-8", newline="\n")
+
+
+def append_jsonl(path: Path | str, record: dict[str, Any]) -> None:
+    """Append one compact JSON object as a line (UTF-8, LF)."""
+    line = json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+    with Path(path).open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(line)

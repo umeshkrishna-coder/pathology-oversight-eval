@@ -1,0 +1,35 @@
+{
+  "version": "0.1",
+  "source": "Adult reference intervals following the convention tabulated in Dacie and Lewis Practical Haematology (12th edition), converted to the fixed units of decision 18 (haematocrit as %, i.e. PCV x 100). MPV range follows common automated-analyser convention. Proposed by the agent; to be reviewed by the owner.",
+  "by_sex": {
+    "female": {
+      "Hb": {"low": 12.0, "high": 15.0},
+      "RBC": {"low": 3.8, "high": 4.8},
+      "Hct": {"low": 36.0, "high": 46.0}
+    },
+    "male": {
+      "Hb": {"low": 13.0, "high": 17.0},
+      "RBC": {"low": 4.5, "high": 5.5},
+      "Hct": {"low": 40.0, "high": 50.0}
+    }
+  },
+  "shared": {
+    "MCV": {"low": 83.0, "high": 101.0},
+    "MCH": {"low": 27.0, "high": 32.0},
+    "MCHC": {"low": 31.5, "high": 34.5},
+    "RDW": {"low": 11.6, "high": 14.0},
+    "WBC": {"low": 4.0, "high": 10.0},
+    "Neutrophils_pct": {"low": 40.0, "high": 80.0},
+    "Neutrophils_abs": {"low": 2.0, "high": 7.0},
+    "Lymphocytes_pct": {"low": 20.0, "high": 40.0},
+    "Lymphocytes_abs": {"low": 1.0, "high": 3.0},
+    "Monocytes_pct": {"low": 2.0, "high": 10.0},
+    "Monocytes_abs": {"low": 0.2, "high": 1.0},
+    "Eosinophils_pct": {"low": 1.0, "high": 6.0},
+    "Eosinophils_abs": {"low": 0.02, "high": 0.5},
+    "Basophils_pct": {"low": 0.0, "high": 2.0},
+    "Basophils_abs": {"low": 0.02, "high": 0.1},
+    "Platelets": {"low": 150.0, "high": 410.0},
+    "MPV": {"low": 7.5, "high": 11.5}
+  }
+}

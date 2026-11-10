@@ -2,3 +2,4 @@
 runs/*/calls.jsonl
 __pycache__/
 .venv/
+data/drafts/_failed/

@@ -160,6 +160,16 @@ def _default_severities(err: PlantedError, taxonomy: Taxonomy) -> list[str] | No
     return [defaults] if isinstance(defaults, str) else list(defaults)
 
 
+def _is_valid_override(err: PlantedError, taxonomy: Taxonomy) -> bool:
+    """Non-default severity that carries a non-empty severity_reason (decision 30)."""
+    defaults = _default_severities(err, taxonomy)
+    return (
+        defaults is not None
+        and err.severity not in defaults
+        and bool((err.severity_reason or "").strip())
+    )
+
+
 def check_severity(report: Report, taxonomy: Taxonomy) -> list[str]:
     reasons = []
     for err in report.errors:
@@ -194,9 +204,10 @@ RULES: tuple[Callable[[Report, Taxonomy], list[str]], ...] = (
 )
 
 
-def check_report(report: Report, taxonomy: Taxonomy) -> list[str]:
-    """Run every per-report rule; return all failure reasons."""
-    return [reason for rule in RULES for reason in rule(report, taxonomy)]
+def check_report(report: Report, taxonomy: Taxonomy, drafts: bool = False) -> list[str]:
+    """Run every per-report rule; return all failure reasons. Drafts skip check_clean_control."""
+    rules = [rule for rule in RULES if not (drafts and rule is check_clean_control)]
+    return [reason for rule in rules for reason in rule(report, taxonomy)]
 
 
 @dataclass
@@ -215,20 +226,19 @@ def _pydantic_reason(exc: ValidationError) -> str:
     return "; ".join(parts)
 
 
-def summarize(reports: list[Report], taxonomy: Taxonomy, failures: int) -> str:
+def summarize(
+    reports: list[Report], taxonomy: Taxonomy, failures: int, drafts: bool = False
+) -> str:
     modality = Counter(r.modality for r in reports)
     split = Counter(r.split for r in reports)
     clean = sum(r.is_clean_control for r in reports)
     by_type = Counter(err.type for r in reports for err in r.errors)
     type_counts = ", ".join(f"{tid} {by_type.get(tid, 0)}" for tid in taxonomy.type_ids())
-    overrides = 0
-    for r in reports:
-        for err in r.errors:
-            defaults = _default_severities(err, taxonomy)
-            overrides += defaults is not None and err.severity not in defaults
+    overrides = sum(_is_valid_override(err, taxonomy) for r in reports for err in r.errors)
     status = "OK" if failures == 0 else f"FAILED ({failures})"
+    label = "validate (drafts):" if drafts else "validate:"
     return (
-        f"validate: {len(reports)} reports | "
+        f"{label} {len(reports)} reports | "
         f"histopathology {modality['histopathology']}, cbc {modality['cbc']} | "
         f"dev {split['dev']}, scored {split['scored']} | "
         f"clean {clean}, planted {len(reports) - clean} | "
@@ -242,13 +252,17 @@ def validate_reports(
     expect: int | None = None,
     expect_clean: int | None = None,
     expect_dev: int | None = None,
+    drafts: bool = False,
 ) -> ValidationResult:
-    """Validate every *.json report in directory; counts are enforced only when given."""
+    """Validate every *.json report in directory; counts are enforced only when given.
+
+    drafts=True relaxes exactly one rule, check_clean_control: drafts start with errors [].
+    """
     directory = Path(directory)
     result = ValidationResult()
     if not directory.is_dir():
         result.failures.append(f"{directory}: folder not found")
-        result.summary = summarize([], taxonomy, len(result.failures))
+        result.summary = summarize([], taxonomy, len(result.failures), drafts)
         return result
 
     seen: dict[str, str] = {}
@@ -267,7 +281,7 @@ def validate_reports(
             seen[report.id] = path.name
         result.failures += [
             f"{path.name}: {reason.replace(FILE_PLACEHOLDER, str(path))}"
-            for reason in check_report(report, taxonomy)
+            for reason in check_report(report, taxonomy, drafts=drafts)
         ]
         result.reports.append(report)
 
@@ -280,5 +294,5 @@ def validate_reports(
         if expected is not None and actual != expected:
             result.failures.append(f"{directory}: expected {expected} {label}, found {actual}")
 
-    result.summary = summarize(result.reports, taxonomy, len(result.failures))
+    result.summary = summarize(result.reports, taxonomy, len(result.failures), drafts)
     return result
