@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 to S3 done.
+Run status: IN PROGRESS — S0 to S4 done.
 
 ## Part 1. Stages
 
@@ -13,6 +13,7 @@ Run status: IN PROGRESS — S0 to S3 done.
 | S1 EVAL-02c audit (EVAL-02c-fix) | PASS | cccad44 | 417 | 3 | 20 confirmed and fixed; 5 rejected with reasons |
 | S2 EVAL-H1 CLAUDE.md and harness decision | PASS | e85eeb3 | 417 | 2 | 1 fixed in the stage (decision wording); 6 settled in the record; 1 rejected |
 | S3 EVAL-02d drafting fixes and four redrafts | PASS | 2269b0d | 440 | 3 | 15 confirmed and fixed (tests first); 0 rejected |
+| S4 EVAL-02e taxonomy final 1.0 | PASS | eafc0f0 | 440 | 1 | 0 defects; 2 recorded (exit codes, plant guard); 2 rejected (out of scope) |
 
 ## Part 2. For the owner
 
@@ -32,6 +33,7 @@ Run status: IN PROGRESS — S0 to S3 done.
 3. CLAUDE.md's "Never" list is narrower than section A of the EVAL-N1 prompt. Compared rule by rule (S2 reviews): A1, tests may run the typed-word actions only in temporary folders with the fake client; A2, never "approve" owner content, and the category map and its approval are owner-only; A3, never run `plant` in its building form; A4, never "open" `.env`, and no secret in any file, log, commit or report; A6, never `git clean`, `git reset --hard` or `git stash drop`, and branch main only; A7, never weaken, skip, xfail or delete a test, never widen or narrow the ruff rule list (decision 29 covers only widening), no new dependencies; A8, nothing copied in from outside the repository. Section A binds this run; whether CLAUDE.md should carry these after the run is the owner's call [READ].
 4. CLAUDE.md says "Evaluation prompts and the taxonomy are the owner's words". prompts/plain.md and prompts/structured_output.md were written by the agent (EVAL-03) and are still "proposed" in prompts/manifest.json; the run treats them as owner-only content (A2) and never edits them (S2 review) [READ].
 5. CLAUDE.md says "Heads, test counts, spend and open items are read from `handoff.md`", but handoff.md has no place for commit heads or test counts (Part 5 item 3). The agent did not change handoff.md's format; they are in this report's Part 1. The owner may want a line or column for them in handoff.md (S2 review) [READ].
+6. The plain-condition isolation check (prompting.check_eval_isolation) looks for type ids, type names and severity definitions, but not for the type definitions, so a copied definition in prompts/plain.md would pass the freeze. Decision 4 says the plain condition never sees the taxonomy. Today's plain.md holds none (S4 review R2). Whether to extend the check is the owner's call [READ; RAN by R2].
 
 ## Part 5. Contradictions between this prompt and the repository, and how each was read
 
@@ -50,6 +52,7 @@ Run status: IN PROGRESS — S0 to S3 done.
 | S1 | — | 0 | 0 (no API path in S1; R3 checked each round) |
 | S2 | — | 0 | 0 (documents only) |
 | S3 | claude-haiku-5-5 | 4 | 0.004447 (data/drafts/_calls.jsonl lines 35–38: 0.001354 + 0.001758 + 0.000576 + 0.000759) |
+| S4 | — | 0 | 0 |
 
 ## Part 7. Stage records
 
@@ -741,12 +744,69 @@ handoff.md updated: yes
 === END ===
 ```
 
+### S4 — EVAL-02e: taxonomy final, version 1.0 — PASS
+
+Stage commit `eafc0f0` "EVAL-02e: taxonomy final, version 1.0", pushed; `git rev-parse HEAD` = `git ls-remote origin main` = eafc0f0450ae877844addda7704f4b6d96c97fb7 [RAN]. One review round (R1, R2, R3) [RAN].
+
+#### Checklist (7 items, all met)
+
+1. data/taxonomy.json: `version` "1.0", `status` "final", C2's definition exactly "MCV, MCH or MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; absolute counts inconsistent with WBC."; nothing else changed (R1's byte comparison: the JSON paths changed are /version, /status and /types[7]/definition only; LF, no BOM, same layout); tests/fixtures/taxonomy.json unchanged — **met** [RAN].
+2. The updated test is **tests/test_taxonomy.py::test_taxonomy_loads_with_nine_types**: it asserted status "draft" and version "0.1"; it now asserts "final", "1.0" and the exact C2 wording. Run on the unchanged file first, it failed (`AssertionError: assert 'draft' == 'final'`, 1 failed, 4 passed). No other test changed — **met** [RAN].
+3. handoff.md: heading "## Error taxonomy (OWNER VERIFIED, final, version 1.0, 2026-11-10)"; the C2 line carries the new wording; the open item "Taxonomy finalised by the owner before any draft is edited" removed; decision 41 "Taxonomy final as version 1.0. C2 now names MCV with MCH and MCHC." (header "29–41 on 2026-11-10") — **met** [RAN; R1].
+4. Stage commands — **met** [RAN]:
+   - `uv run pathqc-eval plant --check` — exit 1, the expected result while 25 planted reports have no [error] entry — plant --check: 9 OK, 25 with problems, 0 sheet problem(s); nothing written (9 OK, 25 "no planted errors yet"; identical to the output with the draft taxonomy, R1).
+   - `uv run pathqc-eval freeze --check` — exit 1 — `freeze --check: FAILED: data/prompts.lock.json does not exist`.
+5. Commit `EVAL-02e: taxonomy final, version 1.0` — **met** (eafc0f0) [RAN].
+6. Gate: `uv run pytest -q` exit 0, 440 passed; ruff check and format exit 0; explicit staging; push; remote = HEAD — **met** [RAN].
+7. No API call (data/drafts/_calls.jsonl unchanged, 38 lines); only the three stage files changed — **met** [RAN; R3].
+
+#### Review findings and triage
+
+| finding | verdict | action |
+|---|---|---|
+| The plain-condition isolation check looks for type ids, type names and severity definitions, not for type definitions, so a copied definition in the plain prompt would pass the freeze (R2 S5; pre-existing, not caused by S4) | REJECTED for S4: outside the stage (S4 allows no other test or code change) | Part 4 item 6 |
+| No test pins that nothing else in data/taxonomy.json changed, and a leftover duplicate "status" key would pass (R2 weak tests) | REJECTED: S4 allows exactly one test change; the one-off diff was verified byte by byte (R1) and the file has no duplicate keys (R2) | — |
+| With the taxonomy final, `pathqc-eval plant` in its building form is no longer refused, so section A3 ("nothing is written under data/reports/ tonight") now rests on never running it on the repository (R3 F1) | CONFIRMED (a hazard, not a defect) | Part 8 item 5; every later review keeps the rule "never run plant without --check or --init, nor freeze without --check, on the repository"; the end-to-end test (S7) runs them only in temporary trees |
+| The stage-command evidence lacked exit codes (R3 F2) | CONFIRMED | quoted above |
+
+#### Files changed (eafc0f0)
+
+```text
+--- git status --short
+M  data/taxonomy.json
+M  handoff.md
+M  tests/test_taxonomy.py
+--- git diff --cached --stat
+ data/taxonomy.json     | 6 +++---
+ handoff.md             | 8 ++++----
+ tests/test_taxonomy.py | 9 +++++++--
+ 3 files changed, 14 insertions(+), 9 deletions(-)
+```
+
+```text
+=== EVAL REPORT: EVAL-02e Taxonomy final, version 1.0 (EVAL-N1 S4) ===
+Status: DONE
+What was asked: set the taxonomy to final, version 1.0, with MCV added to C2's wording; update the one test that asserted the draft; record decision 41.
+What was done: three values changed in data/taxonomy.json [RAN]; test_taxonomy_loads_with_nine_types updated test-first [RAN]; handoff.md updated [RAN].
+Files changed: data/taxonomy.json — final 1.0, C2 wording; tests/test_taxonomy.py — the draft assertions now the final facts; handoff.md — heading, C2 line, open item, decision 41.
+Commands run: uv run pytest — 0 — 20 s — 440 passed; ruff check — 0; ruff format --check — 0; pathqc-eval plant --check — 1 (expected) — 9 OK, 25 no planted errors yet; pathqc-eval freeze --check — 1 — no lock exists.
+Checks: pytest 440 passed, 0 failed | ruff check and format clean
+Git: branch main; commit eafc0f0 "EVAL-02e: taxonomy final, version 1.0"; push ok; remote HEAD matches local HEAD: yes
+API spend this task: no API calls
+Deviations from the prompt: none.
+Claims I could not verify: none.
+Questions for the owner: Part 4 item 6 (plain isolation and type definitions).
+handoff.md updated: yes
+=== END ===
+```
+
 ## Part 8. Known weaknesses, and suggestions that were not acted on
 
 1. S1: `plant` stops with a traceback when an existing report file is read-only (pre-existing; nothing is damaged because the open fails before any truncation). Suggestion: catch OSError per report in write_outputs and list it NOT WRITTEN.
 2. S1: when a hand-edited draft's Values text does not match its numbers, the validator's advice names `render` on the unbuilt report path. Only reachable by editing a draft by hand (decision 37 forbids it).
 3. S1: the test that plant.py's only writer is write_outputs inspects the source (named write calls, no os/shutil imports); a snapshot test checks behaviour on the draft-error paths.
 4. Run procedure (S3 review R3 OF-4): until S3 the reviewers' instructions offered `$env:ANTHROPIC_API_KEY=''` for PowerShell, which in Windows PowerShell deletes the variable, so `cli.main`'s `load_dotenv` would load the key from `.env` into that process. No command the reviewers were allowed to run constructs a client, and data/drafts/_calls.jsonl shows no call other than the lead's (34 lines before S3, 38 after). From S3 on, reviewers run project code only in Git Bash with `ANTHROPIC_API_KEY= PYTHON_DOTENV_DISABLED=1`.
+5. Since S4 the taxonomy is final, so `pathqc-eval plant` in its building form is no longer refused. Section A3 (nothing written under data/reports/ tonight) now rests on never running it on the repository: every later stage uses `plant --check` or a temporary tree, and the reviewers' rules forbid bare `plant` and writing `freeze` on the repository (S4 review R3 F1).
 
 ## Part 9. EVAL report block
 
