@@ -1,0 +1,19 @@
+# H-001
+
+## Clinical details
+Synthetic test case. Lump noted on examination.
+
+## Specimen
+Wide local excision, left side.
+
+## Gross description
+Fatty tissue 40 x 30 x 20 mm with a firm lesion 18 mm across.
+
+## Microscopic description
+Sections show an invasive tumour. Tumour measures 25 mm.
+
+## Diagnosis
+Invasive tumour, grade 2.
+
+## Synoptic summary
+Size 18 mm; grade 2; margins clear; LVI absent; PNI absent; nodes 0/3; pT1c pN0.

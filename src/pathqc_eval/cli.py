@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections import Counter
 from datetime import date
 from pathlib import Path
 
@@ -21,6 +22,15 @@ from pathqc_eval.draft import (
 )
 from pathqc_eval.freeze import check_lock, freeze
 from pathqc_eval.io import read_report_json, write_report_json
+from pathqc_eval.plant import (
+    REPORTS_DIR,
+    SHEET_FILE,
+    check_lines,
+    plan,
+    template,
+    write_outputs,
+    write_readable,
+)
 from pathqc_eval.render import render_cbc_values
 from pathqc_eval.schema import CBCValues
 from pathqc_eval.spec import DEFAULT_SPEC_PATH, DatasetSpec, load_spec, spec_summary
@@ -33,6 +43,8 @@ CLIENT_FACTORY = AnthropicDraftClient
 FREEZE_ROOT = REPO_ROOT
 # Replaced in tests with a temporary spec, so tests never depend on the owner's approvals.
 SPEC_PATH = DEFAULT_SPEC_PATH
+# Replaced in tests with a temporary tree (spec, taxonomy, drafts, sheet, reports).
+PLANT_ROOT = REPO_ROOT
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -68,6 +80,20 @@ def _build_parser() -> argparse.ArgumentParser:
     mode = freeze_cmd.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true", help="verify every hash against the lock")
     mode.add_argument("--replace", action="store_true", help="overwrite an existing lock")
+
+    readable = sub.add_parser(
+        "readable", help="write <folder>/_readable/<id>.md for each report JSON in a folder"
+    )
+    readable.add_argument("path", type=Path, help="folder of report files, e.g. data/drafts")
+
+    plant = sub.add_parser(
+        "plant", help="apply data/specs/planting.md to the drafts and write data/reports/"
+    )
+    plant_mode = plant.add_mutually_exclusive_group()
+    plant_mode.add_argument("--init", action="store_true", help="write the empty template sheet")
+    plant_mode.add_argument(
+        "--check", action="store_true", help="parse and apply in memory; write nothing"
+    )
     return parser
 
 
@@ -175,6 +201,59 @@ def _draft(args: argparse.Namespace) -> int:
     return 1 if summary.failed or summary.stopped_before else 0
 
 
+def _plant(args: argparse.Namespace) -> int:
+    root = PLANT_ROOT
+    taxonomy = load_taxonomy(root / "data" / "taxonomy.json")
+    spec = load_spec(root / "data" / "specs" / "dataset.json", taxonomy)
+    sheet = root / SHEET_FILE
+    if args.init:
+        if sheet.exists():
+            print(f"plant --init refused: {SHEET_FILE.as_posix()} already exists")
+            return 1
+        sheet.write_text(template(spec.reports), encoding="utf-8", newline="\n")
+        print(f"wrote {SHEET_FILE.as_posix()} | {len(spec.reports)} blocks, all verified: no")
+        return 0
+    if not sheet.is_file():
+        print(f"FAIL {SHEET_FILE.as_posix()} not found; run: uv run pathqc-eval plant --init")
+        return 1
+    if not args.check and taxonomy.status != "final":
+        print(
+            f"plant refused: taxonomy status is '{taxonomy.status}', not 'final' "
+            "(plant --check works with a draft taxonomy)"
+        )
+        return 1
+    run = plan(spec.reports, sheet.read_text(encoding="utf-8"), root, taxonomy)
+    ok_count = sum(r.ok for r in run.results)
+    if args.check:
+        for line in check_lines(run):
+            print(line)
+        print("notices:" if run.notices else "notices: none")
+        for notice in run.notices:
+            print(f"  {notice}")
+        print(
+            f"plant --check: {ok_count} OK, {len(run.results) - ok_count} with problems, "
+            f"{len(run.problems)} sheet problem(s); nothing written"
+        )
+        return 0 if run.ok else 1
+    for line in write_outputs(run, root):
+        print(line)
+    result = validate_reports(root / REPORTS_DIR, taxonomy)
+    print(result.summary)
+    print("planted error types (scored / dev / total):")
+    scored = Counter(e.type for r in result.reports if r.split == "scored" for e in r.errors)
+    dev = Counter(e.type for r in result.reports if r.split == "dev" for e in r.errors)
+    for tid in taxonomy.type_ids():
+        print(f"  {tid:<3} {scored[tid]:>2} / {dev[tid]:>2} / {scored[tid] + dev[tid]:>2}")
+    s_total, d_total = sum(scored.values()), sum(dev.values())
+    print(f"  all {s_total:>2} / {d_total:>2} / {s_total + d_total:>2}")
+    print("notices:" if run.notices else "notices: none")
+    for notice in run.notices:
+        print(f"  {notice}")
+    verified = sum(r.provenance.verified for r in result.reports)
+    print(f"verified: {verified} of {len(result.reports)} reports in {REPORTS_DIR.as_posix()}")
+    return 0 if run.ok else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     load_dotenv(override=False)
     if hasattr(sys.stdout, "reconfigure"):
@@ -203,6 +282,13 @@ def main(argv: list[str] | None = None) -> int:
         return _spec_check(args.path)
     if args.command == "draft":
         return _draft(args)
+    if args.command == "readable":
+        lines, ok = write_readable(args.path)
+        for line in lines:
+            print(line)
+        return 0 if ok else 1
+    if args.command == "plant":
+        return _plant(args)
     if args.command == "freeze":
         outcome = check_lock(FREEZE_ROOT) if args.check else freeze(FREEZE_ROOT, args.replace)
         for line in outcome.lines:

@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-10 by agent (EVAL-02b)
+Last updated: 2026-11-10 by agent (EVAL-02c)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
 
 ## Purpose
@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–36 on 2026-11-10)
+## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–37 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -47,6 +47,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 34. Omission errors (amends decision 8): a planted error may be `kind: "omission"`. It quotes an anchor sentence that exists in the report: for CBC, the Values line carrying the number concerned; for histopathology, the Synoptic line next to where the missing element belongs (or the Diagnosis line if none). An omission is detected automatically when the mapped type matches and the finding's section equals the anchor's section; sentence overlap is not required. A finding in the same report with the matching type but another section goes to the owner's blind adjudication.
 35. Structured condition (amends decision 13): histopathology reports use the owner's PathQC text verbatim, then the histopathology taxonomy, then the output block. CBC reports use a short CBC review checklist written by the owner, then the CBC taxonomy, then the output block. The plain condition uses one prompt for both modalities.
 36. Drafting (amends decision 25): reasoning effort high; cumulative cost gate $0.50 per run.
+37. Planting is done through data/specs/planting.md, written by the owner. `pathqc-eval plant` applies it deterministically to the drafts and writes data/reports/; drafts are never edited; reports are never edited by hand; no model takes part. The sheet is published with the dataset as the record of what was planted. The tool refuses to build while the taxonomy status is not "final".
 
 ## Error taxonomy (OWNER VERIFIED as draft; to be finalised before any error is planted)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -90,6 +91,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-03 | 2026-11-10 | Prompts, message assembly, freeze | DONE | AGENT VERIFIED |
 | EVAL-02a | 2026-11-10 | Owner's spec approval recorded (0 edits) | DONE | OWNER VERIFIED |
 | EVAL-02b | 2026-11-10 | 34 drafts (Haiku 5.5, high effort) | DONE ($0.0480 measured) | AGENT VERIFIED |
+| EVAL-02c | 2026-11-10 | Planting sheet tool | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

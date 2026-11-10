@@ -3,3 +3,5 @@ runs/*/calls.jsonl
 __pycache__/
 .venv/
 data/drafts/_failed/
+data/drafts/_readable/
+data/reports/_review/
