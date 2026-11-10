@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 to S2 done.
+Run status: IN PROGRESS — S0 to S3 done.
 
 ## Part 1. Stages
 
@@ -12,6 +12,7 @@ Run status: IN PROGRESS — S0 to S2 done.
 | S0 pre-flight | PASS | none (no commit of its own) | 353 | — | — |
 | S1 EVAL-02c audit (EVAL-02c-fix) | PASS | cccad44 | 417 | 3 | 20 confirmed and fixed; 5 rejected with reasons |
 | S2 EVAL-H1 CLAUDE.md and harness decision | PASS | e85eeb3 | 417 | 2 | 1 fixed in the stage (decision wording); 6 settled in the record; 1 rejected |
+| S3 EVAL-02d drafting fixes and four redrafts | PASS | 2269b0d | 440 | 3 | 15 confirmed and fixed (tests first); 0 rejected |
 
 ## Part 2. For the owner
 
@@ -39,6 +40,7 @@ Run status: IN PROGRESS — S0 to S2 done.
 3. CLAUDE.md (S2, copied verbatim) says "Heads, test counts, spend and open items are read from `handoff.md`", but handoff.md holds no commit heads and no test counts; they are in this report (Part 1). Following CLAUDE.md's own rule ("report that first and change nothing"), the agent changed neither file's format and listed it for the owner (Part 4 item 5) [READ].
 4. CLAUDE.md says "bare `python` is not on PATH". A `python` is on PATH, but it is the Windows Store alias that only prints "Python was not found" (exit 49, S0). There is no working bare interpreter, so the instruction holds in effect; recorded rather than changed, since the text is verbatim [RAN].
 5. S9 item 3 asks handoff.md to receive "the decision from the top of this prompt about this run (next free number, OWNER VERIFIED, 2026-11-10)". That is owner decision 1, which S2 recorded as decision 38. Read as already met: S9 will not add a duplicate (S2 review R3 OF-5) [READ].
+6. S3 step 8 asks for "every sentence or line containing the word \"stage\" other than the fixed staging-edition line". Excluding that line only makes sense if "staging" counts, so Table B also lists sentences with "staging" (four more rows; a superset of the literal reading). The table is for the owner to check each stage group (S3 review R3 OF-1) [READ; RAN].
 
 ## Part 6. API spend, per stage, from the logs
 
@@ -47,6 +49,7 @@ Run status: IN PROGRESS — S0 to S2 done.
 | S0 | — | 0 | 0 |
 | S1 | — | 0 | 0 (no API path in S1; R3 checked each round) |
 | S2 | — | 0 | 0 (documents only) |
+| S3 | claude-haiku-5-5 | 4 | 0.004447 (data/drafts/_calls.jsonl lines 35–38: 0.001354 + 0.001758 + 0.000576 + 0.000759) |
 
 ## Part 7. Stage records
 
@@ -442,11 +445,308 @@ handoff.md updated: yes
 === END ===
 ```
 
+### S3 — EVAL-02d: drafting instructions corrected; four reports drafted again — PASS
+
+Stage commit `2269b0d` "EVAL-02d: drafting instructions corrected; four reports drafted again", pushed; `git rev-parse HEAD` = `git ls-remote origin main` = 2269b0d808b1dffe60722695ec8d7a1370d41775 [RAN]. Three review rounds (R1, R2, R3 each) [RAN]. API: 4 calls to claude-haiku-5-5, $0.004447 by the call log (section B: at most 8 calls, estimate $0.01, hard stop $0.10) [RAN].
+
+#### Checklist (14 items, all met)
+
+1. prompts/drafting/histopathology.md gains the two Rules lines word for word, at the end of the Rules list — **met** [RAN; checked byte for byte by R1].
+2. prompts/drafting/cbc.md gains the Rules line word for word — **met** [RAN; R1].
+3. The CBC user message ends, after the brief and a blank line, with `Reference ranges (adult <sex>):` and one `<label>: <low>–<high> <unit>` line per analyte in CBCValues order, read from data/specs/cbc_reference_ranges.json for the row's sex (src/pathqc_eval/draft.py `reference_ranges_block`, `user_message`); labels, decimals and units are those of the Values text, and a bound those decimals would round is printed in full. The 23 histopathology user messages are byte-identical to before; each of the 11 CBC messages is the old message plus the block for its own sex — **met** [RAN; R1, R3].
+4. Tests: exact-text tests for a female and a male CBC message, a test that each row carries its own sex's ranges and not the other's, the dry-run test now asserts the ranges block, and tests/test_isolation.py is unchanged and passes for all 34 rows (68 cases) — **met** [RAN].
+5. `uv run pathqc-eval draft --dry-run` — exit 0 — both prompts are below [RAN].
+6. `uv run pathqc-eval draft --ids H-009,H-021,C-008,C-009 --force --cost-gate 0.10` — exit 0 — the four drafts overwritten; the earlier versions stay in git history (83ae954) [RAN].
+7. Checks by script, no draft edited — all pass; `uv run pathqc-eval validate --drafts data/drafts` — exit 0 — 34 reports OK. No redraft was needed [RAN].
+8. Report-only tables below (Table B also lists sentences with "staging"; Part 5 item 6) — **met** [RAN].
+9. S1 passed, so `uv run pathqc-eval readable data/drafts` was run again — exit 0 — 34 files written [RAN].
+10. handoff.md decision 40, the stage's text word for word, under the next free number (header now "29–40 on 2026-11-10") — **met** [RAN; R1].
+11. Commit `EVAL-02d: drafting instructions corrected; four reports drafted again` with the code, the tests, the two drafting prompts, the four drafts, data/drafts/_calls.jsonl and handoff.md — **met** (2269b0d) [RAN].
+12. Section B: claude-haiku-5-5 only, drafting calls only, exactly H-009, H-021, C-008 and C-009, 4 calls (limit 8), $0.004447 (hard stop $0.10; the prompt's estimate $0.01; the tool's own estimate for the four rows $0.0165), ANTHROPIC_INFERENCE_GEO not set in the environment and not in `.env` (checked by name) — **met** [RAN].
+13. Owner-editable areas: only the two drafting prompts, the four named drafts, data/drafts/_calls.jsonl (4 lines appended) and the gitignored data/drafts/_readable/ changed; data/specs/cbc_reference_ranges.json and the other 30 drafts are unchanged — **met** [RAN; R1, R3].
+14. Run gate: tests that failed on the old code are kept (below); pytest 440 passed, exit 0; ruff check and format exit 0; explicit staging; status and cached stat quoted; push; remote = HEAD — **met** [RAN].
+
+#### Step 5: `uv run pathqc-eval draft --dry-run` (exit 0) — both drafting prompts [RAN]
+
+```text
+DRY RUN: no client is constructed and no API call is made.
+===== H-001 system prompt (prompts/drafting/histopathology.md) =====
+You write synthetic histopathology reports for an evaluation dataset. Each report is fictional and describes no real patient.
+
+Rules
+- Do not include any patient name, date, hospital number, laboratory number or other identifier, and do not name any hospital, laboratory or doctor.
+- The report must be complete, internally consistent and error-free. Every figure (tumour size, grade, lymph node counts, margin distances, depth of invasion, pT and pN) must be identical wherever it appears.
+- Write in the house style of a tertiary-care cancer centre in India, using British spelling.
+- Stage according to the AJCC Cancer Staging Manual, 8th edition, for the site.
+- Length: 250 to 450 words in total.
+- Use the pT and pN categories exactly as the brief states them. Do not change them and do not discuss how they were chosen.
+- Do not state a stage group, a FIGO stage, a risk category or a prognostic group unless the brief gives one.
+
+Sections, in this order and with exactly these names:
+1. Clinical details
+2. Specimen
+3. Gross description
+4. Microscopic description
+5. Immunohistochemistry (include this section only when the brief calls for immunohistochemistry)
+6. Diagnosis
+7. Synoptic summary
+8. Comment (optional)
+
+The Synoptic summary has one element per line, in this order, each written as "Element: value":
+Tumour size: ...
+Histologic grade: ...
+Margins: ...
+Lymphovascular invasion: ...
+Perineural invasion: ...
+Lymph nodes (positive/total): ...
+pT: ...
+pN: ...
+Staging edition: AJCC 8th edition
+
+The last line of the Synoptic summary is always exactly "Staging edition: AJCC 8th edition", even when pT and pN read "Not applicable". Write "Not applicable" for any element that does not apply to the specimen.
+
+Output: return only a JSON object, with no text before or after it. Its keys are the section names above and its values are the section text as plain text (no Markdown). Use \n for line breaks inside a value.
+===== H-001 user message =====
+Specimen type: Breast, left modified radical mastectomy with axillary dissection
+Patient: female, 52 years
+Brief: A 52-year-old woman with a palpable left breast lump underwent modified radical mastectomy with level I-II axillary dissection after a core biopsy showed carcinoma. The report describes invasive breast carcinoma of no special type, Nottingham grade 2, 32 mm in greatest dimension, with metastatic carcinoma in 3 of 14 axillary lymph nodes and no extranodal extension. All margins are free, the closest being the deep margin at 6 mm; lymphovascular invasion is present and perineural invasion absent; pT2 pN1a.
+===== C-001 system prompt (prompts/drafting/cbc.md) =====
+You write synthetic complete blood count (CBC) reports for an evaluation dataset. Each report is fictional and describes no real patient.
+
+Rules
+- Do not include any patient name, date, identifier, hospital, laboratory or doctor.
+- The values and the text must be complete, internally consistent and error-free, and must match the brief.
+- The patient is an adult. Write in the house style of a tertiary-care hospital laboratory in India, using British spelling.
+- The user message lists the reference range of every value. Unless the brief says otherwise, choose values so that each one, including every absolute count the tool will derive (WBC x percentage / 100), lies inside its range.
+
+Output: return only a JSON object, with no text before or after it, with these keys:
+
+"primary": an object with exactly these numeric fields, in these units:
+- Hb (g/dL), RBC (x10^12/L), Hct (%), RDW (%), WBC (x10^9/L)
+- Neutrophils_pct, Lymphocytes_pct, Monocytes_pct, Eosinophils_pct, Basophils_pct (percent of white cells; the five must sum to 100)
+- Platelets (x10^9/L), MPV (fL)
+
+Do not include MCV, MCH, MCHC or absolute counts. The tool computes them from your values:
+- MCV (fL) = Hct / RBC x 10
+- MCH (pg) = Hb / RBC x 10
+- MCHC (g/dL) = Hb / Hct x 100
+- absolute count (x10^9/L) = WBC x percentage / 100
+
+Choose Hb, RBC and Hct together so that these formulas give the red-cell indices the brief intends.
+
+"interpretation": 3 to 6 sentences of plain text, consistent with the numbers and the brief.
+
+"comment": optional plain text. It is required when the brief says a critical value is present: it must then name the critical value, flag it as critical and give a recommendation.
+===== C-001 user message =====
+Scenario: Severe iron deficiency anaemia
+Patient: female, 34 years
+Brief: A 34-year-old woman with menorrhagia, fatigue and breathlessness on exertion. Severe microcytic hypochromic anaemia with haemoglobin about 6.2 g/dL, MCV in the low 60s fL, a raised RDW and a reactive platelet count near 480 x10^9/L; white cells normal. Haemoglobin is at a critical level, so the comment must flag it and recommend urgent clinical review and iron studies.
+
+Reference ranges (adult female):
+Hb: 12.0–15.0 g/dL
+RBC: 3.80–4.80 x10^12/L
+Hct: 36.0–46.0 %
+MCV: 83.0–101.0 fL
+MCH: 27.0–32.0 pg
+MCHC: 31.5–34.5 g/dL
+RDW: 11.6–14.0 %
+WBC: 4.00–10.00 x10^9/L
+Neutrophils %: 40.0–80.0 %
+Neutrophils absolute: 2.00–7.00 x10^9/L
+Lymphocytes %: 20.0–40.0 %
+Lymphocytes absolute: 1.00–3.00 x10^9/L
+Monocytes %: 2.0–10.0 %
+Monocytes absolute: 0.20–1.00 x10^9/L
+Eosinophils %: 1.0–6.0 %
+Eosinophils absolute: 0.02–0.50 x10^9/L
+Basophils %: 0.0–2.0 %
+Basophils absolute: 0.02–0.10 x10^9/L
+Platelets: 150–410 x10^9/L
+MPV: 7.5–11.5 fL
+Estimate: 34 rows × ~1,200 input + ~8,000 output tokens at Haiku prices = $0.1401
+```
+
+#### Step 6: `uv run pathqc-eval draft --ids H-009,H-021,C-008,C-009 --force --cost-gate 0.10` (exit 0) [RAN]
+
+```text
+  H-009 attempt 1: $0.0014; running $0.0014
+H-009 | Cervix, radical hysterectomy with pelvic lymphadenectomy | 264 words
+  H-021 attempt 1: $0.0018; running $0.0031
+H-021 | Testis, right radical inguinal orchidectomy | 261 words
+  C-008 attempt 1: $0.0006; running $0.0037
+C-008 | Normal blood count at a pre-employment check | 193 words | MCV 89 MCH 29.7 MCHC 33.3 | notes: none
+  C-009 attempt 1: $0.0008; running $0.0044
+C-009 | Near-normal count with mild eosinophilia | 216 words | MCV 88.9 MCH 29.9 MCHC 33.6 | notes: none
+total cost $0.0044
+```
+
+The four lines appended to data/drafts/_calls.jsonl (the spend source) [RAN]:
+
+```text
+{"timestamp":"2026-11-10T21:28:40+00:00","id":"H-009","model":"claude-haiku-5-5","input_tokens":914,"output_tokens":2525,"cost_usd":0.001354,"stop_reason":"end_turn","duration_s":11.26,"attempt":1}
+{"timestamp":"2026-11-10T21:28:55+00:00","id":"H-021","model":"claude-haiku-5-5","input_tokens":889,"output_tokens":3339,"cost_usd":0.001758,"stop_reason":"end_turn","duration_s":14.37,"attempt":1}
+{"timestamp":"2026-11-10T21:28:59+00:00","id":"C-008","model":"claude-haiku-5-5","input_tokens":1205,"output_tokens":911,"cost_usd":0.000576,"stop_reason":"end_turn","duration_s":4.19,"attempt":1}
+{"timestamp":"2026-11-10T21:29:05+00:00","id":"C-009","model":"claude-haiku-5-5","input_tokens":1228,"output_tokens":1272,"cost_usd":0.000759,"stop_reason":"end_turn","duration_s":5.75,"attempt":1}
+```
+
+#### Step 7: checks by script, and the validator [RAN]
+
+```text
+PASS H-009 Synoptic has the line 'pT: pT1b1'
+PASS H-009 'pT1b2' in no section
+PASS H-009 'IIIC' in no section
+PASS H-009 'FIGO' in no section
+PASS H-021 Synoptic has the line 'pT: pT1b'
+PASS H-021 no sentence says pT1 is not subdivided
+PASS C-008 every analyte inside its range
+PASS C-009 inside its range except Eosinophils_pct and Eosinophils_abs -- Eosinophils_pct 9 % (ref 1-6); Eosinophils_abs 0.65 x10^9/L (ref 0.02-0.5)
+PASS C-009 Eosinophils_pct and Eosinophils_abs are the analytes outside (brief: eosinophilia) -- Eosinophils_pct 9 % (ref 1-6); Eosinophils_abs 0.65 x10^9/L (ref 0.02-0.5)
+```
+
+`uv run pathqc-eval validate --drafts data/drafts` — exit 0:
+
+```text
+validate (drafts): 34 reports | histopathology 23, cbc 11 | dev 4, scored 30 | clean 9, planted 25 | errors by type: H1 0, H2 0, H3 0, H4 0, H5 0, H6 0, C1 0, C2 0, C3 0 | overrides 0 | omissions 0 | OK
+```
+
+The redrafted H-009 says `pT: pT1b1` and states no stage group; its Comment reads "Correlation with the clinical staging and multidisciplinary review is recommended." The redrafted H-021 says `pT: pT1b` and has no Comment section [READ].
+
+#### Step 8: report-only tables (nothing changed) [RAN]
+
+Table A: the 11 CBC drafts, every analyte outside its reference range (value, unit, range).
+
+| report | analytes outside their range |
+|---|---|
+| C-001 | Hb 6.2 g/dL (ref 12-15); RBC 3.56 x10^12/L (ref 3.8-4.8); Hct 22.1 % (ref 36-46); MCV 62.1 fL (ref 83-101); MCH 17.4 pg (ref 27-32); MCHC 28.1 g/dL (ref 31.5-34.5); RDW 21.4 % (ref 11.6-14); Platelets 480 x10^9/L (ref 150-410) |
+| C-002 | Hb 12.8 g/dL (ref 13-17); Hct 38.4 % (ref 40-50); WBC 48 x10^9/L (ref 4-10); Neutrophils_pct 12 % (ref 40-80); Lymphocytes_pct 82 % (ref 20-40); Lymphocytes_abs 39.36 x10^9/L (ref 1-3); Monocytes_abs 1.92 x10^9/L (ref 0.2-1); Basophils_abs 0.48 x10^9/L (ref 0.02-0.1) |
+| C-003 | Platelets 12 x10^9/L (ref 150-410); MPV 11.8 fL (ref 7.5-11.5) |
+| C-004 | Hb 7.8 g/dL (ref 13-17); RBC 2 x10^12/L (ref 4.5-5.5); Hct 23.6 % (ref 40-50); MCV 118 fL (ref 83-101); MCH 39 pg (ref 27-32); RDW 18.5 % (ref 11.6-14); WBC 3.2 x10^9/L (ref 4-10); Neutrophils_abs 1.76 x10^9/L (ref 2-7); Monocytes_abs 0.19 x10^9/L (ref 0.2-1); Platelets 110 x10^9/L (ref 150-410) |
+| C-005 | Hb 11.4 g/dL (ref 12-15); Hct 34 % (ref 36-46); WBC 0.9 x10^9/L (ref 4-10); Neutrophils_pct 22 % (ref 40-80); Neutrophils_abs 0.2 x10^9/L (ref 2-7); Lymphocytes_pct 64 % (ref 20-40); Lymphocytes_abs 0.58 x10^9/L (ref 1-3); Monocytes_abs 0.09 x10^9/L (ref 0.2-1); Basophils_abs 0.01 x10^9/L (ref 0.02-0.1); Platelets 95 x10^9/L (ref 150-410) |
+| C-006 | WBC 18.6 x10^9/L (ref 4-10); Neutrophils_pct 86 % (ref 40-80); Neutrophils_abs 16 x10^9/L (ref 2-7); Lymphocytes_pct 7 % (ref 20-40); Basophils_abs 0.19 x10^9/L (ref 0.02-0.1) |
+| C-007 | Hb 20.4 g/dL (ref 13-17); RBC 6.8 x10^12/L (ref 4.5-5.5); Hct 61 % (ref 40-50); WBC 11.8 x10^9/L (ref 4-10); Neutrophils_abs 8.73 x10^9/L (ref 2-7); Lymphocytes_pct 16 % (ref 20-40); Basophils_abs 0.12 x10^9/L (ref 0.02-0.1); Platelets 520 x10^9/L (ref 150-410) |
+| C-008 | none |
+| C-009 | Eosinophils_pct 9 % (ref 1-6); Eosinophils_abs 0.65 x10^9/L (ref 0.02-0.5) |
+| C-010 | Hb 11.2 g/dL (ref 12-15); RBC 5.6 x10^12/L (ref 3.8-4.8); Hct 35.8 % (ref 36-46); MCV 63.9 fL (ref 83-101); MCH 20 pg (ref 27-32); MCHC 31.3 g/dL (ref 31.5-34.5) |
+| C-011 | WBC 2.8 x10^9/L (ref 4-10); Neutrophils_abs 1.26 x10^9/L (ref 2-7); Lymphocytes_pct 44 % (ref 20-40); Platelets 38 x10^9/L (ref 150-410) |
+
+Table B: the 23 histopathology drafts, every sentence or line containing "stage" or "staging", except the fixed line "Staging edition: AJCC 8th edition" (case-insensitive). Rows marked with a sentence that has only "staging" are the four added after review (H-001, H-009, H-014 and H-022's second Comment sentence).
+
+| report | section | sentence |
+|---|---|---|
+| H-001 | Diagnosis | "Pathological prognostic stage cannot be assigned until oestrogen receptor, progesterone receptor and HER2 status are available." |
+| H-001 | Comment | "Oestrogen receptor, progesterone receptor and HER2 status should be requested on the invasive component to complete pathological prognostic staging and to guide systemic therapy." |
+| H-002 | Comment | "pT3 pN1b corresponds to AJCC 8th edition stage group IIIB for carcinoma of the caecum." |
+| H-003 | Comment | "The pathological stage is I (pT2 pN0) according to the AJCC 8th edition." |
+| H-004 | Comment | "The pathological stage is pT3 pN2." |
+| H-004 | Comment | "Assuming M0 on clinical assessment, this corresponds to pathological prognostic stage IIIA under the AJCC 8th edition staging system for gastric carcinoma." |
+| H-005 | Diagnosis | "Pathological stage (AJCC 8th edition): pT2 pN1, stage group III." |
+| H-006 | Diagnosis | "Pathological stage (AJCC 8th edition, patient under 55 years): pT2 pN1a, stage I." |
+| H-006 | Diagnosis | "The M category is not assessed on this specimen; stage I assumes M0." |
+| H-007 | Comment | "Pathological stage group I (pT1b pN0), assuming M0 on clinical assessment." |
+| H-008 | Diagnosis | "- Pathological stage IA according to AJCC 8th edition." |
+| H-008 | Comment | "Low-grade endometrioid histology with no lymphovascular invasion and negative nodes indicates an early-stage tumour." |
+| H-009 | Comment | "Correlation with the clinical staging and multidisciplinary review is recommended." |
+| H-010 | Diagnosis | "Pathological stage group IA3 (AJCC 8th edition)." |
+| H-011 | Comment | "The AJCC 8th edition does not provide a stage for lymphoma, so pT and pN are recorded as not applicable." |
+| H-011 | Comment | "Clinical (Ann Arbor) stage should be assigned by the treating team after imaging and bone marrow assessment, with reference to the Lugano classification." |
+| H-012 | Comment | "Regional nodal status was not assessed, so a pathological stage group cannot be assigned." |
+| H-013 | Comment | "If a lung primary is confirmed, the multiple hepatic metastases would correspond to M1c and stage IVB under AJCC 8th edition." |
+| H-014 | Comment | "In AJCC 8th edition staging of gastric GIST, the T category is assigned by tumour size." |
+| H-015 | Diagnosis | "Pathological staging: pT1c pN0(sn), pathological prognostic stage IA." |
+| H-016 | (none) | |
+| H-017 | (none) | |
+| H-018 | Diagnosis | "Pathological stage (AJCC 8th edition): IA (pT1a pN0)." |
+| H-018 | Comment | "The tumour is confined to one ovary with an intact capsule, an uninvolved ovarian surface and negative peritoneal washings, which corresponds to stage IA." |
+| H-019 | Diagnosis | "AJCC 8th edition stage IIA (pT2a pN0 M not assessed in this specimen)." |
+| H-019 | Comment | "Clinical correlation with imaging for metastatic disease is advised, as M stage cannot be assessed from this specimen." |
+| H-020 | Comment | "Pathological stage group IIIA (AJCC 8th edition, squamous cell carcinoma, pT3 pN1)." |
+| H-021 | (none) | |
+| H-022 | Comment | "Pathological stage group IIB (pT2 pN1; M category not assessed in this specimen), AJCC 8th edition." |
+| H-022 | Comment | "Clinical correlation is advised for any further staging and for adjuvant treatment planning at the multidisciplinary meeting." |
+| H-023 | (none) | |
+
+#### Review findings, triage and fixes
+
+| round | finding | verdict | action |
+|---|---|---|---|
+| 1 | Range bounds were printed with the Values decimals, so a stored bound such as 0.015 or 150.5 would be rounded into a wider range (R2 M06; latent: all 80 bounds of the current file print exactly) | CONFIRMED | test_reference_ranges_block_prints_each_stored_bound_exactly failed first → `_bound` prints a bound in full when the decimals would round it; the dry-run output stayed byte-identical |
+| 1 | The ranges loader accepted NaN, infinities, true/false and text as bounds (R2 M09) | CONFIRMED | test_reference_ranges_refuse_a_bound_that_is_not_a_finite_number and test_reference_ranges_file_with_nan_is_refused failed first → cbc.Range refuses them |
+| 1 | Three weak tests (R2): run_drafts tested with the default ranges; the sex test checked only low bounds; the default-path test compared the loader with itself | CONFIRMED | strengthened (invented ranges, a full male block, a direct read of the file); R2's surviving mutants A, B, C and G now killed |
+| 1 | Table B left out sentences with "staging" (R3 OF-1) | CONFIRMED | Table B regenerated; Part 5 item 6 |
+| 1 | No failing-first output for the drafting-message change (R3 OF-2) | CONFIRMED | kept: on HEAD's code the new tests fail at import (`cannot import name 'reference_ranges_block'`); R3's shim run gave 7 failed |
+| 1 | Command lines and exit codes missing from the evidence (R3 OF-3) | CONFIRMED | quoted in this record |
+| 1 | The reviewers' PowerShell instruction (`$env:ANTHROPIC_API_KEY=''`) deletes the variable in Windows PowerShell, so `.env` would load (R3 OF-4) | CONFIRMED | reviewer instructions changed: project code only in Git Bash with `ANTHROPIC_API_KEY= PYTHON_DOTENV_DISABLED=1`; checked that no reviewer made a call (data/drafts/_calls.jsonl has exactly 34 + 4 lines) |
+| 2 | An integer too large for a float raised OverflowError instead of a validation error (R2 C3; a regression from round 1) | CONFIRMED | the 10**400 cases failed first → the validator converts with float() and refuses on OverflowError |
+| 2 | The finite-number test's match also accepted the old ordering error, so 3 cases never exercised the new rule; False untested (R2, R3 F1) | CONFIRMED | match narrowed to the refusal message; every case keeps low <= high; False and an oversized integer added |
+| 2 | The exact-bound test covered only low bounds with one extra decimal; the sex test checked only low bounds (R2 M3, M4, M5) | CONFIRMED | high bounds and bounds with several extra decimals added; each sex's exact Hb, RBC and Hct lines pinned; mutants M2–M7 killed |
+| 3 | An integer longer than Python will print gave Python's own limit message instead of the refusal (R2 V05) | CONFIRMED | test_reference_ranges_refuse_an_integer_too_long_to_print failed first → the refusal text is built safely |
+| 3 | No test pinned that the dry run prints both prompts in full and the row's own block, or that the drafting prompts carry decision 40's rules (R2) | CONFIRMED | two tests added; R2's mutants M30, M31, M32 and M34 now killed |
+| 3 | The exact-bound test never checked a bound the Values decimals reformat (R2, M10) | CONFIRMED | `WBC: 4.00–11.00` asserted |
+| 3 | A test docstring said every case keeps low <= high, untrue for a 10**400 low (R3 F1) | CONFIRMED | that case now uses -(10**400) |
+| 3 | draft.py's module docstring did not mention the ranges block (R3 F2) | CONFIRMED | docstring updated |
+
+Lead's mutation check (scratch copies; tests/test_draft.py and tests/test_cbc.py): 18 mutants (R2's survivors from rounds 1 to 3 and a revert of every fix), all killed; the unmutated control passes 62 tests [RAN].
+
+#### Files changed (2269b0d)
+
+```text
+M  data/drafts/C-008.json
+M  data/drafts/C-009.json
+M  data/drafts/H-009.json
+M  data/drafts/H-021.json
+M  data/drafts/_calls.jsonl
+M  handoff.md
+M  prompts/drafting/cbc.md
+M  prompts/drafting/histopathology.md
+M  src/pathqc_eval/cbc.py
+M  src/pathqc_eval/draft.py
+M  src/pathqc_eval/render.py
+M  tests/test_cbc.py
+M  tests/test_draft.py
+---
+ data/drafts/C-008.json             |  30 ++---
+ data/drafts/C-009.json             |  33 +++---
+ data/drafts/H-009.json             |  16 +--
+ data/drafts/H-021.json             |  17 ++-
+ data/drafts/_calls.jsonl           |   4 +
+ handoff.md                         |   3 +-
+ prompts/drafting/cbc.md            |   1 +
+ prompts/drafting/histopathology.md |   2 +
+ src/pathqc_eval/cbc.py             |  26 ++++-
+ src/pathqc_eval/draft.py           |  60 ++++++++--
+ src/pathqc_eval/render.py          |   5 +-
+ tests/test_cbc.py                  |  53 ++++++++-
+ tests/test_draft.py                | 223 ++++++++++++++++++++++++++++++++++++-
+ 13 files changed, 406 insertions(+), 67 deletions(-)
+```
+
+#### What was not tested
+
+- The Haiku drafting run itself was made once (step 6); the round-1 and round-2 fixes do not change the messages built from the current ranges file (the dry-run output is byte-identical before and after), so no draft was made again [RAN].
+
+```text
+=== EVAL REPORT: EVAL-02d Drafting instructions corrected; four reports drafted again (EVAL-N1 S3) ===
+Status: DONE
+What was asked: add the owner's three drafting rules, show the CBC reference ranges in the drafting message, redraft H-009, H-021, C-008 and C-009 with Haiku, check them by script, and list the out-of-range values and stage sentences for the owner.
+What was done: rules and ranges block added [RAN]; four drafts made again in 4 calls, every check passes [RAN]; tables written [RAN]; review findings fixed test-first (exact bounds, a stricter ranges loader, stronger tests) [RAN].
+Files changed: src/pathqc_eval/{draft,render,cbc}.py; tests/test_draft.py, tests/test_cbc.py; prompts/drafting/{histopathology,cbc}.md; data/drafts/{H-009,H-021,C-008,C-009}.json; data/drafts/_calls.jsonl; handoff.md.
+Commands run: uv run pytest — 0 — 18 s — 440 passed; ruff check — 0; ruff format --check — 0; pathqc-eval draft --dry-run — 0; pathqc-eval draft --ids H-009,H-021,C-008,C-009 --force --cost-gate 0.10 — 0 — 30 s; validate --drafts — 0; readable data/drafts — 0.
+Checks: pytest 440 passed, 0 failed | ruff check and format clean
+Git: branch main; commit 2269b0d "EVAL-02d: drafting instructions corrected; four reports drafted again"; push ok; remote HEAD matches local HEAD: yes
+API spend this task: $0.004447 (4 calls, claude-haiku-5-5, from data/drafts/_calls.jsonl)
+Deviations from the prompt: Table B also lists "staging" sentences (Part 5 item 6); the ranges loader now refuses bounds that are not finite numbers (a review finding).
+Claims I could not verify: none.
+Questions for the owner: the stage groups listed in Table B are for the owner's [fix] entries.
+handoff.md updated: yes
+=== END ===
+```
+
 ## Part 8. Known weaknesses, and suggestions that were not acted on
 
 1. S1: `plant` stops with a traceback when an existing report file is read-only (pre-existing; nothing is damaged because the open fails before any truncation). Suggestion: catch OSError per report in write_outputs and list it NOT WRITTEN.
 2. S1: when a hand-edited draft's Values text does not match its numbers, the validator's advice names `render` on the unbuilt report path. Only reachable by editing a draft by hand (decision 37 forbids it).
 3. S1: the test that plant.py's only writer is write_outputs inspects the source (named write calls, no os/shutil imports); a snapshot test checks behaviour on the draft-error paths.
+4. Run procedure (S3 review R3 OF-4): until S3 the reviewers' instructions offered `$env:ANTHROPIC_API_KEY=''` for PowerShell, which in Windows PowerShell deletes the variable, so `cli.main`'s `load_dotenv` would load the key from `.env` into that process. No command the reviewers were allowed to run constructs a client, and data/drafts/_calls.jsonl shows no call other than the lead's (34 lines before S3, 38 after). From S3 on, reviewers run project code only in Git Bash with `ANTHROPIC_API_KEY= PYTHON_DOTENV_DISABLED=1`.
 
 ## Part 9. EVAL report block
 
