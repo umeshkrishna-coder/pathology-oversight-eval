@@ -8,6 +8,7 @@ data/reports/<id>.json is generated and never edited by hand, and no model takes
 from __future__ import annotations
 
 import copy
+import json
 import math
 import re
 from dataclasses import dataclass, field
@@ -17,6 +18,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from pathqc_eval.io import read_report_json, write_report_json
+from pathqc_eval.readable import READABLE_DIR
 from pathqc_eval.render import render_cbc_values
 from pathqc_eval.schema import SECTION_CONVENTIONS, CBCValues, Report
 from pathqc_eval.spec import SpecRow
@@ -26,7 +28,6 @@ from pathqc_eval.validate import FILE_PLACEHOLDER, check_report
 SHEET_FILE = Path("data/specs/planting.md")
 DRAFTS_DIR = Path("data/drafts")
 REPORTS_DIR = Path("data/reports")
-READABLE_DIR = "_readable"
 REVIEW_DIR = "_review"
 
 SEVERITIES = ("critical", "major", "minor")
@@ -239,9 +240,15 @@ def _parse_sets(entry: RawEntry) -> tuple[list[tuple[str, float]], list[str]]:
     return sets, problems
 
 
-def interpret_error(entry: RawEntry, modality: str) -> tuple[ErrorEntry | None, list[str]]:
+def interpret_error(
+    entry: RawEntry, modality: str, type_ids: tuple[str, ...]
+) -> tuple[ErrorEntry | None, list[str]]:
     f = entry.fields
     problems = _missing(entry, ERROR_REQUIRED)
+    if "type" in f and f["type"] not in type_ids:
+        problems.append(
+            f"{entry.label}: type '{f['type']}' is not a taxonomy id ({', '.join(type_ids)})"
+        )
     if "severity" in f and f["severity"] not in SEVERITIES:
         problems.append(
             f"{entry.label}: severity '{f['severity']}' is not one of {', '.join(SEVERITIES)}"
@@ -342,9 +349,26 @@ def remove_span(text: str, start: int, end: int) -> str:
     if line_end == -1:
         line_end = len(text)
     if not text[line_start:start].strip() and not text[end:line_end].strip():
-        if line_end < len(text):
-            return text[:line_start] + text[line_end + 1 :]
-        return text[: max(line_start - 1, 0)]
+        lines = text.split("\n")
+        index = text.count("\n", 0, line_start)
+        del lines[index]
+
+        def blank(i: int) -> bool:
+            return not lines[i].strip()
+
+        # Blank lines beside the removed line must not be left leading, trailing or doubled: a
+        # first or last line takes the blank lines after or before it with it, and a line
+        # between two runs of blank lines takes the run after it.
+        if index == 0:
+            while lines and blank(0):
+                del lines[0]
+        elif index == len(lines):
+            while lines and blank(-1):
+                del lines[-1]
+        elif blank(index - 1):
+            while index < len(lines) and blank(index):
+                del lines[index]
+        return "\n".join(lines)
     left, right = text[:start], text[end:]
     if left == "" or left.endswith("\n"):
         right = right.lstrip(" \t")
@@ -359,6 +383,12 @@ def remove_span(text: str, start: int, end: int) -> str:
 
 def values_line(values_text: str, analyte: str) -> str:
     return values_text.split("\n")[ANALYTES.index(analyte)]
+
+
+def word_count(text: str) -> int:
+    """Whitespace-separated tokens that contain a letter or a digit (lone punctuation is not a
+    word)."""
+    return sum(any(ch.isalnum() for ch in token) for token in text.split())
 
 
 # Applying one block
@@ -485,7 +515,7 @@ class _Planter:
                     line_start = new.rfind("\n", 0, start) + 1
                     line_end = new.find("\n", start + len(err.replace))
                     quote = new[line_start : None if line_end == -1 else line_end]
-                elif len(err.replace.split()) >= MIN_QUOTE_WORDS:
+                elif word_count(err.replace) >= MIN_QUOTE_WORDS:
                     quote = err.replace
                 else:
                     self.problems.append(
@@ -560,8 +590,12 @@ def apply_block(
     readable: str = "the readable draft",
     report_path: str = FILE_PLACEHOLDER,
     draft_path: str = "the draft file",
+    draft_problem: str | None = None,
 ) -> BlockResult:
-    """Apply one block (None: no block, so no changes and verified no) to one draft."""
+    """Apply one block (None: no block, so no changes and verified no) to one draft.
+
+    draft None means no draft: draft_problem says why (a file that could not be read), and
+    without it the draft file was not found."""
     result = BlockResult(row.id)
     if block is None:
         block = RawBlock(row.id, 0, {"verified": "no"})
@@ -576,12 +610,12 @@ def apply_block(
             if fix:
                 fixes.append(fix)
         else:
-            err, entry_problems = interpret_error(entry, row.modality)
+            err, entry_problems = interpret_error(entry, row.modality, tuple(taxonomy.type_ids()))
             if err:
                 errors.append(err)
         structural += entry_problems
     if draft is None:
-        structural.append(f"draft not found: {draft_path}")
+        structural.append(draft_problem or f"draft not found: {draft_path}")
     else:
         try:
             parsed = Report.model_validate(draft)
@@ -642,8 +676,9 @@ def apply_block(
         ]
         result.problems = [f"validation: {r}" for r in reasons]
         return result
-    # The clean-control rule is checked above in plain words; every other rule runs here.
-    reasons = check_report(model, taxonomy, drafts=True)
+    # A built report is a final report: every validator rule runs on it, check_clean_control
+    # included (its condition is also checked above, in plain words, before anything applies).
+    reasons = check_report(model, taxonomy)
     if reasons:
         result.problems = [
             f"validation: {r.replace(FILE_PLACEHOLDER, report_path)}" for r in reasons
@@ -701,12 +736,7 @@ def plan(rows: list[SpecRow], sheet_text: str, root: Path, taxonomy: Taxonomy) -
     results = []
     for row in rows:
         draft_path = drafts / f"{row.id}.json"
-        draft = None
-        if draft_path.is_file():
-            try:
-                draft = read_report_json(draft_path)
-            except ValueError:  # invalid JSON: reported as a draft that does not parse
-                draft = {}
+        draft, draft_problem = load_draft(draft_path, _rel(draft_path, root))
         results.append(
             apply_block(
                 row,
@@ -716,9 +746,48 @@ def plan(rows: list[SpecRow], sheet_text: str, root: Path, taxonomy: Taxonomy) -
                 readable=_rel(drafts / READABLE_DIR / f"{row.id}.md", root),
                 report_path=_rel(root / REPORTS_DIR / f"{row.id}.json", root),
                 draft_path=_rel(draft_path, root),
+                draft_problem=draft_problem,
             )
         )
     return PlantRun(results, problems)
+
+
+_JSON_KINDS = {
+    "list": "an array",
+    "str": "a string",
+    "int": "a number",
+    "float": "a number",
+    "bool": "true or false",
+    "NoneType": "null",
+}
+
+
+def load_draft(path: Path, shown: str) -> tuple[dict | None, str | None]:
+    """(the draft, None); or (None, a problem in plain words) when the file cannot be read as a
+    JSON object; or (None, None) when there is no file."""
+    if not path.is_file():
+        return None, None
+    try:
+        data = read_report_json(path)
+    except json.JSONDecodeError as exc:
+        where = f"at line {exc.lineno}, column {exc.colno}"
+        return None, f"{shown} does not parse as JSON ({exc.msg} {where})"
+    except UnicodeDecodeError as exc:
+        return None, f"{shown} is not UTF-8 text ({exc.reason} at byte {exc.start})"
+    except ValueError as exc:  # any other refusal by the JSON reader, e.g. a too-long integer
+        return None, f"{shown} does not parse as JSON ({exc})"
+    except RecursionError:
+        return None, f"{shown} does not parse as JSON (nested too deeply)"
+    except OSError as exc:
+        return None, f"{shown} cannot be read ({exc.strerror or exc})"
+    if not isinstance(data, dict):
+        kind = _JSON_KINDS.get(type(data).__name__, type(data).__name__)
+        return None, f"{shown} is not a JSON object (it holds {kind})"
+    try:  # a \ud83d-style escape decodes to a lone surrogate, which no file can hold
+        json.dumps(data, ensure_ascii=False).encode("utf-8")
+    except UnicodeEncodeError as exc:
+        return None, f"{shown} holds text that cannot be written as UTF-8 ({exc.reason})"
+    return data, None
 
 
 def check_lines(run: PlantRun) -> list[str]:
@@ -798,40 +867,6 @@ def write_outputs(run: PlantRun, root: Path) -> list[str]:
             lines.append(f"{r.report_id} NOT UPDATED")
             lines += [f"  {p}" for p in r.problems]
     return lines
-
-
-def readable_markdown(data: dict) -> str:
-    """The id as a heading, then each section name as a heading with its text as stored."""
-    lines = [f"# {data['id']}", ""]
-    for name, text in data["sections"].items():
-        lines += [f"## {name}", text, ""]
-    return "\n".join(lines).rstrip("\n") + "\n"
-
-
-def write_readable(folder: Path) -> tuple[list[str], bool]:
-    lines: list[str] = []
-    ok = True
-    out = folder / READABLE_DIR
-    for path in sorted(folder.glob("*.json")):
-        try:
-            data = read_report_json(path)
-            if not (
-                isinstance(data, dict)
-                and isinstance(data.get("id"), str)
-                and isinstance(data.get("sections"), dict)
-            ):
-                raise ValueError("needs an id and sections")
-        except ValueError as exc:  # json.JSONDecodeError is a ValueError
-            lines.append(f"FAIL {path}: cannot make a readable file ({exc})")
-            ok = False
-            continue
-        out.mkdir(exist_ok=True)
-        target = out / f"{data['id']}.md"
-        target.write_text(readable_markdown(data), encoding="utf-8", newline="\n")
-        lines.append(f"wrote {target.as_posix()}")
-    if not lines:
-        lines.append(f"readable: no report files in {folder.as_posix()}")
-    return lines, ok
 
 
 TEMPLATE_HEADER = """\

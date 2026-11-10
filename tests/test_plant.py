@@ -4,23 +4,25 @@ Temporary folders and invented reports and sheets only; never reads data/drafts/
 data/reports/ or data/specs/planting.md.
 """
 
+import ast
 import copy
 import json
+from pathlib import Path
 from textwrap import dedent
 
 import pytest
 from conftest import FIXTURES, fixture_text, rerender
 
-from pathqc_eval import cli
+from pathqc_eval import cli, plant
 from pathqc_eval.io import read_report_json, write_report_json
 from pathqc_eval.plant import (
     SHEET_FILE,
     apply_block,
     parse_sheet,
     plan,
-    readable_markdown,
     remove_span,
 )
+from pathqc_eval.readable import readable_markdown
 from pathqc_eval.spec import DATASET_SHAPE, SpecRow
 
 SYNOPTIC = "\n".join(
@@ -571,6 +573,27 @@ def test_planted_types_that_differ_from_the_plan_are_a_notice(histo_draft, fixed
     assert result.notices == ["H-001: planted types H1 differ from the spec's planned types H3"]
 
 
+def test_built_report_is_checked_with_the_full_rule_set(monkeypatch, histo_draft, fixed_taxonomy):
+    """EVAL-02c-fix: a built report is a final report, so every validator rule runs on it.
+
+    check_report(..., drafts=True) would skip check_clean_control; the plain-words check
+    before it does not replace the validator rule.
+    """
+    calls = []
+    real_check_report = plant.check_report
+
+    def recording_check_report(report, taxonomy, drafts=False):
+        calls.append(drafts)
+        return real_check_report(report, taxonomy, drafts=drafts)
+
+    monkeypatch.setattr(plant, "check_report", recording_check_report)
+    body = "verified: no\n" + _error(
+        "H1", "major", "section: Synoptic summary\nfind: size: 18 mm\nreplace: size: 25 mm\n"
+    )
+    assert _apply(_row("H-001"), histo_draft, body, fixed_taxonomy).ok
+    assert calls == [False]
+
+
 # Commands on a complete temporary tree
 
 
@@ -744,3 +767,606 @@ def test_readable_command(tmp_path, histo, cbc, capsys):
         "readable_histopathology.md"
     )
     assert capsys.readouterr().out.count("wrote ") == 2
+
+
+@pytest.mark.parametrize("bad_id", ["../escaped", "..\\escaped", "sub/dir/deep", "H-001.json"])
+def test_readable_refuses_an_id_that_is_not_a_report_id(tmp_path, histo, capsys, bad_id):
+    """EVAL-02c-fix: the output file is named from the id inside the JSON, so an id with path
+    parts must never place a file outside <folder>/_readable/ (or crash with a traceback)."""
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    write_report_json(folder / "H-001.json", histo)
+    write_report_json(folder / "bad.json", histo | {"id": bad_id})
+    assert cli.main(["readable", str(folder)]) == 1
+    out = capsys.readouterr().out
+    assert f"FAIL {folder / 'bad.json'}: cannot make a readable file (id " in out
+    assert "is not a report id such as H-001)" in out
+    files = sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*") if p.is_file())
+    assert files == ["drafts/H-001.json", "drafts/_readable/H-001.md", "drafts/bad.json"]
+
+
+# EVAL-02c-fix: defects found by the S1 adversarial review (each test failed before its fix)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "# Owner note: Hb range 13.0–17.0\n== H-016 ==\nverified: no\n".encode("cp1252"),
+        "== H-016 ==\r\nverified: no\r\n".encode("utf-16"),
+    ],
+    ids=["cp1252", "utf-16"],
+)
+@pytest.mark.parametrize("command", [["plant", "--check"], ["plant"]])
+def test_a_sheet_that_is_not_utf8_is_refused_in_plain_words(tree, capsys, raw, command):
+    (tree / SHEET_FILE).write_bytes(raw)
+    assert cli.main(command) == 1
+    out = capsys.readouterr().out
+    assert out.startswith("FAIL data/specs/planting.md is not UTF-8 text (")
+    assert out.rstrip().endswith("save it as UTF-8 and run the command again")
+    assert not (tree / "data" / "reports").exists()
+
+
+@pytest.mark.parametrize(
+    ("text", "remove", "expected"),
+    [
+        ("A one.\n\nB two.\n\nC three.", "B two.", "A one.\n\nC three."),
+        ("A one.\n\nB two.", "A one.", "B two."),
+        ("A one.\n\nB two.", "B two.", "A one."),
+        ("A one.\nB two.\n\nC three.", "C three.", "A one.\nB two."),
+    ],
+)
+def test_whole_line_removal_next_to_a_blank_line_leaves_no_empty_line(text, remove, expected):
+    start = text.index(remove)
+    assert remove_span(text, start, start + len(remove)) == expected
+
+
+def test_omission_of_a_paragraph_leaves_one_blank_line(histo_draft, fixed_taxonomy):
+    histo_draft["sections"]["Comment"] = (
+        "First invented paragraph.\n\nSecond invented paragraph.\n\nThird invented paragraph."
+    )
+    body = "verified: no\n" + _error(
+        "H5",
+        "major",
+        """
+        kind: omission
+        remove_from: Comment
+        remove: Second invented paragraph.
+        anchor: Staging edition: AJCC 8th edition
+        """,
+    )
+    result = _apply(_row("H-001", planned=["H5"]), histo_draft, body, fixed_taxonomy)
+    assert result.ok, result.problems
+    assert result.report["sections"]["Comment"] == (
+        "First invented paragraph.\n\nThird invented paragraph."
+    )
+
+
+def test_five_word_minimum_counts_words_not_punctuation(histo_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "H1", "major", "section: Diagnosis\nfind: 18 mm.\nreplace: 25 mm - - -\n"
+    )
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert result.problems == [FIVE_WORD_MESSAGE]
+
+
+@pytest.mark.parametrize("bad_type", ["h1", "H9", "X1", "H1."])
+def test_a_type_that_is_not_a_taxonomy_id_is_reported_in_plain_words(
+    histo_draft, fixed_taxonomy, bad_type
+):
+    sheet = (
+        f"== H-001 ==\nverified: no\n[error]\ntype: {bad_type}\nseverity: major\n{ERROR_TEXT}"
+        "section: Diagnosis\nfind: grade 2\nreplace: grade 3 of 3, invented here\n"
+    )
+    parsed = parse_sheet(sheet)
+    result = apply_block(_row("H-001"), histo_draft, parsed.blocks["H-001"], fixed_taxonomy)
+    assert result.problems == [
+        f"[error] 1 (line 3): type '{bad_type}' is not a taxonomy id "
+        "(H1, H2, H3, H4, H5, H6, C1, C2, C3)"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("content", "expected"),
+    [
+        ("null\n", "data/drafts/H-016.json is not a JSON object (it holds null)"),
+        ("[]\n", "data/drafts/H-016.json is not a JSON object (it holds an array)"),
+        ('"text"\n', "data/drafts/H-016.json is not a JSON object (it holds a string)"),
+        (
+            "{not json\n",
+            "data/drafts/H-016.json does not parse as JSON (Expecting property name enclosed "
+            "in double quotes at line 1, column 2)",
+        ),
+        (
+            "﻿{}\n",
+            "data/drafts/H-016.json does not parse as JSON (Unexpected UTF-8 BOM (decode using "
+            "utf-8-sig) at line 1, column 1)",
+        ),
+        (
+            "[" * 100000 + "]" * 100000,
+            "data/drafts/H-016.json does not parse as JSON (nested too deeply)",
+        ),
+    ],
+    ids=["null", "array", "string", "invalid", "bom", "deep"],
+)
+def test_a_draft_that_is_not_a_report_object_is_reported_as_unparseable(
+    tmp_path, fixed_taxonomy, content, expected
+):
+    """The problem names the real cause (round 2: a count of missing fields was shown, and
+    JSON nested too deeply stopped the whole run with a traceback)."""
+    folder = tmp_path / "data" / "drafts"
+    folder.mkdir(parents=True)
+    (folder / "H-016.json").write_text(content, encoding="utf-8")
+    run = plan([_row("H-016", clean=True)], "", tmp_path, fixed_taxonomy)
+    assert run.results[0].problems == [expected]
+
+
+def test_plant_check_reports_every_report_when_one_draft_is_nested_too_deeply(tree, capsys):
+    (tree / "data" / "drafts" / "C-011.json").write_text("[" * 100000 + "]" * 100000)
+    (tree / SHEET_FILE).write_text(GOOD_SHEET, encoding="utf-8")
+    assert cli.main(["plant", "--check"]) == 1
+    lines = capsys.readouterr().out.splitlines()
+    assert "H-001 OK" in lines
+    assert "C-011 data/drafts/C-011.json does not parse as JSON (nested too deeply)" in lines
+
+
+def test_readable_reports_a_section_that_is_not_text_and_goes_on(tmp_path, histo, capsys):
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    write_report_json(folder / "H-001.json", histo | {"sections": histo["sections"] | {"X": None}})
+    write_report_json(folder / "H-002.json", histo | {"id": "H-002"})
+    assert cli.main(["readable", str(folder)]) == 1
+    out = capsys.readouterr().out
+    assert (
+        f"FAIL {folder / 'H-001.json'}: cannot make a readable file (section 'X' is not text)"
+        in out
+    )
+    assert sorted(p.name for p in (folder / "_readable").iterdir()) == ["H-002.md"]
+
+
+def test_readable_ignores_a_folder_whose_name_ends_in_json(tmp_path, histo, capsys):
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    (folder / "A-old.json").mkdir()
+    write_report_json(folder / "H-001.json", histo)
+    assert cli.main(["readable", str(folder)]) == 0
+    assert capsys.readouterr().out == f"wrote {(folder / '_readable' / 'H-001.md').as_posix()}\n"
+
+
+# Tests that pin behaviour the S1 review showed was not pinned (each kills a named mutant)
+
+
+def test_a_given_quote_is_stored_rather_than_the_replace_text(histo_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "H1",
+        "major",
+        """
+        section: Microscopic description
+        find: Tumour measures 18 mm.
+        replace: Tumour measures 25 mm in this invented case.
+        quote: Tumour measures 25 mm in this invented case. Margins are clear.
+        """,
+    )
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert result.ok, result.problems
+    assert result.report["errors"][0]["quoted_sentence"] == (
+        "Tumour measures 25 mm in this invented case. Margins are clear."
+    )
+
+
+def test_a_given_quote_wins_over_the_synoptic_line_rule(histo_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "H1",
+        "major",
+        "section: Synoptic summary\nfind: size: 18 mm\nreplace: size: 25 mm\nquote: size: 25 mm\n",
+    )
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert result.ok, result.problems
+    assert result.report["errors"][0]["quoted_sentence"] == "size: 25 mm"
+
+
+def test_synoptic_quote_is_the_whole_line_for_a_later_line_changed_mid_line(
+    histo_draft, fixed_taxonomy
+):
+    body = "verified: no\n" + _error(
+        "H4",
+        "major",
+        "section: Synoptic summary\nfind: nodes (positive\nreplace: nodes (involved\n",
+    )
+    result = _apply(_row("H-001", planned=["H4"]), histo_draft, body, fixed_taxonomy)
+    assert result.ok, result.problems
+    assert result.report["errors"][0]["quoted_sentence"] == "Lymph nodes (involved/total): 0/3"
+
+
+@pytest.mark.parametrize(
+    ("replace", "ok"),
+    [("The tumour measures 25 mm.", True), ("Tumour is 25 mm.", False)],
+    ids=["five words", "four words"],
+)
+def test_five_word_boundary(histo_draft, fixed_taxonomy, replace, ok):
+    body = "verified: no\n" + _error(
+        "H1",
+        "major",
+        f"section: Microscopic description\nfind: Tumour measures 18 mm.\nreplace: {replace}\n",
+    )
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    if ok:
+        assert result.ok, result.problems
+        assert result.report["errors"][0]["quoted_sentence"] == replace
+    else:
+        assert result.problems == [FIVE_WORD_MESSAGE]
+
+
+def test_overlapping_occurrences_count_separately(histo_draft, fixed_taxonomy):
+    histo_draft["sections"]["Comment"] = "Invented ratio 1/1/1 recorded."
+    body = "verified: no\n[fix]\nsection: Comment\nfind: 1/1\nreplace: 2/2\nnote: Invented note.\n"
+    result = _apply(_row("H-001", clean=True), histo_draft, body, fixed_taxonomy)
+    assert result.problems == [
+        "[fix] 1 (line 3): the find text occurs 2 times in 'Comment' (it must occur exactly "
+        "once); add surrounding words from the readable draft so that it is unique"
+    ]
+
+
+def test_number_change_quotes_the_first_set_analyte_by_default(cbc_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error("C2", "minor", "set: MCHC = 41.0\nset: Hb = 9.0\n")
+    result = _apply(_row("C-001", planned=["C2"]), cbc_draft, body, fixed_taxonomy)
+    assert result.ok, result.problems
+    assert result.report["errors"][0]["quoted_sentence"] == "MCHC: 41.0 g/dL (ref 31.5–34.5)"
+
+
+def test_replace_must_differ_from_find(histo_draft, fixed_taxonomy):
+    body = "verified: no\n[fix]\nsection: Specimen\nfind: left side\nreplace: left side\nnote: N.\n"
+    result = _apply(_row("H-001", clean=True), histo_draft, body, fixed_taxonomy)
+    assert result.problems == ["[fix] 1 (line 3): replace is the same as find"]
+
+
+def test_fixes_apply_before_errors_whatever_the_sheet_order(histo_draft, fixed_taxonomy):
+    body = (
+        "verified: no\n"
+        + _error(
+            "H1",
+            "major",
+            "section: Gross description\nfind: lesion 19 mm across\n"
+            "replace: lesion 25 mm across in this invented case\n",
+        )
+        + "[fix]\nsection: Gross description\nfind: 18 mm across\nreplace: 19 mm across\n"
+        + "note: Invented fix.\n"
+    )
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert result.ok, result.problems
+    assert result.report["sections"]["Gross description"] == (
+        "Fatty tissue 40 x 30 x 20 mm with a firm lesion 25 mm across in this invented case."
+    )
+
+
+def test_review_file_lists_fixes_and_plant_prints_the_validator_summary(tree, capsys):
+    (tree / SHEET_FILE).write_text(GOOD_SHEET, encoding="utf-8")
+    cli.main(["plant"])
+    out = capsys.readouterr().out
+    summary = [line for line in out.splitlines() if line.startswith("validate: ")]
+    assert len(summary) == 1
+    assert summary[0].startswith("validate: 10 reports | histopathology 7, cbc 3 |")
+    assert summary[0].endswith("| OK")
+    review = (tree / "data" / "reports" / "_review" / "H-016.md").read_text(encoding="utf-8")
+    assert "## Fixes\n\n1. Specimen\n   find: left side\n   replace: left breast\n" in review
+
+
+def test_plant_rebuilds_a_report_after_the_sheet_changes(tree):
+    sheet = tree / SHEET_FILE
+    sheet.write_text(GOOD_SHEET, encoding="utf-8")
+    cli.main(["plant"])
+    sheet.write_text(GOOD_SHEET.replace("25 mm across.", "26 mm across."), encoding="utf-8")
+    cli.main(["plant"])
+    report = read_report_json(tree / "data" / "reports" / "H-001.json")
+    assert report["errors"][0]["quoted_sentence"] == "The tumour measures 26 mm across."
+
+
+def test_init_writes_one_block_per_spec_row_in_spec_order(tree):
+    assert cli.main(["plant", "--init"]) == 0
+    text = (tree / SHEET_FILE).read_text(encoding="utf-8")
+    blocks = [line[3:-3] for line in text.splitlines() if line.startswith("== ")]
+    spec = read_report_json(tree / "data" / "specs" / "dataset.json")
+    assert blocks == [row["id"] for row in spec["reports"]]
+
+
+def test_readable_keeps_section_text_exactly_as_stored(histo):
+    histo["sections"]["Comment"] = "  Indented first line.\nLast line ends with spaces.  "
+    expected = "## Comment\n  Indented first line.\nLast line ends with spaces.  \n"
+    assert expected in readable_markdown(histo)
+
+
+def test_check_works_with_a_draft_taxonomy(tree, capsys):
+    (tree / SHEET_FILE).write_text(GOOD_SHEET, encoding="utf-8")
+    path = tree / "data" / "taxonomy.json"
+    write_report_json(path, read_report_json(path) | {"status": "draft"})
+    assert cli.main(["plant", "--check"]) == 1  # 24 planted reports still have no errors
+    out = capsys.readouterr().out
+    assert "refused" not in out
+    assert "H-001 OK" in out and "H-016 OK" in out
+
+
+def _complete_sheet(spec_path, h001_entry=None) -> str:
+    """Every planted row gets one invented error (H-001 gets h001_entry if given); every clean
+    row gets a bare block."""
+    blocks = []
+    for row in read_report_json(spec_path)["reports"]:
+        block = f"== {row['id']} ==\nverified: no\n"
+        if row["is_clean_control"]:
+            pass
+        elif row["id"] == "H-001" and h001_entry:
+            block += h001_entry
+        elif row["modality"] == "histopathology":
+            block += _error(
+                "H1",
+                "major",
+                "section: Microscopic description\nfind: Tumour measures 18 mm.\n"
+                "replace: The tumour measures 25 mm across.\n",
+            )
+        else:
+            block += _error(
+                "C1",
+                "major",
+                "section: Interpretation\nfind: Mild anaemia with normal red cell indices.\n"
+                "replace: Marked anaemia with normal red cell indices.\n",
+            )
+        blocks.append(block)
+    return "".join(blocks)
+
+
+def test_plant_exits_zero_when_every_block_is_ok(tree, capsys):
+    sheet = _complete_sheet(tree / "data" / "specs" / "dataset.json")
+    (tree / SHEET_FILE).write_text(sheet, encoding="utf-8")
+    assert cli.main(["plant"]) == 0
+    out = capsys.readouterr().out
+    assert "NOT UPDATED" not in out
+    assert "notices: none" in out
+
+
+def test_plant_prints_the_notices_after_a_build(tree, capsys):
+    h2 = _error(
+        "H2",
+        "critical",
+        "section: Diagnosis\nfind: grade 2\nreplace: grade 3 of 3, invented here\n",
+    )
+    sheet = _complete_sheet(tree / "data" / "specs" / "dataset.json", h001_entry=h2)
+    (tree / SHEET_FILE).write_text(sheet, encoding="utf-8")
+    assert cli.main(["plant"]) == 0
+    out = capsys.readouterr().out
+    assert "notices:\n  H-001: planted types H2 differ from the spec's planned types H1\n" in out
+
+
+# EVAL-02c-fix, S1 review round 2 (each test failed before its fix)
+
+_FILE_WRITES = {"write_text", "write_bytes", "mkdir", "open", "touch", "unlink", "rename", "rmdir"}
+
+
+def test_plant_module_writes_only_through_write_outputs():
+    """S1: no code path in plant.py may write under data/drafts/. Its only file writes are in
+    write_outputs, which writes data/reports/ and data/reports/_review/; the `readable`
+    command lives in readable.py."""
+    tree = ast.parse(Path(plant.__file__).read_text(encoding="utf-8"))
+    writers = set()
+    for func in (n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)):
+        for node in ast.walk(func):
+            if isinstance(node, ast.Call):
+                called = node.func
+                name = called.attr if isinstance(called, ast.Attribute) else called.id
+                if name in _FILE_WRITES | {"write_report_json", "append_jsonl"}:
+                    writers.add(func.name)
+    assert writers == {"write_outputs"}
+    imported = {
+        alias.name.split(".")[0]
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Import | ast.ImportFrom)
+        for alias in (node.names if isinstance(node, ast.Import) else [ast.alias(node.module)])
+    }
+    assert not imported & {"os", "shutil", "tempfile"}  # no file operations outside the check
+
+
+@pytest.mark.parametrize(
+    ("text", "remove", "expected"),
+    [
+        ("A one.\n\n\nB two.", "A one.", "B two."),
+        ("A one.\n\n\nB two.", "B two.", "A one."),
+        ("A.\n\n\nB.\n\n\nC.", "B.", "A.\n\n\nC."),
+        ("A.\nB.\n\nC.", "B.", "A.\n\nC."),
+    ],
+)
+def test_whole_line_removal_beside_several_blank_lines(text, remove, expected):
+    start = text.index(remove)
+    assert remove_span(text, start, start + len(remove)) == expected
+
+
+def test_omission_of_a_first_paragraph_before_two_blank_lines(histo_draft, fixed_taxonomy):
+    histo_draft["sections"]["Comment"] = "First invented paragraph.\n\n\nSecond invented paragraph."
+    body = "verified: no\n" + _error(
+        "H5",
+        "major",
+        """
+        kind: omission
+        remove_from: Comment
+        remove: First invented paragraph.
+        anchor: Staging edition: AJCC 8th edition
+        """,
+    )
+    result = _apply(_row("H-001", planned=["H5"]), histo_draft, body, fixed_taxonomy)
+    assert result.ok, result.problems
+    assert result.report["sections"]["Comment"] == "Second invented paragraph."
+
+
+def test_a_utf16_sheet_without_a_bom_is_refused_and_reports_stay_as_they_are(tree, capsys):
+    sheet = tree / SHEET_FILE
+    text = "== H-016 ==\nverified: yes\nverified_on: 2026-11-12\n"
+    sheet.write_text(text, encoding="utf-8")
+    cli.main(["plant"])
+    report = tree / "data" / "reports" / "H-016.json"
+    assert read_report_json(report)["provenance"]["verified"] is True
+    before = report.read_bytes()
+    sheet.write_bytes(text.encode("utf-16-le"))
+    capsys.readouterr()
+    assert cli.main(["plant"]) == 1
+    out = capsys.readouterr().out
+    assert out.startswith("FAIL data/specs/planting.md is not UTF-8 text (it contains NUL ")
+    assert report.read_bytes() == before
+
+
+def test_readable_reports_a_file_it_cannot_write(tmp_path, histo, capsys):
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    write_report_json(folder / "H-001.json", histo)
+    (folder / "_readable").write_text("a file where the folder should be", encoding="utf-8")
+    assert cli.main(["readable", str(folder)]) == 1
+    out = capsys.readouterr().out
+    assert out.startswith(f"FAIL {folder / 'H-001.json'}: cannot write ")
+
+
+def test_readable_reports_json_nested_too_deeply_and_goes_on(tmp_path, histo, capsys):
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    (folder / "A-deep.json").write_text("[" * 100000 + "]" * 100000, encoding="utf-8")
+    write_report_json(folder / "H-001.json", histo)
+    assert cli.main(["readable", str(folder)]) == 1
+    out = capsys.readouterr().out
+    assert (
+        f"FAIL {folder / 'A-deep.json'}: cannot make a readable file (JSON nested too deeply)"
+        in out
+    )
+    assert (folder / "_readable" / "H-001.md").is_file()
+
+
+def test_readable_reports_a_file_it_cannot_read_and_goes_on(tmp_path, histo, capsys, monkeypatch):
+    from pathqc_eval import readable as readable_module
+
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    write_report_json(folder / "H-001.json", histo)
+    write_report_json(folder / "H-002.json", histo | {"id": "H-002"})
+    real_read = readable_module.read_report_json
+
+    def read(path):
+        if Path(path).name == "H-001.json":
+            raise PermissionError(13, "Permission denied", str(path))
+        return real_read(path)
+
+    monkeypatch.setattr(readable_module, "read_report_json", read)
+    assert cli.main(["readable", str(folder)]) == 1
+    out = capsys.readouterr().out
+    assert f"FAIL {folder / 'H-001.json'}: cannot make a readable file (" in out
+    assert sorted(p.name for p in (folder / "_readable").iterdir()) == ["H-002.md"]
+
+
+def test_a_draft_that_cannot_be_read_is_reported_in_plain_words(
+    tmp_path, histo_draft, fixed_taxonomy, monkeypatch
+):
+    folder = tmp_path / "data" / "drafts"
+    folder.mkdir(parents=True)
+    write_report_json(folder / "H-016.json", histo_draft | {"id": "H-016"})
+
+    def unreadable(path):
+        raise PermissionError(13, "Permission denied", str(path))
+
+    monkeypatch.setattr(plant, "read_report_json", unreadable)
+    run = plan([_row("H-016", clean=True)], "", tmp_path, fixed_taxonomy)
+    assert run.results[0].problems == ["data/drafts/H-016.json cannot be read (Permission denied)"]
+
+
+# EVAL-02c-fix, S1 review round 3 (each test failed before its fix)
+
+LONE_SURROGATE = "Invented comment \\ud83d with half a character."  # JSON text: a \ud83d escape
+
+
+def _plan_one(tmp_path, taxonomy, raw: bytes):
+    folder = tmp_path / "data" / "drafts"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "H-016.json").write_bytes(raw)
+    return plan([_row("H-016", clean=True)], "", tmp_path, taxonomy).results[0].problems
+
+
+def test_a_draft_with_an_integer_too_long_to_read_is_reported_in_plain_words(
+    tmp_path, fixed_taxonomy
+):
+    problems = _plan_one(tmp_path, fixed_taxonomy, b'{"n": ' + b"1" * 5000 + b"}\n")
+    assert len(problems) == 1
+    assert problems[0].startswith(
+        "data/drafts/H-016.json does not parse as JSON (Exceeds the limit (4300 digits)"
+    )
+
+
+def test_a_draft_that_is_not_utf8_is_reported_in_plain_words(tmp_path, fixed_taxonomy):
+    problems = _plan_one(tmp_path, fixed_taxonomy, b'{"x": "\x96"}\n')
+    assert problems == ["data/drafts/H-016.json is not UTF-8 text (invalid start byte at byte 7)"]
+
+
+def _with_lone_surrogate(draft: dict) -> bytes:
+    """The draft as JSON text whose Comment holds an unpaired surrogate escape."""
+    text = json.dumps(draft | {"sections": draft["sections"] | {"Comment": "PLACEHOLDER"}})
+    return text.replace("PLACEHOLDER", LONE_SURROGATE).encode("utf-8")
+
+
+def test_a_draft_with_a_lone_surrogate_is_reported_in_plain_words(
+    tmp_path, histo_draft, fixed_taxonomy
+):
+    raw = _with_lone_surrogate(histo_draft | {"id": "H-016", "is_clean_control": True})
+    problems = _plan_one(tmp_path, fixed_taxonomy, raw)
+    assert problems == [
+        "data/drafts/H-016.json holds text that cannot be written as UTF-8 (surrogates not allowed)"
+    ]
+
+
+def test_plant_never_empties_a_report_whose_draft_holds_a_lone_surrogate(tree, capsys):
+    (tree / SHEET_FILE).write_text(GOOD_SHEET, encoding="utf-8")
+    cli.main(["plant"])
+    report = tree / "data" / "reports" / "H-016.json"
+    before = report.read_bytes()
+    draft_path = tree / "data" / "drafts" / "H-016.json"
+    draft_path.write_bytes(_with_lone_surrogate(read_report_json(draft_path)))
+    capsys.readouterr()
+    assert cli.main(["plant", "--check"]) == 1
+    assert "H-016 data/drafts/H-016.json holds text that cannot be written as UTF-8" in (
+        capsys.readouterr().out
+    )
+    assert cli.main(["plant"]) == 1
+    out = capsys.readouterr().out
+    assert "H-016 NOT UPDATED\n  data/drafts/H-016.json holds text that cannot be written" in out
+    assert "H-001 built |" in out and "validate: " in out
+    assert report.read_bytes() == before
+
+
+def test_readable_reports_a_lone_surrogate_and_goes_on(tmp_path, histo, capsys):
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    (folder / "A-surrogate.json").write_bytes(_with_lone_surrogate(histo))
+    write_report_json(folder / "H-002.json", histo | {"id": "H-002"})
+    assert cli.main(["readable", str(folder)]) == 1
+    out = capsys.readouterr().out
+    assert (
+        f"FAIL {folder / 'A-surrogate.json'}: cannot make a readable file (it holds text that "
+        "cannot be written as UTF-8 (surrogates not allowed))\n"
+    ) in out
+    assert sorted(p.name for p in (folder / "_readable").iterdir()) == ["H-002.md"]
+
+
+def test_readable_goes_on_after_a_file_it_cannot_write(tmp_path, histo, capsys):
+    folder = tmp_path / "drafts"
+    folder.mkdir()
+    write_report_json(folder / "H-001.json", histo)
+    write_report_json(folder / "H-002.json", histo | {"id": "H-002"})
+    (folder / "_readable" / "H-001.md").mkdir(parents=True)  # a folder where the file goes
+    assert cli.main(["readable", str(folder)]) == 1
+    out = capsys.readouterr().out
+    assert out.startswith(f"FAIL {folder / 'H-001.json'}: cannot write ")
+    assert (folder / "_readable" / "H-002.md").is_file()
+
+
+def test_readable_keeps_the_last_sections_trailing_line_breaks(histo):
+    histo["sections"]["Synoptic summary"] += "\n\n"
+    assert readable_markdown(histo).endswith("pT1c pN0.\n\n\n")
+
+
+def test_draft_problems_never_write_under_data_drafts(tree, capsys):
+    (tree / "data" / "drafts" / "H-016.json").write_text("{not json", encoding="utf-8")
+    (tree / "data" / "drafts" / "C-011.json").write_text("[" * 100000 + "]" * 100000)
+    (tree / SHEET_FILE).write_text(GOOD_SHEET, encoding="utf-8")
+    drafts = _snapshot(tree / "data" / "drafts")
+    assert cli.main(["plant", "--check"]) == 1
+    assert cli.main(["plant"]) == 1
+    assert _snapshot(tree / "data" / "drafts") == drafts

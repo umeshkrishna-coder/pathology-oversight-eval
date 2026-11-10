@@ -13,9 +13,12 @@ def read_report_json(path: Path | str) -> Any:
 
 
 def write_report_json(path: Path | str, data: Any) -> None:
-    """Indented UTF-8 JSON with LF line endings and exactly one trailing newline."""
+    """Indented UTF-8 JSON with LF line endings and exactly one trailing newline.
+
+    The text is encoded before the file is opened, so a value that cannot be written (an
+    unpaired surrogate) raises without emptying an existing file."""
     text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
-    Path(path).write_text(text, encoding="utf-8", newline="\n")
+    Path(path).write_bytes(text.encode("utf-8"))
 
 
 def append_jsonl(path: Path | str, record: dict[str, Any]) -> None:

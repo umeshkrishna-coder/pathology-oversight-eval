@@ -29,8 +29,8 @@ from pathqc_eval.plant import (
     plan,
     template,
     write_outputs,
-    write_readable,
 )
+from pathqc_eval.readable import write_readable
 from pathqc_eval.render import render_cbc_values
 from pathqc_eval.schema import CBCValues
 from pathqc_eval.spec import DEFAULT_SPEC_PATH, DatasetSpec, load_spec, spec_summary
@@ -222,7 +222,20 @@ def _plant(args: argparse.Namespace) -> int:
             "(plant --check works with a draft taxonomy)"
         )
         return 1
-    run = plan(spec.reports, sheet.read_text(encoding="utf-8"), root, taxonomy)
+    try:
+        sheet_text = sheet.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        not_utf8 = f"{exc.reason} at byte {exc.start}"
+    else:
+        # UTF-16 text without a byte-order mark decodes as UTF-8 with NUL characters.
+        not_utf8 = "it contains NUL characters, as UTF-16 text does" if "\0" in sheet_text else ""
+    if not_utf8:
+        print(
+            f"FAIL {SHEET_FILE.as_posix()} is not UTF-8 text ({not_utf8}); "
+            "save it as UTF-8 and run the command again"
+        )
+        return 1
+    run = plan(spec.reports, sheet_text, root, taxonomy)
     ok_count = sum(r.ok for r in run.results)
     if args.check:
         for line in check_lines(run):
