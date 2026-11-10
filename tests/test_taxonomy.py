@@ -7,10 +7,15 @@ from pathqc_eval.taxonomy import DEFAULT_TAXONOMY_PATH, Taxonomy
 
 
 def test_taxonomy_loads_with_nine_types(taxonomy):
-    assert taxonomy.status == "draft"
-    assert taxonomy.version == "0.1"
+    # EVAL-02e: the owner's final taxonomy, version 1.0 (was draft 0.1).
+    assert taxonomy.status == "final"
+    assert taxonomy.version == "1.0"
     assert taxonomy.type_ids() == ["H1", "H2", "H3", "H4", "H5", "H6", "C1", "C2", "C3"]
     assert [lvl.id for lvl in taxonomy.severity_levels] == ["critical", "major", "minor"]
+    assert taxonomy.by_id()["C2"].definition == (
+        "MCV, MCH or MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; "
+        "absolute counts inconsistent with WBC."
+    )
 
 
 def test_taxonomy_modalities_and_list_severities(taxonomy):

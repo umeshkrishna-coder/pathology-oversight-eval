@@ -1,6 +1,6 @@
 {
-  "version": "0.1",
-  "status": "draft",
+  "version": "1.0",
+  "status": "final",
   "severity_levels": [
     {"id": "critical", "definition": "would change patient management"},
     {"id": "major", "definition": "would need an amended report"},
@@ -59,7 +59,7 @@
     {
       "id": "C2",
       "name": "Derived-index inconsistency",
-      "definition": "MCH/MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; absolute counts inconsistent with WBC.",
+      "definition": "MCV, MCH or MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; absolute counts inconsistent with WBC.",
       "modality": "cbc",
       "default_severity": ["minor", "major"]
     },

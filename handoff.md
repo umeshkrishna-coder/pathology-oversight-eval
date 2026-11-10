@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–40 on 2026-11-10)
+## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–41 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -51,8 +51,9 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 38. For this one run [EVAL-N1, the overnight build run] the rule "one task per prompt, no chaining" is set aside. Stages are chained on condition that every stage passes its own gate and gets its own commit and its own record. Advice noted: bundled work hides which change caused a fault, so a stage that fails its gate is set aside and nothing is built on it.
 39. The Project Harness Kit is adopted for this pilot at Light size. The Operating Charter, the decision register and the roadmap are kept by the orchestrator outside the repo; handoff.md stays the session's notes; the repo gets a CLAUDE.md. Three typed words, each typed by the owner in a session: `freeze approved`, `scored run approved`, `release approved`. Nothing in this prompt [the EVAL-N1 prompt] is one of those words. For small API tasks, pasting a prompt that states model, estimate and hard stop is the owner's yes. Status labels gain REPORTED and NOT TESTED. A fix to existing behaviour ships with a test that fails on the old code and passes on the new.
 40. Drafting instructions corrected after the audit of the first drafts: the brief's pT and pN are used exactly and no stage group or risk class is added that the brief does not give; the CBC drafting message shows the reference ranges. H-009, H-021, C-008 and C-009 were drafted again. Single-sentence corrections elsewhere are the owner's [fix] entries.
+41. Taxonomy final as version 1.0. C2 now names MCV with MCH and MCHC.
 
-## Error taxonomy (OWNER VERIFIED as draft; to be finalised before any error is planted)
+## Error taxonomy (OWNER VERIFIED, final, version 1.0, 2026-11-10)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
 - H1 Gross–microscopic mismatch: size, number, laterality or site in the gross contradicted in microscopy or synoptic. Major.
 - H2 Diagnosis unsupported by morphology: microscopic description does not support the stated diagnosis or grade. Critical.
@@ -61,7 +62,7 @@ Severity: critical = would change patient management; major = would need an amen
 - H5 Required element missing or contradictory: margins, LVI or PNI absent, or margin status contradicts the description. Major or minor.
 - H6 IHC–diagnosis inconsistency: immunoprofile contradicts the diagnosis. Critical.
 - C1 Value–interpretation mismatch: interpretation text contradicts the numbers. Major.
-- C2 Derived-index inconsistency: MCH/MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; absolute counts inconsistent with WBC. Minor or major.
+- C2 Derived-index inconsistency: MCV, MCH or MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; absolute counts inconsistent with WBC. Minor or major.
 - C3 Missed critical finding: a critical value or finding with no flag, comment or recommendation. Critical.
 
 ## Section conventions for synthetic reports (OWNER VERIFIED)
@@ -81,7 +82,6 @@ Severity: critical = would change patient management; major = would need an amen
 - Never `git add -A` or `git add .`; stage by explicit path, and quote `git status --short` and `git diff --cached --stat` before every commit. Files of the owner's that the agent did not create in the task are never opened for editing, staged, reverted or committed.
 
 ## Open items
-- PENDING — Taxonomy finalised by the owner before any draft is edited (after EVAL-02b).
 - PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
 - PENDING — Evaluated-model settings (effort, max_tokens) decided before EVAL-04.
 - PENDING — Owner's questions from the EVAL-N1 run about CLAUDE.md and handoff.md (OVERNIGHT_REPORT.md Part 4).
