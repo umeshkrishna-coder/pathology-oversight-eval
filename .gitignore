@@ -1,3 +1,4 @@
 .env
 runs/*/calls.jsonl
 __pycache__/
+.venv/

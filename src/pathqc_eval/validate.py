@@ -15,10 +15,21 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from pathqc_eval.schema import DIFFERENTIAL_CELLS, SECTION_CONVENTIONS, CBCValues, Report
+from pathqc_eval.io import read_report_json
+from pathqc_eval.render import render_cbc_values
+from pathqc_eval.schema import (
+    CBC_UNITS,
+    DIFFERENTIAL_CELLS,
+    SECTION_CONVENTIONS,
+    CBCValues,
+    PlantedError,
+    Report,
+)
 from pathqc_eval.taxonomy import Taxonomy
 
 _EPS = 1e-9
+# Rules cannot see the file name; validate_reports() replaces this with the report's path.
+FILE_PLACEHOLDER = "<file>"
 
 
 def derived_index_inconsistencies(v: CBCValues) -> list[str]:
@@ -117,6 +128,59 @@ def check_cbc_indices(report: Report, taxonomy: Taxonomy) -> list[str]:
     return [f"derived index inconsistency: {item}" for item in inconsistencies]
 
 
+def check_cbc_units(report: Report, taxonomy: Taxonomy) -> list[str]:
+    if report.modality != "cbc" or report.cbc_values is None:
+        return []
+    reasons = []
+    for name, required in CBC_UNITS.items():
+        found = getattr(report.cbc_values, name).unit
+        if found != required:
+            reasons.append(f"{name} unit is '{found}', required '{required}'")
+    return reasons
+
+
+def check_cbc_values_text(report: Report, taxonomy: Taxonomy) -> list[str]:
+    if report.modality != "cbc" or report.cbc_values is None:
+        return []
+    if report.sections.get("Values") == render_cbc_values(report.cbc_values):
+        return []
+    return [
+        (
+            "Values text does not equal the text rendered from cbc_values; "
+            f"run: uv run pathqc-eval render {FILE_PLACEHOLDER}"
+        )
+    ]
+
+
+def _default_severities(err: PlantedError, taxonomy: Taxonomy) -> list[str] | None:
+    error_type = taxonomy.by_id().get(err.type)
+    if error_type is None:
+        return None
+    defaults = error_type.default_severity
+    return [defaults] if isinstance(defaults, str) else list(defaults)
+
+
+def check_severity(report: Report, taxonomy: Taxonomy) -> list[str]:
+    reasons = []
+    for err in report.errors:
+        defaults = _default_severities(err, taxonomy)
+        if defaults is None:
+            continue  # unknown type: reported by check_error_types
+        shown = ", ".join(defaults)
+        if err.severity in defaults:
+            if err.severity_reason is not None:
+                reasons.append(
+                    f"{err.error_id}: severity {err.severity} is a default ({shown}); "
+                    "severity_reason must be null"
+                )
+        elif not (err.severity_reason or "").strip():
+            reasons.append(
+                f"{err.error_id}: severity {err.severity} is not a default ({shown}) "
+                "and severity_reason is empty"
+            )
+    return reasons
+
+
 RULES: tuple[Callable[[Report, Taxonomy], list[str]], ...] = (
     check_clean_control,
     check_error_ids,
@@ -124,6 +188,9 @@ RULES: tuple[Callable[[Report, Taxonomy], list[str]], ...] = (
     check_quoted_sentences,
     check_section_order,
     check_cbc_indices,
+    check_cbc_units,
+    check_cbc_values_text,
+    check_severity,
 )
 
 
@@ -154,13 +221,18 @@ def summarize(reports: list[Report], taxonomy: Taxonomy, failures: int) -> str:
     clean = sum(r.is_clean_control for r in reports)
     by_type = Counter(err.type for r in reports for err in r.errors)
     type_counts = ", ".join(f"{tid} {by_type.get(tid, 0)}" for tid in taxonomy.type_ids())
+    overrides = 0
+    for r in reports:
+        for err in r.errors:
+            defaults = _default_severities(err, taxonomy)
+            overrides += defaults is not None and err.severity not in defaults
     status = "OK" if failures == 0 else f"FAILED ({failures})"
     return (
         f"validate: {len(reports)} reports | "
         f"histopathology {modality['histopathology']}, cbc {modality['cbc']} | "
         f"dev {split['dev']}, scored {split['scored']} | "
         f"clean {clean}, planted {len(reports) - clean} | "
-        f"errors by type: {type_counts} | {status}"
+        f"errors by type: {type_counts} | overrides {overrides} | {status}"
     )
 
 
@@ -182,7 +254,7 @@ def validate_reports(
     seen: dict[str, str] = {}
     for path in sorted(directory.glob("*.json")):
         try:
-            report = Report.model_validate(json.loads(path.read_text(encoding="utf-8")))
+            report = Report.model_validate(read_report_json(path))
         except json.JSONDecodeError as exc:
             result.failures.append(f"{path.name}: does not parse: invalid JSON ({exc})")
             continue
@@ -193,7 +265,10 @@ def validate_reports(
             result.failures.append(f"{path.name}: id {report.id} already used in {seen[report.id]}")
         else:
             seen[report.id] = path.name
-        result.failures += [f"{path.name}: {reason}" for reason in check_report(report, taxonomy)]
+        result.failures += [
+            f"{path.name}: {reason.replace(FILE_PLACEHOLDER, str(path))}"
+            for reason in check_report(report, taxonomy)
+        ]
         result.reports.append(report)
 
     counts = (

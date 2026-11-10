@@ -1,0 +1,17 @@
+"""Report JSON reading and writing. write_report_json is the package's only JSON writer."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+
+def read_report_json(path: Path | str) -> Any:
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def write_report_json(path: Path | str, data: Any) -> None:
+    """Indented UTF-8 JSON with LF line endings and exactly one trailing newline."""
+    text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+    Path(path).write_text(text, encoding="utf-8", newline="\n")

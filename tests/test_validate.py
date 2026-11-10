@@ -1,18 +1,22 @@
 import json
 
 import pytest
+from conftest import rerender
 
 from pathqc_eval.cli import main
 from pathqc_eval.schema import Report
 from pathqc_eval.taxonomy import REPO_ROOT
 from pathqc_eval.validate import (
     check_cbc_indices,
+    check_cbc_units,
+    check_cbc_values_text,
     check_clean_control,
     check_error_ids,
     check_error_types,
     check_quoted_sentences,
     check_report,
     check_section_order,
+    check_severity,
     validate_reports,
 )
 
@@ -26,7 +30,7 @@ def _c2_error() -> dict:
         "error_id": "C-001-E1",
         "type": "C2",
         "section": "Values",
-        "quoted_sentence": "MCH 29.8 pg",
+        "quoted_sentence": "MCH: 33.0 pg (ref 27.0–32.0)",
         "severity": "minor",
         "description": "MCH inconsistent with Hb and RBC.",
         "rationale": "MCH = Hb / RBC x 10.",
@@ -172,6 +176,7 @@ def test_cbc_indices_within_tolerance_pass(cbc, taxonomy):
 
 def test_cbc_declared_c2_with_inconsistency_pass(cbc, taxonomy):
     cbc["cbc_values"]["MCH"]["value"] = 33.0
+    rerender(cbc)
     cbc["is_clean_control"] = False
     cbc["errors"] = [_c2_error()]
     assert check_report(_report(cbc), taxonomy) == []
@@ -200,7 +205,7 @@ def test_folder_pass_and_summary(tmp_path, histo, cbc, taxonomy):
     assert result.summary == (
         "validate: 2 reports | histopathology 1, cbc 1 | dev 1, scored 1 | "
         "clean 1, planted 1 | errors by type: H1 1, H2 0, H3 0, H4 0, H5 0, H6 0, "
-        "C1 0, C2 0, C3 0 | OK"
+        "C1 0, C2 0, C3 0 | overrides 0 | OK"
     )
 
 
@@ -254,3 +259,91 @@ def test_cli_expect_flags(tmp_path, histo):
     _write(tmp_path, "H-001.json", histo)
     assert main(["validate", str(tmp_path), "--expect", "1", "--expect-dev", "1"]) == 0
     assert main(["validate", str(tmp_path), "--expect-clean", "1"]) == 1
+
+
+# CBC units (decision 18)
+
+
+def test_cbc_units_pass(cbc, taxonomy):
+    assert check_cbc_units(_report(cbc), taxonomy) == []
+
+
+def test_cbc_units_wrong_abs_unit_fails(cbc, taxonomy):
+    cbc["cbc_values"]["Neutrophils_abs"]["unit"] = "10^9/L"
+    assert check_cbc_units(_report(cbc), taxonomy) == [
+        "Neutrophils_abs unit is '10^9/L', required 'x10^9/L'"
+    ]
+
+
+def test_cbc_units_wrong_hb_unit_fails(cbc, taxonomy):
+    cbc["cbc_values"]["Hb"]["unit"] = "g/L"
+    assert check_cbc_units(_report(cbc), taxonomy) == ["Hb unit is 'g/L', required 'g/dL'"]
+
+
+# CBC Values text equals the rendered cbc_values (decision 17)
+
+
+def test_cbc_values_text_pass(cbc, taxonomy):
+    assert check_cbc_values_text(_report(cbc), taxonomy) == []
+
+
+def test_cbc_values_text_one_character_changed_fails(cbc, taxonomy):
+    cbc["sections"]["Values"] = cbc["sections"]["Values"].replace("Hb: 14.0", "Hb: 14.1", 1)
+    reasons = check_cbc_values_text(_report(cbc), taxonomy)
+    assert len(reasons) == 1
+    assert reasons[0].endswith("run: uv run pathqc-eval render <file>")
+
+
+def test_cbc_values_text_failure_names_the_file(tmp_path, cbc, taxonomy):
+    cbc["sections"]["Values"] += " "
+    _write(tmp_path, "C-001.json", cbc)
+    result = validate_reports(tmp_path, taxonomy)
+    path = tmp_path / "C-001.json"
+    assert result.failures == [
+        (
+            "C-001.json: Values text does not equal the text rendered from cbc_values; "
+            f"run: uv run pathqc-eval render {path}"
+        )
+    ]
+
+
+# severity vs taxonomy defaults (decision 19)
+
+
+def test_severity_default_pass(histo, cbc, taxonomy):
+    assert check_severity(_report(histo), taxonomy) == []
+    cbc["is_clean_control"] = False
+    cbc["errors"] = [_c2_error() | {"severity": "major"}]  # C2 defaults: minor, major
+    assert check_severity(_report(cbc), taxonomy) == []
+
+
+def test_severity_override_without_reason_fails(histo, taxonomy):
+    histo["errors"][0]["severity"] = "critical"
+    assert check_severity(_report(histo), taxonomy) == [
+        "H-001-E1: severity critical is not a default (major) and severity_reason is empty"
+    ]
+
+
+def test_severity_override_blank_reason_fails(histo, taxonomy):
+    histo["errors"][0] |= {"severity": "critical", "severity_reason": "   "}
+    assert check_severity(_report(histo), taxonomy)
+
+
+def test_severity_override_with_reason_pass(histo, taxonomy):
+    histo["errors"][0] |= {"severity": "critical", "severity_reason": "Size drives pT here."}
+    assert check_severity(_report(histo), taxonomy) == []
+
+
+def test_severity_default_with_reason_fails(histo, taxonomy):
+    histo["errors"][0]["severity_reason"] = "Not needed."
+    assert check_severity(_report(histo), taxonomy) == [
+        "H-001-E1: severity major is a default (major); severity_reason must be null"
+    ]
+
+
+def test_summary_counts_overrides(tmp_path, histo, taxonomy):
+    histo["errors"][0] |= {"severity": "critical", "severity_reason": "Size drives pT here."}
+    _write(tmp_path, "H-001.json", histo)
+    result = validate_reports(tmp_path, taxonomy)
+    assert result.ok, result.failures
+    assert "| overrides 1 | OK" in result.summary

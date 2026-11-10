@@ -40,6 +40,25 @@ SECTION_CONVENTIONS: dict[str, list[tuple[str, bool]]] = {
 
 DIFFERENTIAL_CELLS = ("Neutrophils", "Lymphocytes", "Monocytes", "Eosinophils", "Basophils")
 
+# Fixed unit for every CBCValues field (decision 18); validate.check_cbc_units enforces it.
+CBC_UNITS: dict[str, str] = {
+    "Hb": "g/dL",
+    "RBC": "x10^12/L",
+    "Hct": "%",
+    "MCV": "fL",
+    "MCH": "pg",
+    "MCHC": "g/dL",
+    "RDW": "%",
+    "WBC": "x10^9/L",
+    **{
+        f"{cell}_{kind}": unit
+        for cell in DIFFERENTIAL_CELLS
+        for kind, unit in (("pct", "%"), ("abs", "x10^9/L"))
+    },
+    "Platelets": "x10^9/L",
+    "MPV": "fL",
+}
+
 _SHA256 = r"^[0-9a-f]{64}$"
 
 
@@ -55,7 +74,7 @@ class Analyte(StrictModel):
 
 
 class CBCValues(StrictModel):
-    """Structured CBC values; formulas in validate.py assume Hb g/dL, RBC 10^12/L, Hct %."""
+    """Structured CBC values; each analyte's unit must equal its entry in CBC_UNITS."""
 
     Hb: Analyte
     RBC: Analyte
@@ -85,6 +104,7 @@ class PlantedError(StrictModel):
     section: str
     quoted_sentence: str = Field(min_length=1)
     severity: Severity
+    severity_reason: str | None = None
     description: str
     rationale: str
 

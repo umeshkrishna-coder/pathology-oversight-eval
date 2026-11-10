@@ -8,10 +8,13 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 uv sync                                    # install the locked environment
 uv run pathqc-eval validate [data/reports] # validate every report file in the folder
 uv run pathqc-eval validate --expect 34 --expect-clean 9 --expect-dev 4   # also enforce counts
+uv run pathqc-eval render <file-or-folder> # rewrite each CBC report's Values text from its cbc_values
 uv run pytest                              # run the tests
 uv run ruff check .                        # lint
 uv run ruff format --check .               # formatting check
 ```
+
+render only rewrites the Values text from the stored numbers; it never recalculates derived indices, so a planted C2 error is preserved.
 
 ## Licences
 

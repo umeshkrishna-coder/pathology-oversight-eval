@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-04 by agent (EVAL-01)
+Last updated: 2026-11-10 by agent (EVAL-01b)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
 
 ## Purpose
@@ -27,6 +27,11 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 14. Repo: pathology-oversight-eval, private until the owner approves release of the whole repo at once; visibility changed only by the owner. Dataset CC BY 4.0, code MIT. runs/*/calls.jsonl gitignored until release, then published.
 15. Stack: Python 3.12, uv lockfile, anthropic, pydantic, pytest, JSON/JSONL data.
 16. No API key ever enters the repo. The owner alone puts it in `.env`, only when the harness step needs it.
+17. CBC Values text is generated deterministically from cbc_values by render_cbc_values; the validator requires the section text to equal the rendered text. A C2 error lives in the numbers; the rendered line is what gets quoted.
+18. CBC units are fixed and validated: Hb g/dL; RBC x10^12/L; Hct %; MCV fL; MCH pg; MCHC g/dL; RDW %; WBC and all absolute counts x10^9/L; differential percentages %; Platelets x10^9/L; MPV fL. Anything else fails validation.
+19. A planted error's severity must be one of its type's default severities. An override is allowed only with a non-empty severity_reason; severity_reason is null otherwise.
+20. Licence holder in LICENSE and data/LICENSE-DATASET: Dr. Umesh Krishna Sureshbabu.
+21. Line endings: .gitattributes with `* text=auto eol=lf`; everything is stored and checked out as LF. Freeze hashes (EVAL-03) are computed on LF bytes.
 
 ## Error taxonomy (OWNER VERIFIED as draft; to be finalised before any error is planted)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -50,6 +55,8 @@ Severity: critical = would change patient management; major = would need an amen
 - Pre-flight: clean tree, remote = HEAD, HEAD is the pinned commit or later with only EVAL- commits since.
 - `uv run pytest` runs as its own step and its exit code is read before any commit. Commit messages start with the task ID.
 - Only what the prompt asks; anything else goes under "Questions for the owner". Reverting own uncommitted edits is allowed but listed under Deviations.
+- Every command is run so that its exit code is visible and quoted in the report — in bash `cmd; echo "exit=$?"`, in PowerShell `cmd; "exit=$LASTEXITCODE"`. "Exit not captured" never appears in a report; re-run any command whose exit code was lost.
+- .venv/ is listed in .gitignore explicitly.
 
 ## Open items
 - PENDING — Taxonomy finalised by the owner before planting (target: before EVAL-02 drafts are edited).
@@ -61,6 +68,7 @@ Severity: critical = would change patient management; major = would need an amen
 |---|---|---|---|---|
 | Step 0 | 2026-11-04 | Repo, hygiene files, handoff | DONE | OWNER VERIFIED |
 | EVAL-01 | 2026-11-04 | Scaffold, schemas, taxonomy, validator | DONE | AGENT VERIFIED |
+| EVAL-01b | 2026-11-10 | Validator rules, CBC renderer, hygiene | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

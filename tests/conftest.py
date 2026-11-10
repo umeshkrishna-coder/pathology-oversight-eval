@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import pytest
 
+from pathqc_eval.render import render_cbc_values
+from pathqc_eval.schema import CBCValues
 from pathqc_eval.taxonomy import Taxonomy, load_taxonomy
 
 
@@ -63,16 +65,23 @@ def histo() -> dict:
     }
 
 
+def rerender(report: dict) -> dict:
+    """Set a cbc report dict's Values text to the text rendered from its cbc_values."""
+    values = CBCValues.model_validate(report["cbc_values"])
+    report["sections"]["Values"] = render_cbc_values(values)
+    return report
+
+
 @pytest.fixture
 def cbc() -> dict:
-    """Clean control with internally consistent derived indices."""
-    return {
+    """Clean control with fixed units, consistent derived indices and rendered Values text."""
+    report = {
         "id": "C-001",
         "modality": "cbc",
         "split": "scored",
         "scenario": "Synthetic routine check",
         "sections": {
-            "Values": "Hb 14.0 g/dL (13.0-17.0)\nMCH 29.8 pg (27.0-32.0)\nWBC 8.0 x10^9/L (4.0-11.0)",
+            "Values": "",
             "Interpretation": "All values within reference ranges.",
             "Comment/recommendation": "No action needed.",
         },
@@ -103,3 +112,4 @@ def cbc() -> dict:
         "provenance": _provenance(),
         "schema_version": "1.0",
     }
+    return rerender(report)
