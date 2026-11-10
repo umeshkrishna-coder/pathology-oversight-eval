@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-10 by agent (EVAL-02c)
+Last updated: 2026-11-11 by agent (EVAL-N1 S1: EVAL-02c-fix)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
 
 ## Purpose
@@ -92,6 +92,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-02a | 2026-11-10 | Owner's spec approval recorded (0 edits) | DONE | OWNER VERIFIED |
 | EVAL-02b | 2026-11-10 | 34 drafts (Haiku 5.5, high effort) | DONE ($0.0480 measured) | AGENT VERIFIED |
 | EVAL-02c | 2026-11-10 | Planting sheet tool | DONE | AGENT VERIFIED |
+| EVAL-02c-fix | 2026-11-11 | Planting tool audit (EVAL-N1 S1): 20 review findings fixed test-first, readable moved to its own module | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===
