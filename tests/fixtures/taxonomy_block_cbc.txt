@@ -1,0 +1,9 @@
+Severity levels:
+critical: would change patient management.
+major: would need an amended report.
+minor: internal inconsistency without clinical consequence.
+
+Error types:
+C1 — Value–interpretation mismatch: interpretation text contradicts the numbers. Default severity: major.
+C2 — Derived-index inconsistency: MCH/MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; absolute counts inconsistent with WBC. Default severity: minor or major.
+C3 — Missed critical finding: a critical value or finding with no flag, comment or recommendation. Default severity: critical.

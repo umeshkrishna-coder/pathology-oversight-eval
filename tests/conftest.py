@@ -5,11 +5,64 @@ Content is synthetic test data only; it describes no patient and is not part of 
 
 from __future__ import annotations
 
+import json
+import shutil
+from pathlib import Path
+
 import pytest
 
 from pathqc_eval.render import render_cbc_values
 from pathqc_eval.schema import CBCValues
-from pathqc_eval.taxonomy import Taxonomy, load_taxonomy
+from pathqc_eval.taxonomy import REPO_ROOT, Taxonomy, load_taxonomy
+
+FIXTURES = Path(__file__).parent / "fixtures"
+# Stand-ins for the owner's texts: tests never read prompts/structured_*.md.
+STAND_IN_OWNER_TEXT = {
+    "histopathology": "STAND-IN OWNER TEXT (histopathology). The owner's PathQC prompt goes here.",
+    "cbc": "STAND-IN OWNER TEXT (cbc). The owner's CBC review checklist goes here.",
+}
+
+
+def fixture_text(name: str) -> str:
+    return (FIXTURES / name).read_text(encoding="utf-8").replace("\r\n", "\n")
+
+
+@pytest.fixture
+def fixed_taxonomy() -> Taxonomy:
+    """Copy of the draft taxonomy v0.1, so goldens do not move when the owner edits it."""
+    return load_taxonomy(FIXTURES / "taxonomy.json")
+
+
+def write_prompts(folder: Path, plain: str, output: str) -> Path:
+    """A prompts folder with the given plain and output texts and the stand-in owner texts."""
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "plain.md").write_text(plain, encoding="utf-8", newline="\n")
+    (folder / "structured_output.md").write_text(output, encoding="utf-8", newline="\n")
+    for modality, text in STAND_IN_OWNER_TEXT.items():
+        (folder / f"structured_{modality}.md").write_text(
+            text + "\n", encoding="utf-8", newline="\n"
+        )
+    return folder
+
+
+@pytest.fixture
+def real_prompts(tmp_path) -> Path:
+    """The repo's plain and output prompts (agent-written) with stand-in owner texts."""
+    folder = tmp_path / "prompts"
+    folder.mkdir()
+    for name in ("plain.md", "structured_output.md"):
+        shutil.copyfile(REPO_ROOT / "prompts" / name, folder / name)
+    write_prompts(
+        folder,
+        (folder / "plain.md").read_text(encoding="utf-8"),
+        (folder / "structured_output.md").read_text(encoding="utf-8"),
+    )
+    manifest = {
+        name: {"file": f"prompts/{name}.md", "status": "approved"}
+        for name in ("plain", "structured_output", "structured_histopathology", "structured_cbc")
+    }
+    (folder / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    return folder
 
 
 def _analyte(value: float, unit: str, low: float, high: float) -> dict:

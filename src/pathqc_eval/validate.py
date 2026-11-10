@@ -94,9 +94,8 @@ def check_quoted_sentences(report: Report, taxonomy: Taxonomy) -> list[str]:
         if err.section not in report.sections:
             reasons.append(f"{err.error_id}: section '{err.section}' is not in the report")
         elif err.quoted_sentence not in report.sections[err.section]:
-            reasons.append(
-                f"{err.error_id}: quoted_sentence does not occur verbatim in '{err.section}'"
-            )
+            what = "anchor (omission)" if err.kind == "omission" else "quoted_sentence"
+            reasons.append(f"{err.error_id}: {what} does not occur verbatim in '{err.section}'")
     return reasons
 
 
@@ -235,6 +234,7 @@ def summarize(
     by_type = Counter(err.type for r in reports for err in r.errors)
     type_counts = ", ".join(f"{tid} {by_type.get(tid, 0)}" for tid in taxonomy.type_ids())
     overrides = sum(_is_valid_override(err, taxonomy) for r in reports for err in r.errors)
+    omissions = sum(err.kind == "omission" for r in reports for err in r.errors)
     status = "OK" if failures == 0 else f"FAILED ({failures})"
     label = "validate (drafts):" if drafts else "validate:"
     return (
@@ -242,7 +242,8 @@ def summarize(
         f"histopathology {modality['histopathology']}, cbc {modality['cbc']} | "
         f"dev {split['dev']}, scored {split['scored']} | "
         f"clean {clean}, planted {len(reports) - clean} | "
-        f"errors by type: {type_counts} | overrides {overrides} | {status}"
+        f"errors by type: {type_counts} | overrides {overrides} | omissions {omissions} | "
+        f"{status}"
     )
 
 

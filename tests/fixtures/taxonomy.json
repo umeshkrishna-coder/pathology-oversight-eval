@@ -1,0 +1,74 @@
+{
+  "version": "0.1",
+  "status": "draft",
+  "severity_levels": [
+    {"id": "critical", "definition": "would change patient management"},
+    {"id": "major", "definition": "would need an amended report"},
+    {"id": "minor", "definition": "internal inconsistency without clinical consequence"}
+  ],
+  "types": [
+    {
+      "id": "H1",
+      "name": "Gross–microscopic mismatch",
+      "definition": "size, number, laterality or site in the gross contradicted in microscopy or synoptic.",
+      "modality": "histopathology",
+      "default_severity": "major"
+    },
+    {
+      "id": "H2",
+      "name": "Diagnosis unsupported by morphology",
+      "definition": "microscopic description does not support the stated diagnosis or grade.",
+      "modality": "histopathology",
+      "default_severity": "critical"
+    },
+    {
+      "id": "H3",
+      "name": "Staging inconsistency",
+      "definition": "pT/pN contradicts reported size, depth of invasion or node findings.",
+      "modality": "histopathology",
+      "default_severity": "critical"
+    },
+    {
+      "id": "H4",
+      "name": "Node arithmetic error",
+      "definition": "positive nodes exceed total, or text and synoptic counts differ.",
+      "modality": "histopathology",
+      "default_severity": "major"
+    },
+    {
+      "id": "H5",
+      "name": "Required element missing or contradictory",
+      "definition": "margins, LVI or PNI absent, or margin status contradicts the description.",
+      "modality": "histopathology",
+      "default_severity": ["major", "minor"]
+    },
+    {
+      "id": "H6",
+      "name": "IHC–diagnosis inconsistency",
+      "definition": "immunoprofile contradicts the diagnosis.",
+      "modality": "histopathology",
+      "default_severity": "critical"
+    },
+    {
+      "id": "C1",
+      "name": "Value–interpretation mismatch",
+      "definition": "interpretation text contradicts the numbers.",
+      "modality": "cbc",
+      "default_severity": "major"
+    },
+    {
+      "id": "C2",
+      "name": "Derived-index inconsistency",
+      "definition": "MCH/MCHC inconsistent with Hb, RBC and Hct; differential not summing to 100; absolute counts inconsistent with WBC.",
+      "modality": "cbc",
+      "default_severity": ["minor", "major"]
+    },
+    {
+      "id": "C3",
+      "name": "Missed critical finding",
+      "definition": "a critical value or finding with no flag, comment or recommendation.",
+      "modality": "cbc",
+      "default_severity": "critical"
+    }
+  ]
+}

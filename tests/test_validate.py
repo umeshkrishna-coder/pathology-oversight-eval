@@ -205,7 +205,7 @@ def test_folder_pass_and_summary(tmp_path, histo, cbc, taxonomy):
     assert result.summary == (
         "validate: 2 reports | histopathology 1, cbc 1 | dev 1, scored 1 | "
         "clean 1, planted 1 | errors by type: H1 1, H2 0, H3 0, H4 0, H5 0, H6 0, "
-        "C1 0, C2 0, C3 0 | overrides 0 | OK"
+        "C1 0, C2 0, C3 0 | overrides 0 | omissions 0 | OK"
     )
 
 
@@ -346,7 +346,7 @@ def test_summary_counts_overrides(tmp_path, histo, taxonomy):
     _write(tmp_path, "H-001.json", histo)
     result = validate_reports(tmp_path, taxonomy)
     assert result.ok, result.failures
-    assert "| overrides 1 | OK" in result.summary
+    assert "| overrides 1 | omissions 0 | OK" in result.summary
 
 
 def test_summary_override_without_reason_counts_zero_and_fails(tmp_path, histo, taxonomy):
@@ -354,7 +354,7 @@ def test_summary_override_without_reason_counts_zero_and_fails(tmp_path, histo, 
     _write(tmp_path, "H-001.json", histo)
     result = validate_reports(tmp_path, taxonomy)
     assert len(result.failures) == 1 and "severity_reason is empty" in result.failures[0]
-    assert "| overrides 0 | FAILED (1)" in result.summary
+    assert "| overrides 0 | omissions 0 | FAILED (1)" in result.summary
 
 
 # drafts mode relaxes exactly one rule
@@ -375,3 +375,69 @@ def test_drafts_mode_summary_label(tmp_path, histo, taxonomy):
     result = validate_reports(tmp_path, taxonomy, drafts=True)
     assert result.ok, result.failures
     assert result.summary.startswith("validate (drafts): 1 reports")
+
+
+# omission errors (decision 34)
+
+
+def _omission(histo: dict) -> dict:
+    """H5 omission: PNI is missing; the anchor is the Synoptic line next to where it belongs."""
+    histo["sections"]["Synoptic summary"] = (
+        "Tumour size: 18 mm\nHistologic grade: 2\nMargins: Clear\n"
+        "Lymphovascular invasion: Absent\nLymph nodes (positive/total): 0/3\npT: pT1c\npN: pN0"
+    )
+    histo["errors"][0] |= {
+        "type": "H5",
+        "kind": "omission",
+        "section": "Synoptic summary",
+        "quoted_sentence": "Lymphovascular invasion: Absent",
+        "description": "Perineural invasion is not reported.",
+        "rationale": "PNI is a required synoptic element.",
+    }
+    return histo
+
+
+def test_omission_anchor_passes(histo, taxonomy):
+    assert check_report(_report(_omission(histo)), taxonomy) == []
+
+
+def test_omission_anchor_must_be_verbatim(histo, taxonomy):
+    data = _omission(histo)
+    data["errors"][0]["quoted_sentence"] = "Perineural invasion: Absent"
+    assert check_quoted_sentences(_report(data), taxonomy) == [
+        "H-001-E1: anchor (omission) does not occur verbatim in 'Synoptic summary'"
+    ]
+
+
+def test_omission_anchor_must_be_in_its_section(histo, taxonomy):
+    data = _omission(histo)
+    data["errors"][0]["section"] = "Diagnosis"
+    assert check_quoted_sentences(_report(data), taxonomy) == [
+        "H-001-E1: anchor (omission) does not occur verbatim in 'Diagnosis'"
+    ]
+
+
+def test_cbc_omission_anchor_is_a_values_line(cbc, taxonomy):
+    line = next(x for x in cbc["sections"]["Values"].splitlines() if x.startswith("Hb:"))
+    cbc |= {"is_clean_control": False}
+    cbc["errors"] = [
+        {
+            "error_id": "C-001-E1",
+            "type": "C3",
+            "kind": "omission",
+            "section": "Values",
+            "quoted_sentence": line,
+            "severity": "critical",
+            "description": "No flag or comment for the haemoglobin value.",
+            "rationale": "A critical value needs a flag and a recommendation.",
+        }
+    ]
+    assert check_report(_report(cbc), taxonomy) == []
+
+
+def test_summary_counts_omissions(tmp_path, histo, cbc, taxonomy):
+    _write(tmp_path, "H-001.json", _omission(histo))
+    _write(tmp_path, "C-001.json", cbc)
+    result = validate_reports(tmp_path, taxonomy)
+    assert result.ok, result.failures
+    assert result.summary.endswith("| overrides 0 | omissions 1 | OK")

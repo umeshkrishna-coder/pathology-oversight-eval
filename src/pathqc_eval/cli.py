@@ -19,15 +19,18 @@ from pathqc_eval.draft import (
     dry_run_lines,
     run_drafts,
 )
+from pathqc_eval.freeze import check_lock, freeze
 from pathqc_eval.io import read_report_json, write_report_json
 from pathqc_eval.render import render_cbc_values
 from pathqc_eval.schema import CBCValues
 from pathqc_eval.spec import DEFAULT_SPEC_PATH, DatasetSpec, load_spec, spec_summary
-from pathqc_eval.taxonomy import load_taxonomy
+from pathqc_eval.taxonomy import REPO_ROOT, load_taxonomy
 from pathqc_eval.validate import validate_reports
 
 # Replaced in tests to prove the real client is never constructed.
 CLIENT_FACTORY = AnthropicDraftClient
+# Replaced in tests with a temporary fixture tree.
+FREEZE_ROOT = REPO_ROOT
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -56,6 +59,13 @@ def _build_parser() -> argparse.ArgumentParser:
     draft.add_argument("--dry-run", action="store_true", help="print prompts and estimate only")
     draft.add_argument("--force", action="store_true", help="redraft rows that already exist")
     draft.add_argument("--cost-gate", type=float, default=0.25, help="USD cap per run")
+
+    freeze_cmd = sub.add_parser(
+        "freeze", help="hash taxonomy, prompts and dataset into data/prompts.lock.json"
+    )
+    mode = freeze_cmd.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true", help="verify every hash against the lock")
+    mode.add_argument("--replace", action="store_true", help="overwrite an existing lock")
     return parser
 
 
@@ -191,4 +201,9 @@ def main(argv: list[str] | None = None) -> int:
         return _spec_check(args.path)
     if args.command == "draft":
         return _draft(args)
+    if args.command == "freeze":
+        outcome = check_lock(FREEZE_ROOT) if args.check else freeze(FREEZE_ROOT, args.replace)
+        for line in outcome.lines:
+            print(line)
+        return 0 if outcome.ok else 1
     return 2

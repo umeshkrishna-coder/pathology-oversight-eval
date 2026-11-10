@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-10 by agent (EVAL-02)
+Last updated: 2026-11-10 by agent (EVAL-03)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
 
 ## Purpose
@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–31 on 2026-11-10)
+## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–35 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -42,6 +42,10 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 29. Lint: ruff with the explicit rule set E, F, I, B; code is fixed, the rule list is not widened.
 30. The summary's `overrides` counts only non-default severities that carry a severity_reason.
 31. Two tracks from EVAL-02 onwards. Owner track: approve the spec, drafts (EVAL-02b), final taxonomy, planting, validation. Agent track: prompts and freeze (EVAL-03), harness (EVAL-04) and scorer with blind adjudication (EVAL-05), built against test fixtures and a fake client. The tracks meet at the dev run. Targets: PathQC prompt text by 12 Nov; dataset final 14 Nov; scored run 15 Nov; adjudication 16 Nov; write-up 16–17 Nov; application due 18 Nov.
+32. Sampling (amends decision 3): the current API does not accept a temperature setting for the evaluated model, so runs use the API's default sampling. 3 repeats per report per condition and majority (2 of 3) are unchanged. RunConfig records `sampling: "default"`. The write-up discloses this and reports repeat consistency.
+33. IHC spread in the spec is kept as proposed.
+34. Omission errors (amends decision 8): a planted error may be `kind: "omission"`. It quotes an anchor sentence that exists in the report: for CBC, the Values line carrying the number concerned; for histopathology, the Synoptic line next to where the missing element belongs (or the Diagnosis line if none). An omission is detected automatically when the mapped type matches and the finding's section equals the anchor's section; sentence overlap is not required. A finding in the same report with the matching type but another section goes to the owner's blind adjudication.
+35. Structured condition (amends decision 13): histopathology reports use the owner's PathQC text verbatim, then the histopathology taxonomy, then the output block. CBC reports use a short CBC review checklist written by the owner, then the CBC taxonomy, then the output block. The plain condition uses one prompt for both modalities.
 
 ## Error taxonomy (OWNER VERIFIED as draft; to be finalised before any error is planted)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -67,14 +71,15 @@ Severity: critical = would change patient management; major = would need an amen
 - Only what the prompt asks; anything else goes under "Questions for the owner". Reverting own uncommitted edits is allowed but listed under Deviations.
 - Every command is run so that its exit code is visible and quoted in the report — in bash `cmd; echo "exit=$?"`, in PowerShell `cmd; "exit=$LASTEXITCODE"`. "Exit not captured" never appears in a report; re-run any command whose exit code was lost.
 - .venv/ is listed in .gitignore explicitly.
-- The owner may be editing files under data/specs/, data/drafts/ and data/reports/ while tasks run. Pre-flight "clean tree" means `git status --short` shows nothing outside those three folders; list whatever it shows inside them and do not open, edit, stage, revert or commit those files.
+- Owner-editable areas: data/specs/, data/drafts/, data/reports/, prompts/ and data/taxonomy.json. The owner may have uncommitted edits there while tasks run. Pre-flight "clean tree" means `git status --short` shows nothing outside those areas; list whatever it shows inside them and do not open for editing, stage, revert or commit those files, except files the current task itself creates.
 - Never `git add -A` or `git add .`; stage by explicit path, and quote `git status --short` and `git diff --cached --stat` before every commit. Files of the owner's that the agent did not create in the task are never opened for editing, staged, reverted or committed.
 
 ## Open items
 - PENDING — Taxonomy finalised by the owner before any draft is edited (after EVAL-02b).
-- PENDING — PathQC prompt text supplied by the owner (for EVAL-03).
+- PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
 - PENDING — Key added to .env by the owner immediately before EVAL-02b (first API use).
 - PENDING — Owner approves every spec row before EVAL-02b.
+- PENDING — Evaluated-model settings (effort, max_tokens) decided before EVAL-04.
 
 ## Task log
 | ID | Date | Title | Status | Label |
@@ -83,6 +88,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-01 | 2026-11-04 | Scaffold, schemas, taxonomy, validator | DONE | AGENT VERIFIED |
 | EVAL-01b | 2026-11-10 | Validator rules, CBC renderer, hygiene | DONE | AGENT VERIFIED |
 | EVAL-02 | 2026-11-10 | Dataset spec and drafting tool (dry run) | DONE | AGENT VERIFIED |
+| EVAL-03 | 2026-11-10 | Prompts, message assembly, freeze | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

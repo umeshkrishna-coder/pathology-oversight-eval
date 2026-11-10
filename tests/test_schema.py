@@ -108,7 +108,7 @@ def _run_config(**overrides) -> dict:
         "dataset": "dev",
         "condition": "plain",
         "model": "claude-sonnet-5-5",
-        "temperature": 0,
+        "sampling": "default",
         "repeats": 3,
         "dataset_hash": "a" * 64,
         "prompt_hash": "b" * 64,
@@ -127,7 +127,9 @@ def test_run_config_round_trip():
 @pytest.mark.parametrize(
     "overrides",
     [
+        {"temperature": 0},
         {"temperature": 0.5},
+        {"sampling": "zero"},
         {"repeats": 2},
         {"condition": "other"},
         {"dataset_hash": "not-a-hash"},
@@ -174,3 +176,28 @@ def test_adjudication_hidden_round_trip():
     assert AdjudicationHidden.model_validate_json(hidden.model_dump_json()) == hidden
     with pytest.raises(ValidationError):
         AdjudicationHidden(condition="plain", repeat=4, model="claude-sonnet-5-5")
+
+
+def test_run_config_sampling_defaults_to_default():
+    data = _run_config()
+    del data["sampling"]
+    config = RunConfig.model_validate(data)
+    assert config.sampling == "default"
+    assert "temperature" not in config.model_dump()
+
+
+def test_planted_error_kind_defaults_to_statement(histo):
+    report = Report.model_validate(histo)
+    assert report.errors[0].kind == "statement"
+
+
+@pytest.mark.parametrize("kind", ["statement", "omission"])
+def test_planted_error_kind_values(histo, kind):
+    histo["errors"][0]["kind"] = kind
+    assert Report.model_validate(histo).errors[0].kind == kind
+
+
+def test_planted_error_kind_rejects_other(histo):
+    histo["errors"][0]["kind"] = "absence"
+    with pytest.raises(ValidationError):
+        Report.model_validate(histo)

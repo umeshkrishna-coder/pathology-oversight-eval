@@ -107,6 +107,8 @@ class PlantedError(StrictModel):
     severity_reason: str | None = None
     description: str
     rationale: str
+    # Decision 34: an omission quotes an anchor line that exists in the report.
+    kind: Literal["statement", "omission"] = "statement"
 
 
 class Provenance(StrictModel):
@@ -165,7 +167,8 @@ class RunConfig(StrictModel):
     dataset: Split
     condition: Condition
     model: str
-    temperature: float = Field(default=0.0, ge=0.0, le=0.0)
+    # Decision 32 (amends 3): the API takes no temperature; runs use default sampling.
+    sampling: Literal["default"] = "default"
     repeats: Literal[3] = 3
     dataset_hash: str = Field(pattern=_SHA256)
     prompt_hash: str = Field(pattern=_SHA256)

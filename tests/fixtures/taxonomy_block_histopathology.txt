@@ -1,0 +1,12 @@
+Severity levels:
+critical: would change patient management.
+major: would need an amended report.
+minor: internal inconsistency without clinical consequence.
+
+Error types:
+H1 — Gross–microscopic mismatch: size, number, laterality or site in the gross contradicted in microscopy or synoptic. Default severity: major.
+H2 — Diagnosis unsupported by morphology: microscopic description does not support the stated diagnosis or grade. Default severity: critical.
+H3 — Staging inconsistency: pT/pN contradicts reported size, depth of invasion or node findings. Default severity: critical.
+H4 — Node arithmetic error: positive nodes exceed total, or text and synoptic counts differ. Default severity: major.
+H5 — Required element missing or contradictory: margins, LVI or PNI absent, or margin status contradicts the description. Default severity: major or minor.
+H6 — IHC–diagnosis inconsistency: immunoprofile contradicts the diagnosis. Default severity: critical.
