@@ -225,13 +225,25 @@ def no_real_client(monkeypatch):
     monkeypatch.setattr(cli, "CLIENT_FACTORY", refuse)
 
 
-def test_draft_refuses_unapproved_rows(no_real_client, capsys):
+@pytest.fixture
+def proposed_spec(tmp_path, monkeypatch):
+    """A copy of the spec with every row proposed, independent of the owner's approvals."""
+    data = SPEC.model_dump(mode="json")
+    for row in data["reports"]:
+        row["brief_status"] = "proposed"
+    path = tmp_path / "dataset.json"
+    write_report_json(path, data)
+    monkeypatch.setattr(cli, "SPEC_PATH", path)
+    return path
+
+
+def test_draft_refuses_unapproved_rows(no_real_client, proposed_spec, capsys):
     assert cli.main(["draft"]) == 1
     out = capsys.readouterr().out
     assert out.startswith("FAIL draft refused: 34 row(s) not approved:")
 
 
-def test_draft_refuses_unapproved_ids(no_real_client, capsys):
+def test_draft_refuses_unapproved_ids(no_real_client, proposed_spec, capsys):
     assert cli.main(["draft", "--ids", "H-001,C-003"]) == 1
     assert "2 row(s) not approved" in capsys.readouterr().out
 

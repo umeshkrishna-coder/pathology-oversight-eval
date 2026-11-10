@@ -31,6 +31,8 @@ from pathqc_eval.validate import validate_reports
 CLIENT_FACTORY = AnthropicDraftClient
 # Replaced in tests with a temporary fixture tree.
 FREEZE_ROOT = REPO_ROOT
+# Replaced in tests with a temporary spec, so tests never depend on the owner's approvals.
+SPEC_PATH = DEFAULT_SPEC_PATH
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -136,7 +138,7 @@ def _spec_check(path: Path) -> int:
 
 
 def _draft(args: argparse.Namespace) -> int:
-    spec = load_spec()
+    spec = load_spec(SPEC_PATH)
     rows = spec.reports
     if args.ids:
         wanted = [i.strip() for i in args.ids.split(",") if i.strip()]

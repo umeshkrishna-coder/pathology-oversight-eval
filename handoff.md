@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-10 by agent (EVAL-03)
+Last updated: 2026-11-10 by agent (EVAL-02a)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · PENDING (not yet done or checked)
 
 ## Purpose
@@ -78,7 +78,6 @@ Severity: critical = would change patient management; major = would need an amen
 - PENDING — Taxonomy finalised by the owner before any draft is edited (after EVAL-02b).
 - PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
 - PENDING — Key added to .env by the owner immediately before EVAL-02b (first API use).
-- PENDING — Owner approves every spec row before EVAL-02b.
 - PENDING — Evaluated-model settings (effort, max_tokens) decided before EVAL-04.
 
 ## Task log
@@ -89,6 +88,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-01b | 2026-11-10 | Validator rules, CBC renderer, hygiene | DONE | AGENT VERIFIED |
 | EVAL-02 | 2026-11-10 | Dataset spec and drafting tool (dry run) | DONE | AGENT VERIFIED |
 | EVAL-03 | 2026-11-10 | Prompts, message assembly, freeze | DONE | AGENT VERIFIED |
+| EVAL-02a | 2026-11-10 | Owner's spec approval recorded (0 edits) | DONE | OWNER VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===
