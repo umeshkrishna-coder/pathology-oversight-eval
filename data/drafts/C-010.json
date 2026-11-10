@@ -1,0 +1,142 @@
+{
+  "id": "C-010",
+  "modality": "cbc",
+  "split": "scored",
+  "scenario": "Microcytosis with a high red cell count (beta-thalassaemia trait pattern)",
+  "sections": {
+    "Values": "Hb: 11.2 g/dL (ref 12.0–15.0)\nRBC: 5.60 x10^12/L (ref 3.80–4.80)\nHct: 35.8 % (ref 36.0–46.0)\nMCV: 63.9 fL (ref 83.0–101.0)\nMCH: 20.0 pg (ref 27.0–32.0)\nMCHC: 31.3 g/dL (ref 31.5–34.5)\nRDW: 13.4 % (ref 11.6–14.0)\nWBC: 6.80 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 58.0 % (ref 40.0–80.0)\nNeutrophils absolute: 3.94 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 32.0 % (ref 20.0–40.0)\nLymphocytes absolute: 2.18 x10^9/L (ref 1.00–3.00)\nMonocytes %: 6.0 % (ref 2.0–10.0)\nMonocytes absolute: 0.41 x10^9/L (ref 0.20–1.00)\nEosinophils %: 3.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.20 x10^9/L (ref 0.02–0.50)\nBasophils %: 1.0 % (ref 0.0–2.0)\nBasophils absolute: 0.07 x10^9/L (ref 0.02–0.10)\nPlatelets: 245 x10^9/L (ref 150–410)\nMPV: 9.8 fL (ref 7.5–11.5)",
+    "Interpretation": "Mild microcytic anaemia is present, with haemoglobin of 11.2 g/dL and a markedly low MCV of about 64 fL. The red cell count is raised at 5.6 x10^12/L, and the RDW is within the reference interval. This combination of low MCV, low MCH and a raised red cell count, with a normal RDW and a long-standing history of mild anaemia, is a pattern suggestive of beta-thalassaemia trait rather than iron deficiency. White cell and platelet counts, with their differential, are within normal limits. Haemoglobin HPLC is recommended to assess for an abnormal haemoglobin variant or raised HbA2 and to confirm the diagnosis."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 11.2,
+      "unit": "g/dL",
+      "ref_low": 12.0,
+      "ref_high": 15.0
+    },
+    "RBC": {
+      "value": 5.6,
+      "unit": "x10^12/L",
+      "ref_low": 3.8,
+      "ref_high": 4.8
+    },
+    "Hct": {
+      "value": 35.8,
+      "unit": "%",
+      "ref_low": 36.0,
+      "ref_high": 46.0
+    },
+    "MCV": {
+      "value": 63.9,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 20.0,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 31.3,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 13.4,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 6.8,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 58.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 3.94,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 32.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 2.18,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 6.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 0.41,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 3.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.2,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.07,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 245.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 9.8,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

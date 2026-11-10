@@ -1,0 +1,25 @@
+{
+  "id": "H-003",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Rectum, low anterior resection",
+  "sections": {
+    "Clinical details": "58-year-old man with adenocarcinoma of the upper rectum detected on screening colonoscopy. No neoadjuvant therapy was given. Specimen submitted following low anterior resection.",
+    "Specimen": "Low anterior resection specimen comprising a segment of rectum with attached mesorectal fat.",
+    "Gross description": "The resection specimen measures 16 cm in length. The proximal and distal resection margins are inked and sampled. The circumferential resection margin is inked and sectioned perpendicular to the surface. A firm, ulcerated tumour is present on the anterior wall, measuring 30 mm in greatest dimension. The distal margin lies 25 mm from the tumour edge. The circumferential resection margin lies 4 mm from the nearest tumour edge. Serial sections are taken at 5 mm intervals, and the mesorectal fat is examined for lymph nodes.",
+    "Microscopic description": "Sections show a moderately differentiated adenocarcinoma forming irregular glands and solid nests. The tumour infiltrates through the mucosa and submucosa and extends into, but not through, the muscularis propria. No extension into the perirectal fat is identified. Tumour lies 4 mm from the circumferential resection margin. Lymphovascular invasion is not identified. Perineural invasion is not identified. Fifteen lymph nodes are identified in the mesorectal fat, all free of tumour. Proximal and distal margins are free of tumour.",
+    "Diagnosis": "Low anterior resection of the rectum:\nModerately differentiated (G2) adenocarcinoma of the rectum, 30 mm, invading into but not through the muscularis propria (pT2).\nNo lymph node metastasis (0/15).\nCircumferential and distal resection margins clear.\nNo lymphovascular or perineural invasion.",
+    "Synoptic summary": "Tumour size: 30 mm\nHistologic grade: G2 (moderately differentiated)\nMargins: Circumferential resection margin 4 mm (clear); distal margin 25 mm (clear)\nLymphovascular invasion: Not identified\nPerineural invasion: Not identified\nLymph nodes (positive/total): 0/15\npT: pT2\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "The pathological stage is I (pT2 pN0) according to the AJCC 8th edition. The M category is not assessed on this specimen. Clear circumferential margin and absence of lymphovascular and perineural invasion are noted for multidisciplinary review."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

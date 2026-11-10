@@ -1,0 +1,25 @@
+{
+  "id": "H-016",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Prostate, radical prostatectomy with bilateral pelvic lymphadenectomy",
+  "sections": {
+    "Clinical details": "Man aged 68 years with biopsy-proven prostatic adenocarcinoma. Serum PSA 8.4 ng/mL. Treated by robot-assisted radical prostatectomy with bilateral pelvic lymph node dissection.",
+    "Specimen": "Radical prostatectomy specimen with seminal vesicles, together with bilateral pelvic lymph nodes submitted separately. Fixed in 10% neutral buffered formalin.",
+    "Gross description": "Prostate received intact, weighing 46 g and measuring 4.6 x 4.2 x 3.8 cm. Surface inked. Serial sections at 5 mm from base to apex show a firm, ill-defined, yellow-white area in the right posterior peripheral zone, involving approximately 15 percent of the gland. Seminal vesicles unremarkable. Eight pelvic lymph nodes identified, measuring 0.4 to 1.1 cm; all submitted entirely.",
+    "Microscopic description": "Sections show an infiltrative acinar adenocarcinoma composed of small, crowded glands, with fused and poorly formed glands representing Gleason pattern 4 admixed with pattern 3. Gleason score 3+4=7 (Grade Group 2). Tumour is confined within the prostatic capsule, with no extraprostatic extension. Seminal vesicles are free of tumour. Perineural invasion is present. No lymphovascular invasion is identified. Surgical margins are free of tumour. Background benign prostatic hyperplasia. Zero of eight pelvic lymph nodes contain metastatic carcinoma.",
+    "Diagnosis": "Prostate, radical prostatectomy and bilateral pelvic lymph node dissection:\n- Acinar adenocarcinoma, Gleason score 3+4=7 (Grade Group 2), involving approximately 15 percent of the gland.\n- Organ-confined disease (pT2); no extraprostatic extension; seminal vesicles not involved.\n- Perineural invasion present; lymphovascular invasion absent.\n- Surgical margins negative.\n- Bilateral pelvic lymph nodes: 0 of 8 involved by metastatic carcinoma (pN0).",
+    "Synoptic summary": "Tumour size: Approximately 15 percent of the gland volume involved\nHistologic grade: Gleason score 3+4=7; Grade Group 2\nMargins: Negative\nLymphovascular invasion: Absent\nPerineural invasion: Present\nLymph nodes (positive/total): 0/8\npT: pT2\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "Organ-confined disease with negative surgical margins and no nodal metastasis. Perineural invasion is noted for information. Correlation with postoperative PSA follow-up is advised."
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

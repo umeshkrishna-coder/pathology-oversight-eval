@@ -1,0 +1,25 @@
+{
+  "id": "H-002",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Colon, right hemicolectomy",
+  "sections": {
+    "Clinical details": "64-year-old man undergoing work-up for iron deficiency anaemia. Colonoscopy identified a caecal mass. Right hemicolectomy performed.\nSpecimen type: colon, right hemicolectomy.",
+    "Specimen": "Right hemicolectomy specimen comprising caecum, terminal ileum and ascending colon with attached mesentery. Specimen received fresh and fixed in 10% neutral buffered formalin. Appendix not identified as separate.",
+    "Gross description": "The specimen measures 280 mm in length. A fungating, ulcerated tumour is present in the caecum measuring 45 mm in maximum dimension. The tumour extends to the serosal surface, which appears intact, with no adherent tissue. Mesenteric surface shows pericolic fat with no gross perforation. Proximal and distal resection margins are inked and sampled, and the radial (mesenteric) margin is inked and sectioned. Eighteen lymph nodes are identified in the mesentery, ranging from 3 mm to 15 mm.",
+    "Microscopic description": "Sections show a moderately differentiated adenocarcinoma composed of irregular glands and solid nests infiltrating the bowel wall. The tumour invades through the muscularis propria into pericolic fat. The serosal surface is not involved. Foci of lymphovascular invasion are present. No perineural invasion is identified. Two of 18 lymph nodes contain metastatic adenocarcinoma. The proximal, distal and radial margins are free of tumour.",
+    "Diagnosis": "Caecum, right hemicolectomy:\n- Moderately differentiated adenocarcinoma, 45 mm, invading through the muscularis propria into pericolic fat (pT3).\n- Metastatic adenocarcinoma in 2 of 18 regional lymph nodes (pN1b).\n- Lymphovascular invasion present; perineural invasion absent.\n- Proximal, distal and radial margins clear of tumour.",
+    "Synoptic summary": "Tumour size: 45 mm\nHistologic grade: G2 (moderately differentiated)\nMargins: Proximal, distal and radial margins clear\nLymphovascular invasion: Present\nPerineural invasion: Absent\nLymph nodes (positive/total): 2/18\npT: pT3\npN: pN1b\nStaging edition: AJCC 8th edition",
+    "Comment": "pT3 pN1b corresponds to AJCC 8th edition stage group IIIB for carcinoma of the caecum. Metastatic status was not assessed on this specimen."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "H-013",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Liver, ultrasound-guided core biopsy of a hepatic mass",
+  "sections": {
+    "Clinical details": "A 62-year-old man presented with weight loss. No primary tumour is known. Imaging showed multiple hepatic lesions, and an ultrasound-guided core biopsy was requested to establish the diagnosis.",
+    "Specimen": "Liver, ultrasound-guided core biopsy of a hepatic mass. Fixed in 10% neutral buffered formalin.",
+    "Gross description": "Two cores of pale tan tissue, measuring 1.4 cm and 1.1 cm in length and approximately 0.2 cm in diameter. The entire specimen is submitted in two cassettes.",
+    "Microscopic description": "Sections show hepatic parenchyma infiltrated by a poorly differentiated malignant epithelial neoplasm arranged in sheets, trabeculae and nests. Focal acinar and papillary architecture is seen. Tumour cells have pleomorphic, hyperchromatic nuclei with prominent nucleoli and scant to moderate cytoplasm. Mitotic figures are frequent and there is geographic necrosis. The tumour infiltrates between hepatocytes, and entrapped hepatocytes are seen at the periphery.",
+    "Immunohistochemistry": "CK7: positive\nCK20: negative\nTTF-1: positive\nNapsin A: positive\nCDX2: negative\nHepPar-1: negative",
+    "Diagnosis": "Liver, ultrasound-guided core biopsy: metastatic poorly differentiated adenocarcinoma infiltrating liver parenchyma. The immunophenotype supports a pulmonary primary.",
+    "Synoptic summary": "Tumour size: Not applicable\nHistologic grade: Poorly differentiated (G3)\nMargins: Not applicable\nLymphovascular invasion: Not applicable\nPerineural invasion: Not applicable\nLymph nodes (positive/total): Not applicable\npT: Not applicable\npN: Not applicable\nStaging edition: AJCC 8th edition",
+    "Comment": "The immunohistochemical profile (CK7 positive, TTF-1 positive, napsin A positive, CK20 negative, CDX2 negative, HepPar-1 negative) supports a lung primary. The primary site is not confirmed on this biopsy, and correlation with thoracic imaging is recommended. If a lung primary is confirmed, the multiple hepatic metastases would correspond to M1c and stage IVB under AJCC 8th edition. pT and pN cannot be assessed on core biopsy material."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

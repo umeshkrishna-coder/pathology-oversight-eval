@@ -1,0 +1,142 @@
+{
+  "id": "C-008",
+  "modality": "cbc",
+  "split": "scored",
+  "scenario": "Normal blood count at a pre-employment check",
+  "sections": {
+    "Values": "Hb: 13.2 g/dL (ref 12.0–15.0)\nRBC: 4.60 x10^12/L (ref 3.80–4.80)\nHct: 40.5 % (ref 36.0–46.0)\nMCV: 88.0 fL (ref 83.0–101.0)\nMCH: 28.7 pg (ref 27.0–32.0)\nMCHC: 32.6 g/dL (ref 31.5–34.5)\nRDW: 13.1 % (ref 11.6–14.0)\nWBC: 6.80 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 58.0 % (ref 40.0–80.0)\nNeutrophils absolute: 3.94 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 30.0 % (ref 20.0–40.0)\nLymphocytes absolute: 2.04 x10^9/L (ref 1.00–3.00)\nMonocytes %: 6.0 % (ref 2.0–10.0)\nMonocytes absolute: 0.41 x10^9/L (ref 0.20–1.00)\nEosinophils %: 4.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.27 x10^9/L (ref 0.02–0.50)\nBasophils %: 2.0 % (ref 0.0–2.0)\nBasophils absolute: 0.14 x10^9/L (ref 0.02–0.10)\nPlatelets: 260 x10^9/L (ref 150–410)\nMPV: 9.4 fL (ref 7.5–11.5)",
+    "Interpretation": "The full blood count is within the adult female reference ranges. Haemoglobin, red cell count and haematocrit are normal, with normal red cell indices and a normal red cell distribution width, consistent with normocytic, normochromic red cells. The white cell count and differential are normal, and the platelet count is within the reference range with a normal mean platelet volume. No abnormality is detected, and this is a normal blood count."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 13.2,
+      "unit": "g/dL",
+      "ref_low": 12.0,
+      "ref_high": 15.0
+    },
+    "RBC": {
+      "value": 4.6,
+      "unit": "x10^12/L",
+      "ref_low": 3.8,
+      "ref_high": 4.8
+    },
+    "Hct": {
+      "value": 40.5,
+      "unit": "%",
+      "ref_low": 36.0,
+      "ref_high": 46.0
+    },
+    "MCV": {
+      "value": 88.0,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 28.7,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 32.6,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 13.1,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 6.8,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 58.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 3.94,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 30.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 2.04,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 6.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 0.41,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 4.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.27,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 2.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.14,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 260.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 9.4,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

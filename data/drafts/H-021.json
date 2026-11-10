@@ -1,0 +1,26 @@
+{
+  "id": "H-021",
+  "modality": "histopathology",
+  "split": "dev",
+  "specimen_type": "Testis, right radical inguinal orchidectomy",
+  "sections": {
+    "Clinical details": "Man aged 31 years with a painless swelling of the right testis. Serum lactate dehydrogenase is raised; serum alpha-fetoprotein is normal. Right radical inguinal orchidectomy performed.",
+    "Specimen": "Right radical inguinal orchidectomy with attached spermatic cord.",
+    "Gross description": "The testis is enlarged and replaced by a well-circumscribed, lobulated, tan-white tumour measuring 38 mm in greatest dimension. The cut surface is firm and homogeneous, with no haemorrhage or necrosis. The tumour is confined to the testis and does not extend beyond the tunica albuginea. The spermatic cord margin is clear. The rete testis is unremarkable on macroscopic examination. No lymph nodes are submitted.",
+    "Microscopic description": "The tumour comprises sheets and nests of uniform cells with clear to pale cytoplasm, central nuclei and prominent nucleoli. Fibrous septa contain a lymphocytic infiltrate with scattered granulomas. There is no embryonal carcinoma, yolk sac tumour, choriocarcinoma or teratoma. Lymphovascular invasion is not identified. The rete testis is not involved. The spermatic cord margin is free of tumour.",
+    "Immunohistochemistry": "OCT3/4: positive in tumour cell nuclei.\nSALL4: positive in tumour cell nuclei.\nCD117: positive in tumour cell membranes.\nCD30: negative in tumour cells.\nAlpha-fetoprotein: negative in tumour cells.",
+    "Diagnosis": "Right radical inguinal orchidectomy:\n- Classic seminoma of the testis, 38 mm, confined to the testis (pT1).\n- No lymphovascular invasion; no rete testis invasion.\n- Spermatic cord margin clear.\n- No lymph nodes submitted (pNX).",
+    "Synoptic summary": "Tumour size: 38 mm\nHistologic grade: Not applicable\nMargins: Spermatic cord margin clear\nLymphovascular invasion: Absent\nPerineural invasion: Not identified\nLymph nodes (positive/total): Not applicable (no lymph nodes submitted)\npT: pT1\npN: pNX\nStaging edition: AJCC 8th edition",
+    "Comment": "The tumour is pure seminoma with no non-seminomatous elements. The AJCC 8th edition does not subdivide pT1 testicular tumours, so the category is recorded as pT1. Lymph node sampling was not performed, so pN cannot be assessed. Given the raised serum lactate dehydrogenase, correlation with clinical staging and serum markers is recommended."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

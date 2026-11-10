@@ -1,0 +1,25 @@
+{
+  "id": "H-005",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Tongue, right partial glossectomy with selective neck dissection",
+  "sections": {
+    "Clinical details": "47-year-old man with a non-healing ulcer of the lateral border of the tongue and a long history of tobacco chewing. Right partial glossectomy with ipsilateral selective neck dissection (levels I-IV).",
+    "Specimen": "1. Right partial glossectomy, lateral border of tongue.\n2. Right selective neck dissection, levels I-IV.",
+    "Gross description": "Specimen 1: partial glossectomy measuring 55 x 35 x 20 mm. An ulcerated, indurated lesion on the lateral border measures 28 mm in greatest dimension. The deep surface is inked. The cut surface is firm and greyish-white. The closest mucosal and deep margins are sectioned.\nSpecimen 2: neck dissection tissue in adipose tissue, with 24 lymph nodes identified. One node is firm and greyish-white. Nodes are submitted entirely.",
+    "Microscopic description": "Sections show moderately differentiated keratinising squamous cell carcinoma infiltrating the lateral tongue, with keratin pearls and intercellular bridges. Depth of invasion is 7 mm. Perineural invasion is present. Lymphovascular invasion is not identified. Margins are free, with the closest mucosal margin 6 mm and the deep margin 5 mm.\nNeck dissection: metastatic squamous cell carcinoma is present in one of 24 lymph nodes, with a deposit measuring 18 mm. Extranodal extension is absent.",
+    "Diagnosis": "Right partial glossectomy: keratinising squamous cell carcinoma of the lateral tongue, moderately differentiated (G2), 28 mm, depth of invasion 7 mm, pT2. Margins free. Perineural invasion present. Lymphovascular invasion absent.\nRight selective neck dissection (levels I-IV): metastatic squamous cell carcinoma in one of 24 lymph nodes, deposit 18 mm, no extranodal extension, pN1.\nPathological stage (AJCC 8th edition): pT2 pN1, stage group III.",
+    "Synoptic summary": "Tumour size: 28 mm\nHistologic grade: G2 (moderately differentiated)\nMargins: Free; closest mucosal margin 6 mm, deep margin 5 mm\nLymphovascular invasion: Absent\nPerineural invasion: Present\nLymph nodes (positive/total): 1/24\npT: pT2\npN: pN1\nStaging edition: AJCC 8th edition",
+    "Comment": "Single involved ipsilateral node with a deposit of 18 mm and no extranodal extension, together with perineural invasion. Adjuvant management should be discussed at the multidisciplinary tumour board."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

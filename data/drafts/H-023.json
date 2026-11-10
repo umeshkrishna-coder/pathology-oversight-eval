@@ -1,0 +1,25 @@
+{
+  "id": "H-023",
+  "modality": "histopathology",
+  "split": "dev",
+  "specimen_type": "Colon, laparoscopic sigmoid colectomy",
+  "sections": {
+    "Clinical details": "69-year-old woman with a sigmoid adenocarcinoma diagnosed on colonoscopic biopsy. Laparoscopic sigmoid colectomy performed.",
+    "Specimen": "Laparoscopic sigmoid colectomy specimen with attached mesentery and mesenteric lymph nodes. Received fresh, then fixed in 10% neutral buffered formalin.",
+    "Gross description": "Segment of sigmoid colon measuring 22 cm in length, with proximal and distal resection margins and attached mesentery. Centrally sited, ulcerated, firm tumour in the bowel wall measuring 25 mm in greatest dimension. The serosal surface is intact and no tumour nodules are seen in the mesentery. Fourteen lymph nodes are identified, the largest measuring 9 mm; none appears grossly suspicious. Proximal, distal and mesenteric margins are inked and sampled. Representative sections taken from the tumour, all three margins and all lymph nodes.",
+    "Microscopic description": "Sections show a well to moderately differentiated adenocarcinoma composed of irregular glands with focal solid areas. The tumour invades through the mucosa and submucosa into the muscularis propria but does not penetrate beyond it into the subserosa or through the serosa. No lymphovascular or perineural invasion is identified. The peritumoural lymphoid response is mild. The proximal, distal and mesenteric margins are free of tumour. None of the 14 lymph nodes contains metastatic carcinoma.",
+    "Diagnosis": "Sigmoid colon, laparoscopic sigmoid colectomy:\n- Adenocarcinoma, well to moderately differentiated, 25 mm, invading the muscularis propria (pT2).\n- Lymph nodes: 0 of 14 involved (pN0).\n- Proximal, distal and mesenteric margins clear.\n- No lymphovascular or perineural invasion.",
+    "Synoptic summary": "Tumour size: 25 mm\nHistologic grade: Low grade (well to moderately differentiated)\nMargins: Proximal, distal and mesenteric margins clear\nLymphovascular invasion: Not identified\nPerineural invasion: Not identified\nLymph nodes (positive/total): 0/14\npT: pT2\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "Mismatch repair status is recommended on this resection specimen if it has not already been determined on the biopsy. Adjuvant treatment decisions should be made with reference to the full clinical picture."
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

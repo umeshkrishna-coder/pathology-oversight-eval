@@ -1,0 +1,142 @@
+{
+  "id": "C-002",
+  "modality": "cbc",
+  "split": "scored",
+  "scenario": "Absolute lymphocytosis suggestive of chronic lymphocytic leukaemia",
+  "sections": {
+    "Values": "Hb: 12.8 g/dL (ref 13.0–17.0)\nRBC: 4.50 x10^12/L (ref 4.50–5.50)\nHct: 38.4 % (ref 40.0–50.0)\nMCV: 85.3 fL (ref 83.0–101.0)\nMCH: 28.4 pg (ref 27.0–32.0)\nMCHC: 33.3 g/dL (ref 31.5–34.5)\nRDW: 13.6 % (ref 11.6–14.0)\nWBC: 48.00 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 12.0 % (ref 40.0–80.0)\nNeutrophils absolute: 5.76 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 82.0 % (ref 20.0–40.0)\nLymphocytes absolute: 39.36 x10^9/L (ref 1.00–3.00)\nMonocytes %: 4.0 % (ref 2.0–10.0)\nMonocytes absolute: 1.92 x10^9/L (ref 0.20–1.00)\nEosinophils %: 1.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.48 x10^9/L (ref 0.02–0.50)\nBasophils %: 1.0 % (ref 0.0–2.0)\nBasophils absolute: 0.48 x10^9/L (ref 0.02–0.10)\nPlatelets: 152 x10^9/L (ref 150–410)\nMPV: 9.8 fL (ref 7.5–11.5)",
+    "Interpretation": "Marked leucocytosis with absolute lymphocytosis is present, with lymphocytes forming about 82 percent of total white cells and an absolute lymphocyte count of approximately 39 x10^9/L. Haemoglobin is marginally below the reference range and the red cell indices are normocytic and normochromic, consistent with mild anaemia of uncertain cause. Platelet count is within the reference range. In a 58-year-old man with small cervical lymph nodes, this pattern is suggestive of chronic lymphocytic leukaemia, but it requires confirmation. Peripheral blood smear review by a haematologist and flow cytometry immunophenotyping of the lymphocyte population are recommended to establish clonality and guide further assessment."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 12.8,
+      "unit": "g/dL",
+      "ref_low": 13.0,
+      "ref_high": 17.0
+    },
+    "RBC": {
+      "value": 4.5,
+      "unit": "x10^12/L",
+      "ref_low": 4.5,
+      "ref_high": 5.5
+    },
+    "Hct": {
+      "value": 38.4,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 50.0
+    },
+    "MCV": {
+      "value": 85.3,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 28.4,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 33.3,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 13.6,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 48.0,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 12.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 5.76,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 82.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 39.36,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 4.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 1.92,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.48,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.48,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 152.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 9.8,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

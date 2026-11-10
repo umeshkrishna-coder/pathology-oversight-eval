@@ -30,10 +30,13 @@ from pathqc_eval.validate import check_report
 
 DRAFT_MODEL = "claude-haiku-5-5"
 DRAFT_MAX_TOKENS = 16000
+# Reasoning effort (owner decision, EVAL-02b). Haiku 5.5 thinks adaptively by default; effort
+# goes in output_config. No sampling parameter is sent.
+DRAFT_EFFORT = "high"
 PROMPTS_DIR = REPO_ROOT / "prompts" / "drafting"
 DEFAULT_DRAFTS_DIR = REPO_ROOT / "data" / "drafts"
 EST_INPUT_TOKENS = 1200
-EST_OUTPUT_TOKENS = 1100
+EST_OUTPUT_TOKENS = 8000  # including thinking at high effort
 STAGING_EDITION_LINE = "Staging edition: AJCC 8th edition"
 _EPS = 1e-12
 
@@ -55,6 +58,17 @@ class MissingAPIKeyError(RuntimeError):
     pass
 
 
+def draft_request_args(model: str, system: str, user: str, max_tokens: int) -> dict:
+    """Keyword arguments for one drafting messages.create call."""
+    return {
+        "model": model,
+        "max_tokens": max_tokens,
+        "system": system,
+        "messages": [{"role": "user", "content": user}],
+        "output_config": {"effort": DRAFT_EFFORT},
+    }
+
+
 class AnthropicDraftClient:
     """Real client; constructed only when a real drafting run is requested (EVAL-02b)."""
 
@@ -70,10 +84,7 @@ class AnthropicDraftClient:
 
     def complete(self, system: str, user: str, max_tokens: int) -> DraftResponse:
         message = self._client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            system=system,
-            messages=[{"role": "user", "content": user}],
+            **draft_request_args(self.model, system, user, max_tokens)
         )
         text = "".join(block.text for block in message.content if block.type == "text")
         return DraftResponse(

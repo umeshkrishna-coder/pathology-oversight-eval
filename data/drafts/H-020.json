@@ -1,0 +1,25 @@
+{
+  "id": "H-020",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Oesophagus, Ivor Lewis oesophagectomy",
+  "sections": {
+    "Clinical details": "60-year-old man with progressive dysphagia and a mid-thoracic oesophageal stricture on endoscopy. Biopsy showed squamous cell carcinoma. No neoadjuvant therapy was given. Ivor Lewis oesophagectomy was performed.",
+    "Specimen": "Ivor Lewis oesophagectomy specimen comprising oesophagus with attached gastric conduit and mediastinal and abdominal lymph nodes, received fresh and fixed in formalin.",
+    "Gross description": "Oesophagus with attached stomach, the oesophageal segment measuring 220 mm in length. There is an ulcerated, infiltrative mid-thoracic tumour measuring 40 mm in maximum dimension. The proximal resection margin lies 35 mm from the tumour edge, the distal margin 60 mm, and the nearest circumferential (radial) margin 8 mm. Sixteen lymph nodes are identified, the largest measuring 18 mm.",
+    "Microscopic description": "Sheets, nests and cords of pleomorphic squamous cells with intercellular bridges and focal keratinisation, consistent with moderately differentiated keratinising squamous cell carcinoma. The tumour invades through the muscularis propria into the adventitia. Lymphovascular invasion is identified. Perineural invasion is not seen. All margins are free of tumour, the nearest being the circumferential margin at 8 mm. One of 16 lymph nodes contains metastatic carcinoma, with no extranodal extension identified.",
+    "Diagnosis": "Oesophagus, mid-thoracic, Ivor Lewis oesophagectomy:\n- Moderately differentiated keratinising squamous cell carcinoma, 40 mm, invading adventitia (pT3).\n- Metastatic carcinoma in 1 of 16 regional lymph nodes (pN1).\n- All margins free of tumour.\n- Lymphovascular invasion present; perineural invasion absent.",
+    "Synoptic summary": "Tumour size: 40 mm\nHistologic grade: G2, moderately differentiated\nMargins: All clear; closest margin circumferential, 8 mm\nLymphovascular invasion: Present\nPerineural invasion: Absent\nLymph nodes (positive/total): 1/16\npT: pT3\npN: pN1\nStaging edition: AJCC 8th edition",
+    "Comment": "Pathological stage group IIIA (AJCC 8th edition, squamous cell carcinoma, pT3 pN1). The M category is not assessed on this specimen."
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

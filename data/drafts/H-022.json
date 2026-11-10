@@ -1,0 +1,25 @@
+{
+  "id": "H-022",
+  "modality": "histopathology",
+  "split": "dev",
+  "specimen_type": "Pancreas, pancreaticoduodenectomy",
+  "sections": {
+    "Clinical details": "62-year-old woman presenting with obstructive jaundice. Imaging demonstrated a mass in the head of the pancreas. Pancreaticoduodenectomy was performed.",
+    "Specimen": "Pancreaticoduodenectomy comprising pancreatic head and uncinate process, duodenum, distal common bile duct, gallbladder and regional lymph nodes.",
+    "Gross description": "Received fresh, orientated and inked. An ill-defined, firm, grey-white mass is centred on the pancreatic head, measuring 26 mm in greatest dimension. The superior mesenteric artery margin is 2 mm from the tumour. The pancreatic neck margin is clear, 8 mm from the tumour. The bile duct margin is clear, 6 mm from the tumour. The gallbladder and duodenum are unremarkable. Seventeen lymph nodes are identified and submitted. Representative sections are taken from the tumour, all margins and all lymph nodes.",
+    "Microscopic description": "Infiltrating irregular glands and small clusters of moderately differentiated ductal adenocarcinoma are present in a dense desmoplastic stroma. The tumour is confined to the pancreas, with no extrapancreatic extension. Perineural invasion is present. Lymphovascular invasion is present. Metastatic carcinoma is identified in 3 of 17 regional lymph nodes. The margins are free of tumour, the closest being the superior mesenteric artery margin at 2 mm.",
+    "Diagnosis": "Pancreas, pancreaticoduodenectomy:\n- Moderately differentiated ductal adenocarcinoma of the pancreatic head, 26 mm (pT2).\n- Metastatic carcinoma in 3 of 17 regional lymph nodes (pN1).\n- Perineural and lymphovascular invasion present.\n- Margins free of tumour; closest margin is the superior mesenteric artery at 2 mm.",
+    "Synoptic summary": "Tumour size: 26 mm\nHistologic grade: G2, moderately differentiated\nMargins: Free of tumour; closest margin superior mesenteric artery, 2 mm\nLymphovascular invasion: Present\nPerineural invasion: Present\nLymph nodes (positive/total): 3/17\npT: pT2\npN: pN1\nStaging edition: AJCC 8th edition",
+    "Comment": "Pathological stage group IIB (pT2 pN1; M category not assessed in this specimen), AJCC 8th edition. Clinical correlation is advised for any further staging and for adjuvant treatment planning at the multidisciplinary meeting."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

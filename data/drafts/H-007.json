@@ -1,0 +1,25 @@
+{
+  "id": "H-007",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Kidney, left radical nephrectomy",
+  "sections": {
+    "Clinical details": "A 55-year-old man with an incidentally detected left renal mass, referred for radical nephrectomy.",
+    "Specimen": "Left radical nephrectomy with perinephric fat and intact Gerota fascia. Two hilar lymph nodes submitted separately.",
+    "Gross description": "The kidney is received with its perinephric fat and Gerota fascia intact. Sectioning shows a well-circumscribed, golden-yellow to tan, partly haemorrhagic mass in the upper pole, measuring 65 mm in greatest dimension. The tumour appears confined to the renal parenchyma, with no gross involvement of the renal sinus. The renal vein, ureteric and Gerota fascia margins are inked and sampled. Two hilar lymph nodes are identified and submitted entirely.",
+    "Microscopic description": "Sections show a tumour of nests, alveoli and acini composed of cells with clear to eosinophilic cytoplasm and round nuclei with moderate nuclear atypia, consistent with WHO/ISUP nucleolar grade 2. A delicate, thin-walled, branching vasculature is present. No sarcomatoid or rhabdoid differentiation is seen. The tumour does not invade renal sinus fat or perinephric fat. The renal vein, ureteric and Gerota fascia margins are free of tumour. Lymphovascular invasion is not identified. Both hilar lymph nodes are free of metastatic carcinoma.",
+    "Diagnosis": "Left kidney, radical nephrectomy: clear cell renal cell carcinoma, WHO/ISUP grade 2, 65 mm, confined to the kidney without invasion of renal sinus or perinephric fat (pT1b). Renal vein, ureteric and Gerota fascia margins free of tumour. Lymph nodes: 0 of 2 positive (pN0). Lymphovascular invasion not identified.",
+    "Synoptic summary": "Tumour size: 65 mm (greatest dimension)\nHistologic grade: WHO/ISUP grade 2\nMargins: Renal vein, ureteric and Gerota fascia margins free of tumour\nLymphovascular invasion: Not identified\nPerineural invasion: Not applicable\nLymph nodes (positive/total): 0/2\npT: pT1b\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "Pathological stage group I (pT1b pN0), assuming M0 on clinical assessment. Distant metastatic status cannot be assessed on this specimen."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

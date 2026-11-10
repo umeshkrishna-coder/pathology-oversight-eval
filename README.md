@@ -12,7 +12,7 @@ uv run pathqc-eval validate --drafts data/drafts                         # draft
 uv run pathqc-eval render <file-or-folder> # rewrite each CBC report's Values text from its cbc_values
 uv run pathqc-eval spec-check [data/specs/dataset.json]                  # validate the dataset spec
 uv run pathqc-eval draft --dry-run         # print the drafting prompts and a cost estimate; no API call
-uv run pathqc-eval draft [--ids H-001,C-003] [--force] [--cost-gate 0.25] # draft approved rows (EVAL-02b)
+uv run pathqc-eval draft [--ids H-001,C-003] [--force] [--cost-gate 0.50] # draft approved rows (EVAL-02b)
 uv run pathqc-eval freeze [--replace]      # hash taxonomy, prompts and dataset into data/prompts.lock.json
 uv run pathqc-eval freeze --check          # exit 0 only if every hash still matches the lock
 uv run pytest                              # run the tests

@@ -7,6 +7,8 @@ from pathqc_eval import cli
 from pathqc_eval.cbc import load_reference_ranges
 from pathqc_eval.cost import cost_usd
 from pathqc_eval.draft import (
+    DRAFT_EFFORT,
+    DRAFT_MAX_TOKENS,
     STAGING_EDITION_LINE,
     AnthropicDraftClient,
     DraftParseError,
@@ -14,6 +16,7 @@ from pathqc_eval.draft import (
     FakeDraftClient,
     MissingAPIKeyError,
     draft_report,
+    draft_request_args,
     run_drafts,
 )
 from pathqc_eval.io import read_report_json, write_report_json
@@ -254,8 +257,27 @@ def test_dry_run_runs_with_no_client(no_real_client, capsys):
     assert "===== H-001 system prompt (prompts/drafting/histopathology.md) =====" in out
     assert "===== C-001 user message =====" in out
     assert out.rstrip().endswith(
-        "Estimate: 34 rows × ~1,200 input + ~1,100 output tokens at Haiku prices = $0.0228"
+        "Estimate: 34 rows × ~1,200 input + ~8,000 output tokens at Haiku prices = $0.1401"
     )
+
+
+def test_draft_request_args_set_high_effort_and_no_sampling():
+    args = draft_request_args("claude-haiku-5-5", "SYSTEM", "USER", DRAFT_MAX_TOKENS)
+    assert args == {
+        "model": "claude-haiku-5-5",
+        "max_tokens": 16000,
+        "system": "SYSTEM",
+        "messages": [{"role": "user", "content": "USER"}],
+        "output_config": {"effort": "high"},
+    }
+    assert DRAFT_EFFORT == "high"
+    for sampling in ("temperature", "top_p", "top_k"):
+        assert sampling not in args
+    assert "thinking" not in args  # Haiku 5.5 thinks adaptively by default
+
+
+def test_draft_default_cost_gate_is_050():
+    assert cli._build_parser().parse_args(["draft"]).cost_gate == 0.50
 
 
 def test_anthropic_client_names_missing_key(monkeypatch):

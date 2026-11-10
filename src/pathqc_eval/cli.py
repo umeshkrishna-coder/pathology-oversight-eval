@@ -60,7 +60,7 @@ def _build_parser() -> argparse.ArgumentParser:
     draft.add_argument("--ids", help="comma-separated row ids, e.g. H-001,C-003")
     draft.add_argument("--dry-run", action="store_true", help="print prompts and estimate only")
     draft.add_argument("--force", action="store_true", help="redraft rows that already exist")
-    draft.add_argument("--cost-gate", type=float, default=0.25, help="USD cap per run")
+    draft.add_argument("--cost-gate", type=float, default=0.50, help="USD cap per run")
 
     freeze_cmd = sub.add_parser(
         "freeze", help="hash taxonomy, prompts and dataset into data/prompts.lock.json"

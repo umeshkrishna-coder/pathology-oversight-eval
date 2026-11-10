@@ -1,0 +1,26 @@
+{
+  "id": "H-012",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Skin, excision of a pigmented lesion of the upper back",
+  "sections": {
+    "Clinical details": "49-year-old man with an irregular pigmented lesion of the upper back that has changed over the past six months. Excision submitted for histopathological assessment.",
+    "Specimen": "Skin, excision of a pigmented lesion of the upper back.",
+    "Gross description": "Received in formalin, labelled as skin excision of a pigmented lesion of the upper back. A fusiform ellipse of skin measuring 26 x 18 x 5 mm. Centrally placed irregular brown-black pigmented lesion measuring 14 mm in greatest dimension. Peripheral margin of 4 mm of apparently normal skin on the lesion's margin. Bisected through the lesion and entirely submitted in cassettes A1 to A6.",
+    "Microscopic description": "Sections show an invasive melanocytic neoplasm with an in situ component arising at the epidermis. Atypical melanocytes arranged in nests and single units, with pagetoid spread through the epidermis. Invasive tumour cells are pleomorphic with large nuclei and prominent nucleoli, extending into the reticular dermis to Clark level IV. Breslow thickness is 1.6 mm. Mitotic figures are present at a rate of 2 per mm2. The overlying epidermis is intact and there is no ulceration. Lymphovascular and perineural invasion are not identified. The peripheral margin is clear at 4 mm and the deep margin is clear at 3 mm.",
+    "Immunohistochemistry": "SOX10, Melan-A and HMB-45 are positive in the tumour cells. Pancytokeratin is negative in the tumour cells, excluding a carcinoma.",
+    "Diagnosis": "Skin, upper back, excision: invasive melanoma, superficial spreading type, Breslow thickness 1.6 mm, Clark level IV, non-ulcerated, mitotic rate 2 per mm2 (pT2a). Peripheral and deep margins clear. No lymph nodes submitted (pNX).",
+    "Synoptic summary": "Tumour size: Breslow thickness 1.6 mm (lesion 14 mm in greatest dimension)\nHistologic grade: Not applicable\nMargins: Peripheral 4 mm clear; deep 3 mm clear\nLymphovascular invasion: Not identified\nPerineural invasion: Not identified\nLymph nodes (positive/total): Not applicable (no lymph nodes submitted)\npT: pT2a\npN: pNX (regional lymph nodes not submitted)\nStaging edition: AJCC 8th edition",
+    "Comment": "The pT2a category is assigned on Breslow thickness and the absence of ulceration. Regional nodal status was not assessed, so a pathological stage group cannot be assigned. Clinical correlation and consideration of nodal assessment are recommended."
+  },
+  "is_clean_control": false,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}
