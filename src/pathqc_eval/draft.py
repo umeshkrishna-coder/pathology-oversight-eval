@@ -1,8 +1,10 @@
 """Drafting: approved spec rows -> draft reports with claude-haiku-5-5 (decision 25).
 
 The drafting model sees only the system prompt in prompts/drafting/ and a user message built
-from the row's brief, specimen_type or scenario, sex and age. It never sees the taxonomy or the
-planned error types and is never asked to include errors; the owner plants every error later.
+from the row's brief, specimen_type or scenario, sex and age; a CBC message also lists the
+reference ranges for the row's sex from data/specs/cbc_reference_ranges.json (EVAL-02d). It
+never sees the taxonomy or the planned error types and is never asked to include errors; the
+owner plants every error later.
 """
 
 from __future__ import annotations
@@ -19,12 +21,19 @@ from typing import Protocol
 
 from pydantic import Field, ValidationError
 
-from pathqc_eval.cbc import CBCPrimary, ReferenceRanges, derive_cbc
+from pathqc_eval.cbc import CBCPrimary, ReferenceRanges, derive_cbc, load_reference_ranges
 from pathqc_eval.cost import cost_usd
 from pathqc_eval.io import append_jsonl, write_report_json
-from pathqc_eval.render import render_cbc_values
-from pathqc_eval.schema import SCHEMA_VERSION, SECTION_CONVENTIONS, Report, StrictModel
-from pathqc_eval.spec import SpecRow
+from pathqc_eval.render import DECIMALS, analyte_label, render_cbc_values
+from pathqc_eval.schema import (
+    CBC_UNITS,
+    SCHEMA_VERSION,
+    SECTION_CONVENTIONS,
+    CBCValues,
+    Report,
+    StrictModel,
+)
+from pathqc_eval.spec import Sex, SpecRow
 from pathqc_eval.taxonomy import REPO_ROOT, load_taxonomy
 from pathqc_eval.validate import check_report
 
@@ -130,18 +139,45 @@ def system_prompt(modality: str) -> str:
     return (PROMPTS_DIR / f"{modality}.md").read_text(encoding="utf-8")
 
 
-def user_message(row: SpecRow) -> str:
-    """Built from brief, specimen_type or scenario, sex and age, and nothing else in the row."""
+def _bound(value: float, decimals: int) -> str:
+    """A stored range bound with the Values text's decimals, or in full when those decimals
+    would round it (a rounded bound could show a wider range than the one stored)."""
+    shown = f"{value:.{decimals}f}"
+    return shown if float(shown) == value else repr(value)
+
+
+def reference_ranges_block(sex: Sex, ranges: ReferenceRanges) -> str:
+    """`Reference ranges (adult <sex>):`, then one `<label>: <low>–<high> <unit>` line per
+    analyte in CBCValues order, with the labels, decimals and units of the Values text."""
+    lines = [f"Reference ranges (adult {sex}):"]
+    for name in CBCValues.model_fields:
+        rng = ranges.for_field(name, sex)
+        d = DECIMALS[name]
+        low, high = _bound(rng.low, d), _bound(rng.high, d)
+        lines.append(f"{analyte_label(name)}: {low}–{high} {CBC_UNITS[name]}")
+    return "\n".join(lines)
+
+
+def user_message(row: SpecRow, ranges: ReferenceRanges | None = None) -> str:
+    """Built from brief, specimen_type or scenario, sex and age, and nothing else in the row.
+
+    A CBC message ends with the reference ranges for the row's sex (EVAL-02d), from `ranges`
+    or else from data/specs/cbc_reference_ranges.json. The histopathology message is unchanged.
+    """
     subject = (
         f"Specimen type: {row.specimen_type}"
         if row.modality == "histopathology"
         else f"Scenario: {row.scenario}"
     )
-    return f"{subject}\nPatient: {row.sex}, {row.age} years\nBrief: {row.brief}"
+    message = f"{subject}\nPatient: {row.sex}, {row.age} years\nBrief: {row.brief}"
+    if row.modality == "cbc":
+        ranges = ranges if ranges is not None else load_reference_ranges()
+        message += "\n\n" + reference_ranges_block(row.sex, ranges)
+    return message
 
 
-def build_messages(row: SpecRow) -> tuple[str, str]:
-    return system_prompt(row.modality), user_message(row)
+def build_messages(row: SpecRow, ranges: ReferenceRanges | None = None) -> tuple[str, str]:
+    return system_prompt(row.modality), user_message(row, ranges)
 
 
 # Parsing and assembly
@@ -321,7 +357,7 @@ def run_drafts(
             summary.skipped.append(row.id)
             out(f"skip {row.id}: {target.name} exists (use --force to redraft)")
             continue
-        system, user = build_messages(row)
+        system, user = build_messages(row, ranges)
         assembled = None
         raw_text = ""
         for attempt in (1, 2):

@@ -1,10 +1,12 @@
 import ast
+import json
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from pathqc_eval import render, validate
-from pathqc_eval.cbc import CBCPrimary, derive_cbc, load_reference_ranges
+from pathqc_eval.cbc import CBCPrimary, ReferenceRanges, derive_cbc, load_reference_ranges
 from pathqc_eval.schema import CBC_UNITS
 from pathqc_eval.taxonomy import REPO_ROOT
 from pathqc_eval.validate import derived_index_inconsistencies
@@ -140,3 +142,52 @@ def test_derive_cbc_is_called_only_from_draft():
         if path.name != "cbc.py" and "derive_cbc(" in path.read_text(encoding="utf-8")
     ]
     assert callers == ["draft.py"]
+
+
+@pytest.mark.parametrize(
+    ("analyte", "end", "bad"),
+    [
+        ("Platelets", "low", float("nan")),
+        ("Platelets", "low", float("-inf")),
+        ("Platelets", "low", False),
+        ("Platelets", "low", "150"),
+        ("Platelets", "low", -(10**400)),
+        ("Platelets", "high", float("nan")),
+        ("Platelets", "high", float("inf")),
+        ("Platelets", "high", "410"),
+        ("Platelets", "high", 10**400),
+        ("Basophils_pct", "high", True),
+    ],
+    ids=lambda v: v if isinstance(v, str) else repr(v)[:12],
+)
+def test_reference_ranges_refuse_a_bound_that_is_not_a_finite_number(ranges, analyte, end, bad):
+    """EVAL-02d (S3 review): a range bound that is NaN, infinite, true/false, text or an integer
+    too large for a float would reach the drafting model as a reference range; the file is
+    refused instead. Each value here keeps low <= high, so only the finite-number rule can
+    refuse it."""
+    data = ranges.model_dump()
+    data["shared"][analyte][end] = bad
+    with pytest.raises(ValidationError, match="a range bound must be a finite number"):
+        ReferenceRanges.model_validate(data)
+
+
+def test_reference_ranges_refuse_an_integer_too_long_to_print(ranges):
+    """EVAL-02d (S3 review round 3): an integer longer than Python will print (over 4300
+    digits) is refused with the same message, not with Python's own limit message."""
+    data = ranges.model_dump()
+    data["shared"]["Platelets"]["high"] = 10**4300
+    with pytest.raises(ValidationError) as caught:
+        ReferenceRanges.model_validate(data)
+    messages = [error["msg"] for error in caught.value.errors()]
+    assert messages == [
+        "Value error, a range bound must be a finite number, not an integer too long to print"
+    ]
+
+
+def test_reference_ranges_file_with_nan_is_refused(tmp_path, ranges):
+    path = tmp_path / "ranges.json"
+    text = json.dumps(ranges.model_dump()).replace('"low": 150.0', '"low": NaN', 1)
+    assert "NaN" in text
+    path.write_text(text, encoding="utf-8")
+    with pytest.raises(ValidationError):
+        load_reference_ranges(path)

@@ -4,6 +4,7 @@ Rules
 - Do not include any patient name, date, identifier, hospital, laboratory or doctor.
 - The values and the text must be complete, internally consistent and error-free, and must match the brief.
 - The patient is an adult. Write in the house style of a tertiary-care hospital laboratory in India, using British spelling.
+- The user message lists the reference range of every value. Unless the brief says otherwise, choose values so that each one, including every absolute count the tool will derive (WBC x percentage / 100), lies inside its range.
 
 Output: return only a JSON object, with no text before or after it, with these keys:
 

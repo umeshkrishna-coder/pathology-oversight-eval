@@ -6,9 +6,10 @@ never import this module, so a planted C2 inconsistency survives a re-render (de
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 
 from pathqc_eval.io import read_report_json
 from pathqc_eval.schema import CBC_UNITS, DIFFERENTIAL_CELLS, CBCValues, StrictModel
@@ -39,9 +40,32 @@ class CBCPrimary(StrictModel):
     MPV: float
 
 
+def _refusal(value: object) -> str:
+    try:
+        shown = repr(value)[:40]
+    except ValueError:  # an integer longer than Python will print
+        shown = "an integer too long to print"
+    return f"a range bound must be a finite number, not {shown}"
+
+
 class Range(StrictModel):
     low: float
     high: float
+
+    @field_validator("low", "high", mode="before")
+    @classmethod
+    def _finite_number(cls, value: object) -> object:
+        # Bounds reach the drafting model (EVAL-02d): NaN, infinities, true/false and text are
+        # refused rather than coerced.
+        if isinstance(value, bool) or not isinstance(value, int | float):
+            raise ValueError(_refusal(value))
+        try:
+            number = float(value)
+        except OverflowError:  # an integer too large for a float
+            raise ValueError(_refusal(value)) from None
+        if not math.isfinite(number):
+            raise ValueError(_refusal(value))
+        return value
 
     @model_validator(mode="after")
     def _ordered(self) -> Range:

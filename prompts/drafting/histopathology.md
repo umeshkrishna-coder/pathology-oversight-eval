@@ -6,6 +6,8 @@ Rules
 - Write in the house style of a tertiary-care cancer centre in India, using British spelling.
 - Stage according to the AJCC Cancer Staging Manual, 8th edition, for the site.
 - Length: 250 to 450 words in total.
+- Use the pT and pN categories exactly as the brief states them. Do not change them and do not discuss how they were chosen.
+- Do not state a stage group, a FIGO stage, a risk category or a prognostic group unless the brief gives one.
 
 Sections, in this order and with exactly these names:
 1. Clinical details

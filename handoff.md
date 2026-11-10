@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–39 on 2026-11-10)
+## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–40 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -50,6 +50,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 37. Planting is done through data/specs/planting.md, written by the owner. `pathqc-eval plant` applies it deterministically to the drafts and writes data/reports/; drafts are never edited; reports are never edited by hand; no model takes part. The sheet is published with the dataset as the record of what was planted. The tool refuses to build while the taxonomy status is not "final".
 38. For this one run [EVAL-N1, the overnight build run] the rule "one task per prompt, no chaining" is set aside. Stages are chained on condition that every stage passes its own gate and gets its own commit and its own record. Advice noted: bundled work hides which change caused a fault, so a stage that fails its gate is set aside and nothing is built on it.
 39. The Project Harness Kit is adopted for this pilot at Light size. The Operating Charter, the decision register and the roadmap are kept by the orchestrator outside the repo; handoff.md stays the session's notes; the repo gets a CLAUDE.md. Three typed words, each typed by the owner in a session: `freeze approved`, `scored run approved`, `release approved`. Nothing in this prompt [the EVAL-N1 prompt] is one of those words. For small API tasks, pasting a prompt that states model, estimate and hard stop is the owner's yes. Status labels gain REPORTED and NOT TESTED. A fix to existing behaviour ships with a test that fails on the old code and passes on the new.
+40. Drafting instructions corrected after the audit of the first drafts: the brief's pT and pN are used exactly and no stage group or risk class is added that the brief does not give; the CBC drafting message shows the reference ranges. H-009, H-021, C-008 and C-009 were drafted again. Single-sentence corrections elsewhere are the owner's [fix] entries.
 
 ## Error taxonomy (OWNER VERIFIED as draft; to be finalised before any error is planted)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.

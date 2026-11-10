@@ -25,7 +25,8 @@ DECIMALS: dict[str, int] = {
 }
 
 
-def _label(field_name: str) -> str:
+def analyte_label(field_name: str) -> str:
+    """The analyte's label in the Values text, e.g. "Neutrophils %" or "Basophils absolute"."""
     cell, _, kind = field_name.partition("_")
     if kind == "pct":
         return f"{cell} %"
@@ -41,7 +42,7 @@ def render_cbc_values(values: CBCValues) -> str:
         analyte = getattr(values, field_name)
         d = DECIMALS[field_name]
         lines.append(
-            f"{_label(field_name)}: {analyte.value:.{d}f} {analyte.unit} "
+            f"{analyte_label(field_name)}: {analyte.value:.{d}f} {analyte.unit} "
             f"(ref {analyte.ref_low:.{d}f}–{analyte.ref_high:.{d}f})"
         )
     return "\n".join(lines)

@@ -4,19 +4,19 @@
   "split": "scored",
   "specimen_type": "Cervix, radical hysterectomy with pelvic lymphadenectomy",
   "sections": {
-    "Clinical details": "Woman aged 44 years. A cervical growth was seen on speculum examination. She underwent radical hysterectomy with bilateral pelvic lymphadenectomy.",
-    "Specimen": "Radical hysterectomy with bilateral pelvic lymphadenectomy. Uterus with cervix, parametrial tissue and a cuff of upper vagina, together with pelvic lymph nodes from both sides (20 nodes in total).",
-    "Gross description": "Uterus and cervix with attached parametria and upper vaginal cuff. An ulcerated, fungating exophytic cervical mass with a greatest dimension of 32 mm. The vaginal cuff and both parametrial margins have been inked and sampled. Twenty pelvic lymph nodes are identified and submitted.",
-    "Microscopic description": "Sections show moderately differentiated non-keratinising squamous cell carcinoma infiltrating the cervical stroma to a depth of 11 mm. Lymphovascular invasion is present. Perineural invasion is not identified. The vaginal cuff and parametrial margins are free of tumour. Metastatic carcinoma is present in two of the 20 pelvic lymph nodes.",
-    "Diagnosis": "Cervix, radical hysterectomy with bilateral pelvic lymphadenectomy:\n1. Invasive moderately differentiated non-keratinising squamous cell carcinoma of the cervix, 32 mm, with stromal invasion of 11 mm (pT1b2).\n2. Metastatic carcinoma in two of 20 pelvic lymph nodes (pN1).\n3. Lymphovascular invasion present; perineural invasion absent.\nPathological stage IIIC1p (AJCC 8th edition).",
-    "Synoptic summary": "Tumour size: 32 mm (greatest dimension)\nHistologic grade: Moderately differentiated (G2)\nMargins: Clear (vaginal cuff and both parametria)\nLymphovascular invasion: Present\nPerineural invasion: Absent\nLymph nodes (positive/total): 2/20\npT: pT1b2\npN: pN1\nStaging edition: AJCC 8th edition",
-    "Comment": "The greatest tumour dimension of 32 mm places the tumour in pT1b2 (more than 2 cm and no more than 4 cm), so the T category is recorded as pT1b2 rather than pT1b1."
+    "Clinical details": "Woman aged 44 years with a cervical growth identified on speculum examination. Treated by radical hysterectomy with bilateral pelvic lymphadenectomy.",
+    "Specimen": "Radical hysterectomy specimen comprising uterus, cervix, parametrial tissue and a cuff of upper vagina. Bilateral pelvic lymph nodes submitted separately, 20 nodes in total.",
+    "Gross description": "The uterus and cervix are received with an ill-defined, greyish-white cervical lesion measuring 32 mm in greatest dimension. The lesion is centred on the cervix. The vaginal cuff and parametrial tissue are submitted for margin assessment. Twenty pelvic lymph nodes are identified and submitted for histological examination.",
+    "Microscopic description": "Sections show a non-keratinising squamous cell carcinoma with solid sheets and nests of atypical squamous cells showing moderate differentiation. Tumour invades the cervical stroma to a maximum depth of 11 mm, within a cervical stromal width of 15 mm. Lymphovascular invasion is present. No perineural invasion is seen. The vaginal cuff and parametrial margins are free of tumour. Two of 20 pelvic lymph nodes contain metastatic carcinoma.",
+    "Diagnosis": "Radical hysterectomy:\nInvasive non-keratinising squamous cell carcinoma of the cervix, moderately differentiated (G2), measuring 32 mm, with stromal invasion of 11 mm. Confined to the cervix (pT1b1). Lymphovascular invasion present. Perineural invasion absent. Margins clear.\n\nBilateral pelvic lymph nodes:\nMetastatic squamous cell carcinoma in 2 of 20 lymph nodes (pN1).",
+    "Synoptic summary": "Tumour size: 32 mm (greatest dimension)\nHistologic grade: G2 (moderately differentiated)\nMargins: Clear (vaginal cuff and parametrial margins)\nLymphovascular invasion: Present\nPerineural invasion: Absent\nLymph nodes (positive/total): 2/20\npT: pT1b1\npN: pN1\nStaging edition: AJCC 8th edition",
+    "Comment": "Metastatic deposits are present in two pelvic lymph nodes. Correlation with the clinical staging and multidisciplinary review is recommended."
   },
   "is_clean_control": false,
   "errors": [],
   "provenance": {
     "drafted_by": "claude-haiku-5-5",
-    "drafted_at": "2026-11-10",
+    "drafted_at": "2026-11-11",
     "edited_by": "owner",
     "verified": false,
     "verified_at": null
