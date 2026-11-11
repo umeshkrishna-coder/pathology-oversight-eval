@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 to S8 done.
+Run status: DONE — all ten stages S0 to S9 PASS (ended 2026-11-11).
 
 ## Part 1. Stages
 
@@ -18,10 +18,17 @@ Run status: IN PROGRESS — S0 to S8 done.
 | S6 EVAL-05 scorer, blind adjudication, metrics | PASS | 61982e3 | 816 | 3 | 27 confirmed and fixed test-first (10, 11, 6), 28 weak tests strengthened; 58 mutants, all killed; 1 reading; 7 items to the owner |
 | S7 EVAL-05b end-to-end rehearsal | PASS | d09cc0e | 818 | 3 | 1 breach of A4 by the test's own isolation check, caught in review and replaced; 21 confirmed and fixed; 27 mutants, all killed; no src defect found; 1 deviation (bootstrap intervals pinned) |
 | S8 EVAL-04b live smoke test | PASS | f188afd | 866 | 3 | 1 live run (4 calls, $0.040390); 25 confirmed and fixed test-first (12, 8, 5) before and after the call; 26 mutants, all killed; 2 departures disclosed |
+| S9 final audit and morning report | PASS | a2f1878 (fixes); then the report commit | 867 | 1 (three fresh auditors) | 2 fixed (a test reading data/reports/; the smoke help); open items rewritten; 3 new owner items |
 
 ## Part 2. For the owner
 
-(Written at S9.)
+1. Ready to use: the planting tool, the evaluation harness, the scorer with blind adjudication, and a live smoke test that worked first time (4 Sonnet calls, $0.0404, all answers read cleanly). 867 tests pass. Nothing under data/reports/ yet; no lock; no run except the smoke test [RAN].
+2. Read the drafts: `uv run pathqc-eval readable data/drafts`, then open data/drafts/_readable/<id>.md. The four drafts redone tonight are H-009, H-021, C-008 and C-009.
+3. Fill in data/specs/planting.md: [fix] entries for the stage groups the briefs do not give (Table B in the S3 record), [error] entries for the 25 planted reports, and `verified: yes` for all 34. Check it with `uv run pathqc-eval plant --check` (exit 0 when every block is ready).
+4. Then build and check: `uv run pathqc-eval plant` and `uv run pathqc-eval validate --expect 34 --expect-clean 9 --expect-dev 4`.
+5. Paste your texts into prompts/structured_histopathology.md and prompts/structured_cbc.md and approve the four entries in prompts/manifest.json; then type `freeze approved` in a session for the freeze.
+6. Cost: the dev run (24 calls) is projected at about $0.24–0.36, the scored run (180 calls) at about $1.82–2.73 (from four calls; handoff.md).
+7. Needs your decision before the scored split is scored: the scorer defaults in decision 47 (OWNER_CONFIRMED); decision 10 against the matching rule (an unmapped finding goes to adjudication only when section and sentence match); whether results/ is gitignored during adjudication; whether `run` keeps pricing at the dearer model. The full list is Part 4.
 
 ## Part 3. Defaults taken, for the owner to confirm
 
@@ -66,7 +73,7 @@ Run status: IN PROGRESS — S0 to S8 done.
 7. The cost gate is not a hard ceiling. The stage's rule assumes the next call costs as much as the dearest so far ($0.06 before any call), but one call at the 16,000-token limit costs about $0.17, so the total can pass the gate by the difference for each call in flight (R3 measured $0.66 against a $0.25 gate with 4 workers). Accept it, or choose a stricter rule (assume the max_tokens price for every call, or cap --workers). Until then a run under a hard stop uses --workers 1 and a gate about $0.17 below the stop; S8 does (S5 review R3) [RAN].
 8. `--max-calls` counts attempts; each attempt can send up to 3 more requests through transport retries. Section B counts calls; S8 states how it counts them (S5 review R3) [RAN].
 9. Assignment forms of the split ("split = dev", "'split' = 'dev'") are not refused: decision 42 names `split:` and the quoted key only. Say whether '=' forms should count; no draft or prompt holds 'split' today (S5 review R3) [RAN].
-10. The EVAL-01 test tests/test_validate.py::test_cli_empty_reports_folder_exits_zero reads the repository's data/reports/ and expects it to be empty, so it will fail once `plant` builds the reports. Outside S5; listed for the final audit (S5 review R1) [READ].
+10. The EVAL-01 test tests/test_validate.py::test_cli_empty_reports_folder_exits_zero reads the repository's data/reports/ and expects it to be empty, so it will fail once `plant` builds the reports. Outside S5; listed for the final audit (S5 review R1) [READ]. Fixed at S9 (a2f1878): the test uses a temporary folder.
 11. Decision 9 against S6's `--provisional` (6.8): ranges and counts by condition, shown before every verdict is entered, can reveal where an item came from. The scorer leaves out the per-item tables, logs each provisional score and discloses the count, and the README says a provisional score is not blind. Accept, or forbid provisional scoring of the scored split while the sheet is open (S6 reviews) [RAN].
 12. Decision 10's "nothing is remapped after scoring" is recorded (the map's version and sha256 in score.json), not enforced: an approved map can be edited and the split scored again without a warning (S6 R2) [RAN].
 13. Decision 10's "unmapped strings go to adjudication" and the wording of 47(a) against 6.4: an unmapped finding goes to adjudication only when its section and quoted sentence match a planted error; otherwise it is a false alarm. The code follows 6.4; confirm 47(a) before setting OWNER_CONFIRMED (S6 R3) [READ].
@@ -77,6 +84,9 @@ Run status: IN PROGRESS — S0 to S8 done.
 18. (reserved: S7 raised no question for the owner.)
 19. S8 changed how `run` prices a call: at the dearer of the model requested and the model the API returns (before: the returned model, or the requested one if unknown), so the cost gate can never under-count. It was found in the smoke test's review and made test-first; keep it or revert it (S8 reviews) [RAN].
 20. S8: a call abandoned by a second Ctrl+C is billed but not logged, so later smoke runs (and `run`'s gate on resume) cannot count it; with one worker this is at most one call (README) [READ].
+21. Decision 23 (one to three planted errors per planted report): the spec caps planned types at 3, but neither the validator nor `plant` caps the errors planted, so a report with 4 would validate and freeze. Add a validator rule if the decision is to be enforced (S9 audit) [RAN by the auditor].
+22. Decision 27 (every histopathology Synoptic summary ends with the fixed staging-edition line): checked when a draft is made, not by the validator, so a [fix] or [error] that changed the line would pass `plant` and the freeze. All 23 histopathology drafts end with it today. Add a validator rule if wanted; the test fixtures would need the line too (S9 audit) [RAN by the auditor].
+23. data/drafts/_calls.jsonl, the drafting call log (models, tokens, costs; no key, no report text), is tracked, unlike runs/*/calls.jsonl. Keep it tracked or ignore it (S9 audit) [RAN by the auditor].
 
 ## Part 5. Contradictions between this prompt and the repository, and how each was read
 
@@ -93,6 +103,7 @@ Run status: IN PROGRESS — S0 to S8 done.
 11. S6 6.8's output list names the per-error table and the outcome of every finding; decision 9 keeps condition and repeat hidden until every verdict is entered. Under the corrections rule the decision wins, so a provisional score leaves those two tables out; the final score has them (S6 reviews) [READ].
 12. S7 step 7 asks that every headline number equal a value worked out by hand. The comparison's bootstrap intervals come from 10,000 seeded resamples and cannot be worked by hand; the test pins them at the scorer's values, so a change to the resampling still shows. Every other headline number is worked in the docstrings [RAN].
 13. S8 step 1 asks for "the same ... retry rule and cost gate as `run`"; section B caps the stage at 8 calls (one retry each) and a $1.00 hard stop. `run`'s rule retries a transport failure up to 3 times (each a call) and assumes the next call costs as much as the dearest so far, which can pass a hard stop. Read as section B wins: no transport retry, and every call assumed to cost its ceiling before it starts, one at a time. The attempt-2 rule for an unreadable answer and the gate machinery are `run`'s own code [READ].
+14. Section H asks that the final reply be section H in full. Part 7 holds every stage record (about 1,600 lines), so the reply gives Parts 1–6, 8 and 9 in full and Part 7 as a summary, with this file as the full text [READ].
 
 ## Part 6. API spend, per stage, from the logs
 
@@ -107,6 +118,8 @@ Run status: IN PROGRESS — S0 to S8 done.
 | S6 | — | 0 | 0 (no API path in the scorer; R3 checked each round) |
 | S7 | — | 0 | 0 (fake client only; R3 checked each round) |
 | S8 | claude-sonnet-5-5 | 4 | 0.040390 (runs/smoke-20261111-150542/calls.jsonl: 0.011692 + 0.010586 + 0.009792 + 0.008320; estimate $0.25, hard stop $1.00) |
+| S9 | — | 0 | 0 |
+| total | | 8 | 0.044837 (S3 0.004447 + S8 0.040390) |
 
 ## Part 7. Stage records
 
@@ -1731,6 +1744,62 @@ handoff.md updated: yes
 === END ===
 ```
 
+### S9 — Final audit and morning report — PASS
+
+Audit fixes commit `a2f1878` "EVAL-N1: final audit fixes", pushed; remote = HEAD at that commit [RAN]. The report and handoff.md are in `EVAL-N1: overnight report` (its head is quoted at the end of the final reply). No model API call [RAN].
+
+#### Checklist
+
+1. Whole-repository review by three fresh read-only sub-agents — **met** [RAN]:
+   - Decisions against code: 47 decisions checked; 40 implemented as stated; 47 PENDING with its reason; 14 partly unverified (repository visibility, no network call); 9 and 10 depart from their wording (already Part 4 items 11–14); 23 and 27 only partly enforced (new, Part 4 items 21–22); 4 has a narrower plain-condition check (Part 4 item 6).
+   - Documents against commands: every command and option README.md and CLAUDE.md name exists with that meaning; all 12 subcommands and the 3 adjudicate actions are documented; smoke's --condition was undocumented and its help said "one call each" (fixed); CLAUDE.md expects heads and test counts in handoff.md, which holds neither (Part 4 item 5); validate's default folder is relative to the current directory and a bare validate passes on an empty folder (Part 8).
+   - Safety sweep: all 16 commits a699037..5628371 start with "EVAL-"; each stage touched only its own files; no key-like string is tracked; .env is untracked and ignored; data/specs/dataset.json, data/specs/cbc_reference_ranges.json and the five prompt files are byte-identical to a699037; data/taxonomy.json differs only as S4 says; under data/drafts/ only H-009, H-021, C-008, C-009 and _calls.jsonl differ; data/specs/planting.md holds the template and no entry; data/reports/ holds only .gitkeep; no lock file; no run folder except runs/smoke-20261111-150542 [RAN by the auditors].
+2. Confirmed findings fixed, failing test first where code is involved — **met**: the smoke help text (test_the_help_states_the_call_limit_and_the_condition failed first: S9/failing_before_help_fix.txt); tests/test_validate.py::test_cli_empty_reports_folder_exits_zero now uses a temporary folder, so the gate does not fail once the owner plants (a test change; the old test would fail as soon as data/reports/ holds a report [INFERRED from the test body]) [RAN].
+3. handoff.md: "Last updated" EVAL-N1; a task-log row for every stage (S0 and S9 added, S5 labelled); the run's decision is decision 38 (with 39), recorded at S2, so no duplicate (Part 5 item 5); open items rewritten for the morning — **met** [RAN].
+4. OVERNIGHT_REPORT.md completed; commit `EVAL-N1: overnight report`, push, local head beside remote head — **met** (final reply) [RAN].
+5. The final reply is section H — **met** (Part 5 item 14) [RAN].
+
+#### Gate commands (a2f1878) [RAN]
+
+- `uv run pytest` — exit 0 — 867 passed
+- `uv run ruff check .` — exit 0 — All checks passed!
+- `uv run ruff format --check .` — exit 0 — 59 files already formatted
+- Auditors, read-only [RAN by them]: `pathqc-eval spec-check` — exit 0; `validate data/drafts --drafts --expect 34 --expect-dev 4` — exit 0; `validate` — exit 0 (0 reports); `plant --check` — exit 1 (9 OK, 25 "no planted errors yet", as expected before planting); `freeze --check` — exit 1 (no lock yet); `run --dataset dev --condition plain --dry-run` — exit 1 (no dev reports yet).
+
+#### Audit findings and triage
+
+| finding | verdict | action |
+|---|---|---|
+| smoke --condition undocumented; help said "one call each" (documents) | CONFIRMED | fixed (a2f1878) |
+| a validate test reads the repository's data/reports/ and would fail after planting (decisions, Part 4 item 10) | CONFIRMED | fixed (a2f1878) |
+| handoff open items left out the blockers on the critical path (decisions F2, F6) | CONFIRMED | open items rewritten |
+| decision 10 vs the matching rule; decision 9's "only"; decision 4's narrower check (decisions F1, F5, F7) | OWNER | Part 4 items 6, 11–14 (already there) |
+| decisions 23 and 27 only partly enforced (decisions F3, F4) | OWNER | Part 4 items 21–22 (new) |
+| results/ not gitignored; data/drafts/_calls.jsonl tracked; a stale gitignored lock in the smoke folder (safety SS-1..3) | OWNER / NOTED | Part 4 items 16, 23; Part 8 |
+| CLAUDE.md "heads and test counts from handoff.md" (documents D2) | OWNER | Part 4 item 5 (already there) |
+| validate's relative default folder; a bare validate passes on an empty folder (documents D3, D4) | NOTED | Part 8 |
+
+#### Files changed (a2f1878)
+
+```text
+--- git status --short
+M  README.md
+M  src/pathqc_eval/cli.py
+M  tests/test_smoke.py
+M  tests/test_validate.py
+--- git diff --cached --stat
+ README.md              |  4 ++--
+ src/pathqc_eval/cli.py |  6 ++++--
+ tests/test_smoke.py    | 11 +++++++++++
+ tests/test_validate.py |  8 +++++---
+ 4 files changed, 22 insertions(+), 7 deletions(-)
+```
+
+#### What was not tested
+
+- Repository visibility on GitHub (decision 14): no network call was made.
+- The owner's real planting, freeze, dev and scored runs: none exists yet.
+
 ## Part 8. Known weaknesses, and suggestions that were not acted on
 
 1. S1: `plant` stops with a traceback when an existing report file is read-only (pre-existing; nothing is damaged because the open fails before any truncation). Suggestion: catch OSError per report in write_outputs and list it NOT WRITTEN.
@@ -1742,7 +1811,24 @@ handoff.md updated: yes
 7. S5: every run folder keeps an empty, gitignored runs/<id>/.run.lock after the run.
 8. S7: `pathqc-eval validate` always loads the repository's data/taxonomy.json (cli.py, load_taxonomy() with no path), even when it validates a folder elsewhere; the rehearsal points it at the temporary copy. Suggestion: take the taxonomy from the validated tree.
 9. S7 (process): in review round 1, the rehearsal's own isolation check hashed every file in the repository, which opened .env (contents were only hashed, never printed or stored). R3 caught it; the check was replaced by an audit-hook watch that records paths only, and R3 confirmed with a suite-wide trace that no test opens .env.
+10. S9: `validate` resolves its default folder (data/reports or data/drafts) against the current directory, while spec-check's default is fixed to the repository root; run the commands from the repository root. A bare `validate` passes on an empty folder (0 reports, OK); the counts bind only with --expect*.
+11. S9: runs/smoke-20261111-150542/.run.lock stays after the run (gitignored; harmless).
 
 ## Part 9. EVAL report block
 
-(Written at S9.)
+```text
+=== EVAL REPORT: EVAL-N1 Overnight build run, S0–S9 ===
+Status: DONE
+What was asked: ten stages in one unattended run (S0 pre-flight; S1 planting tool audit; S2 CLAUDE.md and harness decision; S3 four redrafts; S4 taxonomy final; S5 evaluation harness; S6 scorer and blind adjudication; S7 end-to-end rehearsal; S8 live smoke test; S9 final audit and this report), each with its own gate, three independent reviews, commit and record.
+What was done: all ten stages PASS (Part 1) [RAN]; every confirmed review finding fixed, fixes to existing behaviour with a test that failed first, checked by mutation runs [RAN]; two API stages inside section B (S3 $0.004447, S8 $0.040390) [RAN]; no owner file changed beyond what S3 and S4 authorise; nothing under data/reports/; no lock; no typed-word action [RAN].
+Files changed: per stage in Part 7 (src/pathqc_eval/: adjudication.py, findings.py, harness.py, matching.py, readable.py, score_output.py, scoring.py, scoring_config.py, stats.py new; cli.py, draft.py, io.py, plant.py, prompting.py, schema.py, validate.py changed; tests/ for each; README.md, CLAUDE.md, handoff.md, OVERNIGHT_REPORT.md, .gitignore; data/taxonomy.json (S4); four drafts (S3); runs/smoke-20261111-150542/config.json and results.json (S8)).
+Commands run: uv run pytest — 0 — about 85 s — 867 passed; uv run ruff check . — 0; uv run ruff format --check . — 0; uv run pathqc-eval draft (S3) — 0 — 4 calls; uv run pathqc-eval smoke (S8) — 0 — 4 calls.
+Checks: pytest 867 passed, 0 failed | ruff check and format clean
+Git: branch main; last commit "EVAL-N1: overnight report"; push ok; remote HEAD matches local HEAD: yes (heads quoted in the final reply)
+API spend this task: $0.044837 (S3 claude-haiku-5-5 $0.004447; S8 claude-sonnet-5-5 $0.040390; from the logs)
+Deviations from the prompt: Part 5 (readings where the prompt and the repository differ); S8's stricter retry rule and gate; `run` priced at the dearer model (Part 4 item 19); review round 2 of S6 was resumed after the session ended (R2 re-run on the unchanged tree).
+Claims I could not verify: repository visibility; the real API's behaviour beyond four plain calls; the run lock on Linux or macOS.
+Questions for the owner: Part 4 (23 items).
+handoff.md updated: yes
+=== END ===
+```

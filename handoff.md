@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-11 by agent (EVAL-N1 S8: EVAL-04b)
+Last updated: 2026-11-11 by agent (EVAL-N1)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · REPORTED (stated, not checked) · NOT TESTED · PENDING (not yet done)
 
 ## Purpose
@@ -89,10 +89,14 @@ Severity: critical = would change patient management; major = would need an amen
 
 ## Open items
 - PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
-- PENDING — Dev run (24 calls) once the four dev reports are in data/reports/ and the owner texts are in place.
+- PENDING — Owner writes data/specs/planting.md: [fix] entries for stage groups the briefs do not give (Table B in OVERNIGHT_REPORT.md, S3 record), [error] entries for the 25 planted reports, and verified: yes for all 34 (decisions 37, 40). Check with `uv run pathqc-eval plant --check`, then build with `uv run pathqc-eval plant` and `uv run pathqc-eval validate --expect 34 --expect-clean 9 --expect-dev 4` (target 14 Nov).
+- PENDING — Freeze, after the reports and the owner texts: the owner types `freeze approved` in a session (decision 39).
+- PENDING — Dev run (24 calls) once the four dev reports are in data/reports/ and the owner texts are in place; then the agent proposes data/category_map.json from it and the owner approves it (decision 10).
 - REPORTED — Cost projection from four calls (EVAL-04b smoke test, 2026-11-11: claude-sonnet-5-5, plain condition, dev drafts H-021, H-022, H-023, C-011; 4,670 input + 3,105 output tokens, $0.040390 in total, $0.0101 a call). Dev run, 24 calls: about $0.24 at the measured average, $0.36 at the dry-run estimate (average plus 50%, $0.0152 a call). Scored run, 180 calls: about $1.82 at the measured average, $2.73 at the dry-run estimate. A projection only: the structured condition's prompts are longer, planted reports may draw more findings, and every attempt 2 adds a call (at most twice the calls).
 - PENDING — Owner confirms or changes the scorer defaults in decision 47; until OWNER_CONFIRMED is True in src/pathqc_eval/scoring_config.py, scoring the scored split refuses.
-- PENDING — Owner's questions from the EVAL-N1 run about CLAUDE.md and handoff.md (OVERNIGHT_REPORT.md Part 4).
+- PENDING — Before the scored adjudication: decide whether results/ (adjudication_hidden.json, provisional outputs) is gitignored, so that the item-to-condition map cannot be committed before the reveal (OVERNIGHT_REPORT.md Part 4 item 16).
+- PENDING — The scored run needs the owner's typed `scored run approved`; `run`'s cost gate is a soft bound, so use --workers 1 and a gate below the hard stop (OVERNIGHT_REPORT.md Part 4 item 7).
+- PENDING — Owner decisions from the EVAL-N1 run: OVERNIGHT_REPORT.md Part 4 (20 items): CLAUDE.md and handoff.md wording; decisions 4, 9, 10, 23, 27 and 47 against the code; `run` now pricing at the dearer model (item 19); smaller points.
 
 ## Task log
 | ID | Date | Title | Status | Label |
@@ -105,14 +109,17 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-02a | 2026-11-10 | Owner's spec approval recorded (0 edits) | DONE | OWNER VERIFIED |
 | EVAL-02b | 2026-11-10 | 34 drafts (Haiku 5.5, high effort) | DONE ($0.0480 measured) | AGENT VERIFIED |
 | EVAL-02c | 2026-11-10 | Planting sheet tool | DONE | AGENT VERIFIED |
+| EVAL-N1 S0 | 2026-11-11 | Overnight run pre-flight (no commit of its own) | DONE | AGENT VERIFIED |
 | EVAL-02c-fix | 2026-11-11 | Planting tool audit (EVAL-N1 S1): 20 review findings fixed test-first, readable moved to its own module | DONE | AGENT VERIFIED |
 | EVAL-H1 | 2026-11-11 | CLAUDE.md and harness decision (EVAL-N1 S2; decisions 38–39) | DONE | AGENT VERIFIED |
 | EVAL-02d | 2026-11-11 | Drafting instructions corrected; H-009, H-021, C-008, C-009 drafted again (EVAL-N1 S3; decision 40) | DONE ($0.0044 measured) | AGENT VERIFIED |
 | EVAL-02e | 2026-11-11 | Taxonomy final, version 1.0 (EVAL-N1 S4; decision 41) | DONE | AGENT VERIFIED |
-| EVAL-04 | 2026-11-11 | Evaluation harness (fake client), isolation and anchor fixes | DONE | AGENT VERIFIED |
+| EVAL-04 | 2026-11-11 | Evaluation harness (fake client), isolation and anchor fixes (EVAL-N1 S5; decisions 42–46) | DONE | AGENT VERIFIED |
 | EVAL-05 | 2026-11-11 | Scorer, blind adjudication, metrics (EVAL-N1 S6; decision 47 PENDING, OWNER_CONFIRMED False) | DONE | AGENT VERIFIED |
 | EVAL-05b | 2026-11-11 | End-to-end rehearsal on invented data (EVAL-N1 S7; no src defect found) | DONE | AGENT VERIFIED |
 | EVAL-04b | 2026-11-11 | Live smoke test (EVAL-N1 S8): 4 Sonnet calls, all valid | DONE ($0.0404 measured) | AGENT VERIFIED |
+| EVAL-N1 S9 | 2026-11-11 | Final audit (three read-only auditors; 2 fixes) and overnight report | DONE | AGENT VERIFIED |
+| EVAL-N1 | 2026-11-11 | Overnight build run S0–S9: all ten stages PASS (OVERNIGHT_REPORT.md) | DONE ($0.0448 measured) | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===
