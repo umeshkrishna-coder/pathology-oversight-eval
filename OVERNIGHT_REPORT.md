@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 to S6 done.
+Run status: IN PROGRESS — S0 to S7 done.
 
 ## Part 1. Stages
 
@@ -16,6 +16,7 @@ Run status: IN PROGRESS — S0 to S6 done.
 | S4 EVAL-02e taxonomy final 1.0 | PASS | eafc0f0 | 440 | 1 | 0 defects; 2 recorded (exit codes, plant guard); 2 rejected (out of scope) |
 | S5 EVAL-04 evaluation harness (fake client) | PASS | 51f79be | 673 | 3 | 32 confirmed and fixed test-first (11, 13, 8; one the lead's own regression), 2 more before review, 18 weak tests strengthened; 4 rejected with reasons (3 to the owner) |
 | S6 EVAL-05 scorer, blind adjudication, metrics | PASS | 61982e3 | 816 | 3 | 27 confirmed and fixed test-first (10, 11, 6), 28 weak tests strengthened; 58 mutants, all killed; 1 reading; 7 items to the owner |
+| S7 EVAL-05b end-to-end rehearsal | PASS | d09cc0e | 818 | 3 | 1 breach of A4 by the test's own isolation check, caught in review and replaced; 21 confirmed and fixed; 27 mutants, all killed; no src defect found; 1 deviation (bootstrap intervals pinned) |
 
 ## Part 2. For the owner
 
@@ -84,6 +85,7 @@ Run status: IN PROGRESS — S0 to S6 done.
 9. S5 step 9 says "In the reply"; under the corrections rule it is the S5 record [READ].
 10. S6 6.2 "drop a trailing colon or full stop" is read as the trailing run of colons and full stops, so "Diagnosis.:" still matches "Diagnosis" (S6 R1) [READ].
 11. S6 6.8's output list names the per-error table and the outcome of every finding; decision 9 keeps condition and repeat hidden until every verdict is entered. Under the corrections rule the decision wins, so a provisional score leaves those two tables out; the final score has them (S6 reviews) [READ].
+12. S7 step 7 asks that every headline number equal a value worked out by hand. The comparison's bootstrap intervals come from 10,000 seeded resamples and cannot be worked by hand; the test pins them at the scorer's values, so a change to the resampling still shows. Every other headline number is worked in the docstrings [RAN].
 
 ## Part 6. API spend, per stage, from the logs
 
@@ -96,6 +98,7 @@ Run status: IN PROGRESS — S0 to S6 done.
 | S4 | — | 0 | 0 |
 | S5 | — | 0 | 0 (fake client only; R3 confirmed each round that no real client was built) |
 | S6 | — | 0 | 0 (no API path in the scorer; R3 checked each round) |
+| S7 | — | 0 | 0 (fake client only; R3 checked each round) |
 
 ## Part 7. Stage records
 
@@ -1416,6 +1419,185 @@ handoff.md updated: yes
 === END ===
 ```
 
+### S7 — EVAL-05b: end-to-end rehearsal on invented data — PASS
+
+Stage commit `d09cc0e` "EVAL-05b: end-to-end rehearsal", pushed; `git rev-parse HEAD` = `git ls-remote origin main` = d09cc0ea49c29d250184c02d5dcfb0a3579096f8 [RAN]. One new module, tests/test_end_to_end.py; nothing in src/ changed, because the rehearsal exposed no defect in the S6 code [RAN]. Three review rounds; the round-3 findings were fixed without a fourth round (Part 3 item 2), each checked with the lead's mutation run. No model API call (FakeEvalClient only; R3 each round) [RAN].
+
+#### Checklist (items 1–12, round-3 wording)
+
+1. One new test module; no src change (no defect found) — **met** [RAN].
+2. A temporary root with 34 invented drafts (the conftest fixtures the freeze tests use: histo, cbc, real_prompts; plus rerender for the CBC Values text) and a spec of the real shape — **met** [RAN].
+3. A planting sheet written by the test: H1–H6 text errors, a C2 number error (`set: MCHC = 41.0`), a C1 text error, a C3 omission with `anchor_analyte: Platelets`, H5 omissions, a [fix] on clean H-016, a severity override with its reason on H-008, nine clean reports, every report verified — **met** [RAN; R1 checked the planted output].
+4. Stand-in owner texts, an approved manifest, and a final taxonomy as a temporary copy, marked (" (rehearsal copy)" on one type per modality) so that its use is proven: the fake model checks the mark in every structured prompt, and `validate` is pointed at the copy — **met** [RAN].
+5. plant; validate --expect 34 --expect-clean 9 --expect-dev 4 (each count also shown to fail when wrong); freeze; freeze --check — **met** [RAN].
+6. Both scored runs with the fake client, every unit's outcome scripted: hits, misses (H-013; H-006 found in 1 of 3), a near-miss, duplicates, false alarms in planted reports (H-003, C-001) and in a clean one (H-016, 2 of 3 repeats), an unmapped category, a borderline overlap (0.4), an omission under another section, an invalid unit after two bad outputs, a unit valid on its second attempt — **met** [RAN].
+7. map-list; an approved map; adjudicate prepare (the owner-facing files checked blind); the sheet filled; apply; score with OWNER_CONFIRMED True by monkeypatch only — **met** [RAN].
+8. Every headline number equals the docstring's hand-worked value (recall per type and overall with Wilson intervals by formula, weighted recall, false alarms, specificity, Brier, ECE, consistency, differences, counts); freeze --check passes again and is shown to fail on a changed report; a second score is byte-identical; the drafts are byte-identical; nothing outside the temporary root is created, changed or removed, and the repository's .env, drafts, reports, specs, taxonomy and owner texts are never opened (audit-hook watch, paths only) — **met, with one deviation**: the three bootstrap intervals cannot be worked by hand (10,000 seeded resamples), so they are pinned at the scorer's values (Part 5) [RAN].
+9. The same flow on the dev split without a freeze, with one adjudicated review item, an approved map, a byte-identical second score and every dev headline number asserted — **met** [RAN].
+10. The rehearsal's summary.md in this record, marked as invented data — **met** (below).
+11. Checks and commit — **met** [RAN].
+12. No API call, no change outside the stage, owner files untouched, no new dependency, no test weakened — **met** [RAN; R3 each round].
+
+#### Gate commands (final state, d09cc0e) [RAN]
+
+- `uv run pytest` — exit 0 — 818 passed
+- `uv run ruff check .` — exit 0 — All checks passed!
+- `uv run ruff format --check .` — exit 0 — 58 files already formatted
+- `uv run pytest tests/test_end_to_end.py -W error` — exit 0 — 2 passed
+
+#### Review findings, triage and fixes
+
+| round | finding | verdict | fix |
+|---|---|---|---|
+| 1 | The isolation check hashed every repository file, opening .env (a breach of A4 by the test itself; contents hashed only, never printed), the drafts, reports and owner texts (R3, R2) | CONFIRMED | Snapshot removed; an audit-hook watch that records paths only |
+| 1 | Writes outside both the root and the repository, and empty folders, went unnoticed; the run could send the repository's owner texts (R2) | CONFIRMED | The watch; the fake model checks the stand-in owner text |
+| 1 | Majority boundaries, the valid-unit denominator and intervals untested; blindness, freeze --check and validate checked only when passing; the dev flow shorter (R1, R2) | CONFIRMED | New scripted cases (H-006 1 of 3, H-016 2 of 3, C-001 beside its invalid repeat), intervals, negative checks, the full dev flow |
+| 1 | ECE bins untested (all confidences 0.8) | REJECTED for the rehearsal | Covered by tests/test_stats.py (S6) |
+| 2 | The watch recorded a link's source, not the link; it missed shutil.copy2 (_winapi.CopyFile2 on this Python), utime, chmod and the \\?\ and ::$DATA aliases (R2, R3) | CONFIRMED | Event table with read and write positions; aliases normalised |
+| 2 | The taxonomy copy was never proven used; blindness was a word list; --expect-clean/--expect-dev not shown to bind; dev and per-type numbers not all asserted (R1, R2) | CONFIRMED | Marked copy and protected repository taxonomy; rationale check; negative checks; assertions |
+| 3 | \\?\UNC\ became a relative path (a round-2 regression); \??\ not stripped; _winapi.CreateFile unwatched (R2) | CONFIRMED | Fixed; mutants K08–K10 killed by the watch (the files were written and caught) |
+| 3 | 8.3 short names, UNC shares, folder listings, child processes, C-library access, junctions (R2, R3) | ACCEPTED as limits | Stated in the module docstring; the code under test uses none |
+| 3 | Dev headline numbers not all worked by hand (R1) | CONFIRMED | Worked in the docstring and asserted |
+
+Mutation checks (scratch copies of src/ and tests/): round 1, 12 mutants; round 2, 12 (one survivor, copy2, exposed the CopyFile2 gap; fixed and re-run); round 3, 3; all killed [RAN].
+
+#### The rehearsal's summary.md (INVENTED DATA)
+
+INVENTED DATA from a temporary tree in the test run (the scorer commit shows as "rehearsal"; the lock time is the test's clock). The disclosures paragraph is the scorer's fixed text and is not true here: these reports were not drafted by a model or corrected by the owner, no evaluated model was called (the fake client returned scripted outputs), and the review items were adjudicated by the test, not the owner.
+
+```markdown
+# Scores: scored split
+
+Runs: plain scored-plain, structured scored-structured. Category map: approved, version 1.0. Lock created: 2026-11-11T14:39:09Z. Scorer commit: rehearsal.
+
+## Per-type recall by condition
+
+| | Plain | Structured |
+|---|---|---|
+| H1 | 3/3 = 100.0% (95% CI 43.9%–100.0%) | 3/3 = 100.0% (95% CI 43.9%–100.0%) |
+| H2 | 1/2 = 50.0% (95% CI 9.5%–90.5%) | 2/2 = 100.0% (95% CI 34.2%–100.0%) |
+| H3 | 2/2 = 100.0% (95% CI 34.2%–100.0%) | 2/2 = 100.0% (95% CI 34.2%–100.0%) |
+| H4 | 2/2 = 100.0% (95% CI 34.2%–100.0%) | 2/2 = 100.0% (95% CI 34.2%–100.0%) |
+| H5 | 4/4 = 100.0% (95% CI 51.0%–100.0%) | 4/4 = 100.0% (95% CI 51.0%–100.0%) |
+| H6 | 1/2 = 50.0% (95% CI 9.5%–90.5%) | 1/2 = 50.0% (95% CI 9.5%–90.5%) |
+| C1 | 3/3 = 100.0% (95% CI 43.9%–100.0%) | 3/3 = 100.0% (95% CI 43.9%–100.0%) |
+| C2 | 2/2 = 100.0% (95% CI 34.2%–100.0%) | 2/2 = 100.0% (95% CI 34.2%–100.0%) |
+| C3 | 2/2 = 100.0% (95% CI 34.2%–100.0%) | 2/2 = 100.0% (95% CI 34.2%–100.0%) |
+
+## Overall recall
+
+| | Plain | Structured |
+|---|---|---|
+| Overall recall | 20/22 = 90.9% (95% CI 72.2%–97.5%) | 21/22 = 95.5% (95% CI 78.2%–99.2%) |
+
+## False alarms per report
+
+| | Plain | Structured |
+|---|---|---|
+| Planted reports | 0.07 (22 reports) | 0.00 (22 reports) |
+| Clean controls | 0.08 (8 reports) | 0.00 (8 reports) |
+| All | 0.07 (30 reports) | 0.00 (30 reports) |
+
+## Specificity on clean controls
+
+| | Plain | Structured |
+|---|---|---|
+| By majority | 7/8 = 87.5% | 8/8 = 100.0% |
+| Per unit | 22/24 = 91.7% | 24/24 = 100.0% |
+
+## Calibration
+
+| | Plain | Structured |
+|---|---|---|
+| Brier score | 0.092 | 0.040 |
+| ECE (5 bins) | 0.113 | 0.200 |
+| Findings used | 69 | 66 |
+| Left out: verdict miss or in review | 0 | 0 |
+| Left out: no confidence | 0 | 0 |
+
+## Repeat consistency
+
+| | Plain | Structured |
+|---|---|---|
+| Planted errors detected: mean pairwise agreement | 97.0% (n=22) | 97.0% (n=22) |
+| Planted errors detected: same result in every valid unit | 95.5% | 95.5% |
+| Clean controls with any false alarm: mean pairwise agreement | 91.7% (n=8) | 100.0% (n=8) |
+| Clean controls with any false alarm: same result in every valid unit | 87.5% | 100.0% |
+
+## Severity-weighted recall
+
+| | Plain | Structured |
+|---|---|---|
+| Severity-weighted recall | 41/47 = 87.2% | 44/47 = 93.6% |
+
+## Structured minus plain
+
+| Metric | Difference | 95% interval (paired bootstrap) |
+|---|---|---|
+| Overall recall | +4.5 pp | -10.0 pp to +20.0 pp |
+| False alarms per report | -0.07 | -0.16 to +0.00 |
+| Specificity (by majority) | +12.5 pp | +0.0 pp to +40.0 pp |
+
+Reports in the paired comparison: 30; left out (no majority result in a condition): 0.
+
+## Counts
+
+| | Plain | Structured |
+|---|---|---|
+| Reports | 30 | 30 |
+| Invalid units | 1 | 0 |
+| Findings in valid units | 69 | 66 |
+| False alarms | 6 | 0 |
+| Near-misses | 3 | 1 |
+| Duplicates | 0 | 3 |
+| Review findings | 2 | 2 |
+| Set aside by a verdict of miss | 0 | 0 |
+| Still in review | 0 | 0 |
+| Findings with a null confidence | 0 | 0 |
+| Findings with a null severity | 0 | 0 |
+| Dropped findings | 0 | 0 |
+| Reports with no majority result | 0 | 0 |
+
+Planted errors by type: H1 3, H2 2, H3 2, H4 2, H5 4, H6 2, C1 3, C2 2, C3 2.
+Review items: 3 (detected 2, near_miss 1).
+
+## Disclosures
+
+The reports are synthetic: drafted by claude-haiku-5-5 and corrected by the owner. Sampling was the API default. One evaluated model was used; the API returned the model string claude-sonnet-5-5. 30 reports were scored (scored split). 3 review item(s) were adjudicated by hand by the owner, from a sheet that names no condition, repeat or model. A finding's category can still suggest its condition. results/scored/provisional/provisional_log.json records no provisional score made before every review finding had a verdict.
+```
+
+#### Files changed (d09cc0e)
+
+```text
+--- git status --short
+A  tests/test_end_to_end.py
+--- git diff --cached --stat
+ tests/test_end_to_end.py | 702 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 702 insertions(+)
+```
+
+#### What was not tested
+
+- The real API (S8 is the first contact); the owner's real reports, texts and verdicts.
+- The watch's stated limits (child processes, C-library file access, junctions, 8.3 names, UNC shares, folder listings).
+
+```text
+=== EVAL REPORT: EVAL-05b End-to-end rehearsal (EVAL-N1 S7) ===
+Status: DONE
+What was asked: one test module rehearsing plant, validate, freeze, both runs with the fake client, map-list, blind adjudication and score on invented data, every headline number worked by hand, and the same flow on the dev split.
+What was done: tests/test_end_to_end.py [RAN]; three review rounds, every confirmed finding fixed; 27 mutants across three checks, all killed [RAN]; no src change (no defect found) [RAN].
+Files changed: tests/test_end_to_end.py (new).
+Commands run: uv run pytest — 0 — 86 s — 818 passed; uv run ruff check . — 0; uv run ruff format --check . — 0.
+Checks: pytest 818 passed, 0 failed | ruff check and format clean
+Git: branch main; commit d09cc0e "EVAL-05b: end-to-end rehearsal"; push ok; remote HEAD matches local HEAD: yes
+API spend this task: no API calls
+Deviations from the prompt: the bootstrap intervals are pinned at the seeded scorer's values, not worked by hand (Part 5 item 12); the round-1 isolation check opened .env to hash it before review caught it (contents never printed; replaced).
+Claims I could not verify: the watch's stated limits.
+Questions for the owner: none new.
+handoff.md updated: yes
+=== END ===
+```
+
 ## Part 8. Known weaknesses, and suggestions that were not acted on
 
 1. S1: `plant` stops with a traceback when an existing report file is read-only (pre-existing; nothing is damaged because the open fails before any truncation). Suggestion: catch OSError per report in write_outputs and list it NOT WRITTEN.
@@ -1425,6 +1607,8 @@ handoff.md updated: yes
 5. Since S4 the taxonomy is final, so `pathqc-eval plant` in its building form is no longer refused. Section A3 (nothing written under data/reports/ tonight) now rests on never running it on the repository: every later stage uses `plant --check` or a temporary tree, and the reviewers' rules forbid bare `plant` and writing `freeze` on the repository (S4 review R3 F1).
 6. S5: a Ctrl+C still has two narrow gaps: a few bytecodes between starting a call and noting it as in flight, and a second Ctrl+C, which abandons the calls in flight (billed, not logged; they run again on resume and the gate's spend misses them). The README says so.
 7. S5: every run folder keeps an empty, gitignored runs/<id>/.run.lock after the run.
+8. S7: `pathqc-eval validate` always loads the repository's data/taxonomy.json (cli.py, load_taxonomy() with no path), even when it validates a folder elsewhere; the rehearsal points it at the temporary copy. Suggestion: take the taxonomy from the validated tree.
+9. S7 (process): in review round 1, the rehearsal's own isolation check hashed every file in the repository, which opened .env (contents were only hashed, never printed or stored). R3 caught it; the check was replaced by an audit-hook watch that records paths only, and R3 confirmed with a suite-wide trace that no test opens .env.
 
 ## Part 9. EVAL report block
 
