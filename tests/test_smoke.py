@@ -521,3 +521,14 @@ def test_results_json_is_marked_even_after_an_interrupt(tree, monkeypatch):
     assert _smoke("--ids", "H-021", "--cost-gate", "1.00") == 130
     results = read_report_json(tree / "runs" / RUN_ID / "results.json")
     assert results["purpose"] == PURPOSE
+
+
+# Final audit (S9)
+
+
+def test_the_help_states_the_call_limit_and_the_condition(capsys):
+    with pytest.raises(SystemExit):
+        cli.main(["smoke", "--help"])
+    out = " ".join(capsys.readouterr().out.split())
+    assert "one unit each, at most two calls" in out
+    assert "one call each" not in out

@@ -5,7 +5,6 @@ from conftest import rerender
 
 from pathqc_eval.cli import main
 from pathqc_eval.schema import Report
-from pathqc_eval.taxonomy import REPO_ROOT
 from pathqc_eval.validate import (
     check_cbc_indices,
     check_cbc_units,
@@ -241,8 +240,11 @@ def test_expect_counts_fail(tmp_path, histo, cbc, taxonomy, kwargs):
     assert len(result.failures) == 1 and "expected" in result.failures[0]
 
 
-def test_cli_empty_reports_folder_exits_zero(capsys):
-    assert main(["validate", str(REPO_ROOT / "data" / "reports")]) == 0
+def test_cli_empty_reports_folder_exits_zero(tmp_path, capsys):
+    """An empty reports folder (only .gitkeep, as data/reports/ is before `plant`). It is a
+    temporary folder: the repository's data/reports/ fills up once the owner plants (S9)."""
+    (tmp_path / ".gitkeep").write_text("", encoding="utf-8")
+    assert main(["validate", str(tmp_path)]) == 0
     out = capsys.readouterr().out
     assert out.startswith("validate: 0 reports | histopathology 0, cbc 0 | dev 0, scored 0")
     assert out.rstrip().endswith("| OK")

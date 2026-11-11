@@ -21,7 +21,7 @@ uv run pathqc-eval freeze [--replace]      # hash taxonomy, prompts and dataset 
 uv run pathqc-eval freeze --check          # exit 0 only if every hash still matches the lock
 uv run pathqc-eval run --dataset dev --condition plain --dry-run          # messages and estimate; no API call
 uv run pathqc-eval run --dataset dev|scored --condition plain|structured --cost-gate USD [--run-id ID] [--workers 4] [--max-calls N]
-uv run pathqc-eval smoke --ids H-021,H-022,H-023,C-011 --cost-gate 1.00  # live smoke test (EVAL-04b); not evaluation data
+uv run pathqc-eval smoke --ids H-021,H-022,H-023,C-011 --cost-gate 1.00 [--condition plain]  # live smoke test (EVAL-04b); not evaluation data
 uv run pytest                              # run the tests
 uv run ruff check .                        # lint
 uv run ruff format --check .               # formatting check
@@ -179,7 +179,7 @@ A real run needs `ANTHROPIC_API_KEY` in `.env`; without it the run stops with a 
 
 ### Smoke test (EVAL-04b)
 
-`smoke` is the first live contact with the API, not evaluation data: it reads the named dev drafts from `data/drafts/` in memory (writing nothing under `data/`), sends each once in the plain condition, and writes `runs/smoke-<UTC timestamp>/` (config.json and results.json say "smoke test; not evaluation data"; the scorer refuses the folder). Section B of the EVAL-N1 prompt limits the whole stage to 8 calls and $1.00, so: no transport retry; at most two calls per report; the calls and spend of every earlier smoke run count against those limits; a gate above $1.00 is refused; each call is assumed to cost its ceiling (the texts' UTF-8 bytes plus 100 tokens of input, 16,000 tokens of output) before it starts, one call at a time; `ANTHROPIC_INFERENCE_GEO` must be unset; only one smoke run can go on at a time (a lock on `runs/_smoke_stage/.run.lock`); and a model string other than claude-sonnet-5-5 in a response fails the test. Before the first call it prints each request with the texts replaced by their lengths. One gap remains: a call abandoned by a second Ctrl+C is billed but not logged, so later smoke runs cannot count it.
+`smoke` is the first live contact with the API, not evaluation data (`--condition` takes only `plain`; `structured` is refused): it reads the named dev drafts from `data/drafts/` in memory (writing nothing under `data/`), sends each once in the plain condition, and writes `runs/smoke-<UTC timestamp>/` (config.json and results.json say "smoke test; not evaluation data"; the scorer refuses the folder). Section B of the EVAL-N1 prompt limits the whole stage to 8 calls and $1.00, so: no transport retry; at most two calls per report; the calls and spend of every earlier smoke run count against those limits; a gate above $1.00 is refused; each call is assumed to cost its ceiling (the texts' UTF-8 bytes plus 100 tokens of input, 16,000 tokens of output) before it starts, one call at a time; `ANTHROPIC_INFERENCE_GEO` must be unset; only one smoke run can go on at a time (a lock on `runs/_smoke_stage/.run.lock`); and a model string other than claude-sonnet-5-5 in a response fails the test. Before the first call it prints each request with the texts replaced by their lengths. One gap remains: a call abandoned by a second Ctrl+C is billed but not logged, so later smoke runs cannot count it.
 
 ## Scoring and adjudication (EVAL-05)
 

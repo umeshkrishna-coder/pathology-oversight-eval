@@ -187,9 +187,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--dry-run", action="store_true", help="print the messages and an estimate; no client"
     )
 
-    smoke = sub.add_parser(
-        "smoke", help="live smoke test: dev drafts, plain condition, one call each (EVAL-04b)"
+    smoke_text = (
+        "live smoke test (EVAL-04b): dev drafts, plain condition, one unit each, at most two "
+        "calls per report; 8 calls and $1.00 for every smoke run together; not evaluation data"
     )
+    smoke = sub.add_parser("smoke", help=smoke_text, description=smoke_text)
     smoke.add_argument("--ids", required=True, help="comma-separated dev draft ids")
     smoke.add_argument("--cost-gate", type=float, help="USD limit; required")
     smoke.add_argument("--condition", default="plain", help="plain only (structured is refused)")
