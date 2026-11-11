@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 to S4 done.
+Run status: IN PROGRESS — S0 to S5 done.
 
 ## Part 1. Stages
 
@@ -14,6 +14,7 @@ Run status: IN PROGRESS — S0 to S4 done.
 | S2 EVAL-H1 CLAUDE.md and harness decision | PASS | e85eeb3 | 417 | 2 | 1 fixed in the stage (decision wording); 6 settled in the record; 1 rejected |
 | S3 EVAL-02d drafting fixes and four redrafts | PASS | 2269b0d | 440 | 3 | 15 confirmed and fixed (tests first); 0 rejected |
 | S4 EVAL-02e taxonomy final 1.0 | PASS | eafc0f0 | 440 | 1 | 0 defects; 2 recorded (exit codes, plant guard); 2 rejected (out of scope) |
+| S5 EVAL-04 evaluation harness (fake client) | PASS | 51f79be | 673 | 3 | 32 confirmed and fixed test-first (11, 13, 8; one the lead's own regression), 2 more before review, 18 weak tests strengthened; 4 rejected with reasons (3 to the owner) |
 
 ## Part 2. For the owner
 
@@ -25,6 +26,20 @@ Run status: IN PROGRESS — S0 to S4 done.
 2. Review rounds. The prompt allows three review rounds per stage. Findings of the third round were fixed with a test that failed first, the lead's mutation check and a re-run of the reviewer's own reproduction scripts, without a fourth review round (S1) [RAN].
 3. S1 word count for the five-word minimum: a word is a whitespace-separated token with at least one letter or digit, which matches the scorer's tokens (S1 review finding) [RAN].
 4. S2 decisions 38 and 39 hold the owner's decisions 1 and 2 word for word, with two clarifications by the agent in square brackets: "[EVAL-N1, the overnight build run]" after "this one run" and "[the EVAL-N1 prompt]" after "this prompt", so that a later session does not read "this run" as its own. Removing the bracketed words gives the owner's text exactly (checked by script). The owner may keep or drop them [RAN].
+5. S5 prompt_hash. The lock holds no single prompt hash, so a run's prompt_hash combines the sha256 of the condition's prompt files (plain: plain.md; structured: structured_output.md and both owner texts) the way the dataset hash combines the reports [RAN].
+6. S5 a dev run's dataset_hash is taken over every file in data/reports/ (both splits), with the freeze's own function, so editing any report after a dev run makes its resume refuse (dataset_hash differs) [RAN].
+7. S5 resume identity: every RunConfig field except created_at, so the cost gate and the SDK version too; to change one, start a new run id [RAN].
+8. S5 a valid attempt needs the stop reason end_turn and a readable output; attempt 2 follows either failure [RAN].
+9. S5 failures: a call still failing after its 3 transport retries, or any other API error (logged with "fatal": true), stops the run once the calls in flight have finished (exit 1). Ctrl+C, or a calls.jsonl line that cannot be written: no new call starts, the calls in flight are logged, results.json is rebuilt (exit 130 or 1); a second Ctrl+C abandons the calls in flight [RAN].
+10. S5 results.json lists unfinished units as "pending", with a pending total [RAN].
+11. S5 transport failures are exactly the stage's list: connection errors and timeouts, HTTP 408 (read as the stage's "timeout"), 429 and 500–599; the API's x-should-retry header is not consulted [RAN].
+12. S5 lenient reading: extra top-level keys are accepted and noted; a list item that is not an object is dropped; every nulled severity or confidence is noted; the rationale is stripped; code fences of backticks or tildes are accepted as CommonMark allows (a longer closing fence, an info string, content on the opening line) [RAN].
+13. S5 an escaped unpaired surrogate in an output (\ud800) is replaced with U+FFFD, with a note, so the line can be written as UTF-8; raw_text then differs from the output in that character [RAN].
+14. S5 refusals beyond the stage text, all before any call: one report id in two files; an unreadable report of either split; a missing prompt file, or one that is not UTF-8 or holds NUL; calls.jsonl without config.json, or a line that is not strictly a call line of this run; a run id outside letters, digits, '.', '_' and '-', longer than 100, ending in '.', or a Windows device name; --workers or --max-calls below 1; a gate that is not a positive finite number; another invocation on the same run id (a lock on runs/<id>/.run.lock, gitignored), or a lock file that cannot be used [RAN].
+15. S5 exit codes: 0 when every unit is finished or --max-calls stopped the run; 130 after Ctrl+C; 1 otherwise [RAN].
+16. S5 split labels: quotes, markdown emphasis and a joined prefix around `split:` still count; the key is "split" in double quotes, or 'split' in any quotes before a colon; 'split' in quotes in prose passes (decision 42) [RAN].
+17. S5 tests/conftest.py blanks ANTHROPIC_API_KEY and disables dotenv for every test, so no test can load the key [RAN].
+18. S5 the README's decision-34 paragraph names the anchor sections (decision 43) [RAN].
 
 ## Part 4. Left for the owner
 
@@ -34,6 +49,10 @@ Run status: IN PROGRESS — S0 to S4 done.
 4. CLAUDE.md says "Evaluation prompts and the taxonomy are the owner's words". prompts/plain.md and prompts/structured_output.md were written by the agent (EVAL-03) and are still "proposed" in prompts/manifest.json; the run treats them as owner-only content (A2) and never edits them (S2 review) [READ].
 5. CLAUDE.md says "Heads, test counts, spend and open items are read from `handoff.md`", but handoff.md has no place for commit heads or test counts (Part 5 item 3). The agent did not change handoff.md's format; they are in this report's Part 1. The owner may want a line or column for them in handoff.md (S2 review) [READ].
 6. The plain-condition isolation check (prompting.check_eval_isolation) looks for type ids, type names and severity definitions, but not for the type definitions, so a copied definition in prompts/plain.md would pass the freeze. Decision 4 says the plain condition never sees the taxonomy. Today's plain.md holds none (S4 review R2). Whether to extend the check is the owner's call [READ; RAN by R2].
+7. The cost gate is not a hard ceiling. The stage's rule assumes the next call costs as much as the dearest so far ($0.06 before any call), but one call at the 16,000-token limit costs about $0.17, so the total can pass the gate by the difference for each call in flight (R3 measured $0.66 against a $0.25 gate with 4 workers). Accept it, or choose a stricter rule (assume the max_tokens price for every call, or cap --workers). Until then a run under a hard stop uses --workers 1 and a gate about $0.17 below the stop; S8 does (S5 review R3) [RAN].
+8. `--max-calls` counts attempts; each attempt can send up to 3 more requests through transport retries. Section B counts calls; S8 states how it counts them (S5 review R3) [RAN].
+9. Assignment forms of the split ("split = dev", "'split' = 'dev'") are not refused: decision 42 names `split:` and the quoted key only. Say whether '=' forms should count; no draft or prompt holds 'split' today (S5 review R3) [RAN].
+10. The EVAL-01 test tests/test_validate.py::test_cli_empty_reports_folder_exits_zero reads the repository's data/reports/ and expects it to be empty, so it will fail once `plant` builds the reports. Outside S5; listed for the final audit (S5 review R1) [READ].
 
 ## Part 5. Contradictions between this prompt and the repository, and how each was read
 
@@ -43,6 +62,9 @@ Run status: IN PROGRESS — S0 to S4 done.
 4. CLAUDE.md says "bare `python` is not on PATH". A `python` is on PATH, but it is the Windows Store alias that only prints "Python was not found" (exit 49, S0). There is no working bare interpreter, so the instruction holds in effect; recorded rather than changed, since the text is verbatim [RAN].
 5. S9 item 3 asks handoff.md to receive "the decision from the top of this prompt about this run (next free number, OWNER VERIFIED, 2026-11-10)". That is owner decision 1, which S2 recorded as decision 38. Read as already met: S9 will not add a duplicate (S2 review R3 OF-5) [READ].
 6. S3 step 8 asks for "every sentence or line containing the word \"stage\" other than the fixed staging-edition line". Excluding that line only makes sense if "staging" counts, so Table B also lists sentences with "staging" (four more rows; a superset of the literal reading). The table is for the owner to check each stage group (S3 review R3 OF-1) [READ; RAN].
+7. S5 step 4 says transport lines carry "the error class and message only". A line has to name its unit, so the lines also carry run_id, report_id, condition and repeat, and a failure that stopped the run is the same line marked "fatal": true. Read as: no request or response content on these lines (S5 reviews) [READ].
+8. S5 step 7 lists "Last updated" EVAL-04 and the task-log row with the handoff.md edits before the step-8 commit; run rule D9 puts them in the record commit. Read as D9, as S3 and S4 did [READ].
+9. S5 step 9 says "In the reply"; under the corrections rule it is the S5 record [READ].
 
 ## Part 6. API spend, per stage, from the logs
 
@@ -53,6 +75,7 @@ Run status: IN PROGRESS — S0 to S4 done.
 | S2 | — | 0 | 0 (documents only) |
 | S3 | claude-haiku-5-5 | 4 | 0.004447 (data/drafts/_calls.jsonl lines 35–38: 0.001354 + 0.001758 + 0.000576 + 0.000759) |
 | S4 | — | 0 | 0 |
+| S5 | — | 0 | 0 (fake client only; R3 confirmed each round that no real client was built) |
 
 ## Part 7. Stage records
 
@@ -800,6 +823,441 @@ handoff.md updated: yes
 === END ===
 ```
 
+### S5 — EVAL-04: evaluation harness (fake client), isolation and anchor fixes — PASS
+
+Stage commit `51f79be` "EVAL-04: evaluation harness, isolation and anchor fixes", pushed; `git rev-parse HEAD` = `git ls-remote origin main` = 51f79be5fc3d6aa49aee0e1ace34376b1fc96974 [RAN]. Three review rounds (R1, R2, R3); the round-3 findings were fixed test-first without a fourth round (Part 3 item 2), checked with the lead's mutation run and by re-running R2's own reproduction scripts [RAN]. No model API call was made in this stage [RAN; R3 each round].
+
+#### Pre-flight [RAN]
+
+- On `main`; HEAD d14b648 = `git ls-remote origin main`; `git status --short` empty, so nothing inside the owner-editable areas either; HEAD is after 32ac420 and the 11 commits since it all start with EVAL-.
+- `git log --oneline -5`: d14b648 EVAL-N1: record S4; eafc0f0 EVAL-02e: taxonomy final, version 1.0; d70747a EVAL-N1: record S3; 2269b0d EVAL-02d: drafting instructions corrected; four reports drafted again; 857ae24 EVAL-N1: record S2.
+- `uv run pytest` before the stage: 440 passed, exit 0. The output of the run made when the stage began was not kept; the count is from HEAD d14b648 re-run on a git-archive copy during review round 1, and R1 and R3 each got the same [RAN].
+
+#### Checklist (items 0–22, all met)
+
+0. Pre-flight — **met** (above).
+1. `check_eval_isolation`: the whole-word split test is replaced by label forms, in both messages, any case: `split:` followed by dev or scored, with spaces, quotes or markdown emphasis allowed around the colon and a prefix joined to the label still counting (`data_split: dev`); the key `"split"` in double quotes, or 'split' in any quotes before a colon. "HER2 scored 2+", "The dev slide was reviewed." and 'split' in quotes in prose pass; the user message must still equal the report text. Test first: 12 failed on the old code — **met** [RAN].
+2. `check_omission_anchor`: an omission's anchor must be in Values (CBC) or in the Synoptic summary or Diagnosis (histopathology); the message names the error id, the section given and the sections allowed; pass and fail tests for both modalities. Test first: 6 failed. On the repository `plant --check` shows no anchor problem — **met** [RAN].
+3. RunConfig gains `effort` ("default"), `max_tokens`, `sdk_version`, `lock_created_at`; one dataset and one condition per run; the run id is `<YYYYMMDD-HHMMSS>-<dataset>-<condition>` (UTC) unless given — **met** [RAN].
+4. `findings.py`: `parse_findings` → ParseResult(status, findings, dropped, notes); code fences, `{"findings": [...]}` or a bare list; anything else invalid, an empty list valid; ParsedFinding with stripped required strings, severity lower-cased or null, confidence a number in [0, 1] or null, rationale a string or ""; extra keys noted; findings without a usable required string dropped with the reason; `schema.Finding` unchanged — **met** [RAN].
+5. Clients: `EvalClient.complete(system, user, max_tokens)` → EvalResponse; `AnthropicEvalClient` sends exactly model, system, one user message and max_tokens (claude-sonnet-5-5; no effort, sampling or tools), refuses a missing key with the drafting client's names-only error, joins the text blocks; `FakeEvalClient` for tests — **met** [RAN].
+6. Units (report, repeat 1–3); isolation checked for every report and the run refused before any call; attempt 2 after an unreadable output or a stop reason other than end_turn; then valid or invalid — **met** [RAN].
+7. Transport failures — connection errors and timeouts, HTTP 408, 429 and 500–599, whatever the API's x-should-retry header says — retried up to 3 times after 2, 8 and 30 s and logged as transport lines, not attempts — **met** [RAN].
+8. `config.json`: the RunConfig; a scored run's hashes from the lock with lock_created_at, a dev run's computed with the freeze's functions, lock_created_at null — **met** [RAN].
+9. `calls.jsonl` (gitignored): one line per attempt with the 20 fields; transport lines carry the unit ids, the error class and the message (Part 5 item 7); no request text — **met** [RAN].
+10. `results.json`: rebuilt from calls.jsonl at the end of every invocation; units by report id, then repeat; totals with the distinct models returned — **met** [RAN].
+11. Resume skips finished units and refuses a changed config — **met** [RAN].
+12. Cost gate: `--cost-gate` required; cumulative from calls.jsonl; the next call assumed to cost as much as the dearest so far ($0.06 before any), counting calls in flight — **met** (a soft bound by this rule: Part 4 item 7) [RAN].
+13. `--workers N` (default 4), one writer, results ordered by report then repeat, `--max-calls N` stops cleanly — **met** [RAN].
+14. `pathqc-eval run`: scored refuses unless `freeze --check` passes (the same check_lock); dev uses the dev reports and refuses none, an invalid one, or (structured) a placeholder — **met** [RAN].
+15. `--dry-run`: no client, no gate needed; counts, the full messages of the first report of each modality, and the estimate labelled as an assumption — **met** [RAN].
+16. A real run prints a line per finished unit and the totals — **met** [RAN].
+17. Tests: every case the stage lists, with the fake client in temporary folders only. R1's and R3's audit hooks over the whole suite found no read of data/reports/, data/drafts/, the owner's texts or `.env`, no socket and no SDK client — **met** [RAN; R1, R3].
+18. README: the run command, the run folder, resume, the gate, and calls.jsonl kept local until release — **met** [RAN].
+19. handoff.md: decisions 42–46 word for word (R1's byte comparison), the open item on model settings replaced by the dev-run item, in the stage commit; "Last updated" and the task-log row in this record commit, as in S3 and S4 (Part 5 item 8) — **met** [RAN].
+20. Checks and commit — **met** (below) [RAN].
+21. The record — this section.
+22. Run rules: no API call; no change outside the stage; owner files untouched; no new dependency; no test weakened — **met** [RAN; R3 each round].
+
+#### Gate commands (final state, 51f79be) [RAN]
+
+- `uv run pytest` — exit 0 — 673 passed
+- `uv run ruff check .` — exit 0 — All checks passed!
+- `uv run ruff format --check .` — exit 0 — 46 files already formatted
+- `uv run pathqc-eval run --dataset dev --condition plain --dry-run` — exit 1, the step-8 refusal the stage expects:
+
+```text
+run refused:
+  - no dev reports in data/reports/
+```
+
+- `uv run pathqc-eval freeze --check` — exit 1 — `freeze --check: FAILED: data/prompts.lock.json does not exist`
+
+#### In the reply (step 9; invented data, fake client, temporary folder) [RAN]
+
+The fake run's console output (one worker; 2 dev reports, C-001 clean and H-001 planted; repeat 2 of C-001 unreadable twice):
+
+```text
+run 20261116-093000-dev-plain: 2 reports x 3 repeats, dev, plain, gate $1.00
+C-001 repeat 1: valid | 0 finding(s) | 2400 in + 380 out tokens | $0.0086 | running $0.0086
+C-001 repeat 2: invalid | 0 finding(s) | 4800 in + 760 out tokens | $0.0172 | running $0.0258
+C-001 repeat 3: valid | 0 finding(s) | 2400 in + 380 out tokens | $0.0086 | running $0.0344
+H-001 repeat 1: valid | 1 finding(s) | 2400 in + 380 out tokens | $0.0086 | running $0.0430
+H-001 repeat 2: valid | 1 finding(s) | 2400 in + 380 out tokens | $0.0086 | running $0.0516
+H-001 repeat 3: valid | 1 finding(s) | 2400 in + 380 out tokens | $0.0086 | running $0.0602
+totals: 6 units (5 valid, 1 invalid, 0 pending) | 7 calls | 16800 input + 2660 output tokens | $0.0602 | models returned: claude-sonnet-5-5
+[exit code 0]
+```
+
+A calls.jsonl line of a valid unit, as stored:
+
+```json
+{"run_id":"20261116-093000-dev-plain","report_id":"H-001","condition":"plain","repeat":1,"attempt":1,"started_at":"2026-11-16T09:30:00Z","duration_s":0.0,"model_requested":"claude-sonnet-5-5","model_returned":"claude-sonnet-5-5","system_sha256":"bf0a38617fcd283bd9dff0820a9e089e724b5b9b767e910d1802464568424bef","user_sha256":"5f75aea5e25b067f0edceab1a5061f86c75042646538b80fbb79d8de94fb7c9b","raw_text":"```json\n{\"findings\": [{\"quoted_sentence\": \"Tumour measures 25 mm.\", \"section\": \"Microscopic description\", \"category\": \"size mismatch between gross and microscopy\", \"severity\": \"major\", \"confidence\": 0.85, \"rationale\": \"The gross description gives 18 mm.\", \"note\": \"extra\"}]}\n```","stop_reason":"end_turn","input_tokens":2400,"output_tokens":380,"cost_usd":0.0086,"parse_status":"valid","findings":[{"quoted_sentence":"Tumour measures 25 mm.","section":"Microscopic description","category":"size mismatch between gross and microscopy","severity":"major","confidence":0.85,"rationale":"The gross description gives 18 mm."}],"dropped":[],"notes":["finding 1: extra keys ignored: note"]}
+```
+
+A calls.jsonl line of an invalid attempt, as stored:
+
+```json
+{"run_id":"20261116-093000-dev-plain","report_id":"C-001","condition":"plain","repeat":2,"attempt":1,"started_at":"2026-11-16T09:30:00Z","duration_s":0.0,"model_requested":"claude-sonnet-5-5","model_returned":"claude-sonnet-5-5","system_sha256":"bf0a38617fcd283bd9dff0820a9e089e724b5b9b767e910d1802464568424bef","user_sha256":"e051b86323241d95c84e2da4d1dc0760d427fe8345718747b02208e5874b6de5","raw_text":"I could not find any errors in this report.","stop_reason":"end_turn","input_tokens":2400,"output_tokens":380,"cost_usd":0.0086,"parse_status":"invalid","findings":[],"dropped":[],"notes":["output is not JSON (JSONDecodeError)"]}
+```
+
+The resulting results.json:
+
+```json
+{
+  "run_id": "20261116-093000-dev-plain",
+  "dataset": "dev",
+  "condition": "plain",
+  "units": [
+    {
+      "report_id": "C-001",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 2400,
+      "output_tokens": 380,
+      "cost_usd": 0.0086
+    },
+    {
+      "report_id": "C-001",
+      "repeat": 2,
+      "status": "invalid",
+      "attempts": 2,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 4800,
+      "output_tokens": 760,
+      "cost_usd": 0.0172
+    },
+    {
+      "report_id": "C-001",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 2400,
+      "output_tokens": 380,
+      "cost_usd": 0.0086
+    },
+    {
+      "report_id": "H-001",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour measures 25 mm.",
+          "section": "Microscopic description",
+          "category": "size mismatch between gross and microscopy",
+          "severity": "major",
+          "confidence": 0.85,
+          "rationale": "The gross description gives 18 mm."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 2400,
+      "output_tokens": 380,
+      "cost_usd": 0.0086
+    },
+    {
+      "report_id": "H-001",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour measures 25 mm.",
+          "section": "Microscopic description",
+          "category": "size mismatch between gross and microscopy",
+          "severity": "major",
+          "confidence": 0.85,
+          "rationale": "The gross description gives 18 mm."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 2400,
+      "output_tokens": 380,
+      "cost_usd": 0.0086
+    },
+    {
+      "report_id": "H-001",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour measures 25 mm.",
+          "section": "Microscopic description",
+          "category": "size mismatch between gross and microscopy",
+          "severity": null,
+          "confidence": 0.85,
+          "rationale": "The gross description gives 18 mm."
+        }
+      ],
+      "dropped_count": 1,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 2400,
+      "output_tokens": 380,
+      "cost_usd": 0.0086
+    }
+  ],
+  "totals": {
+    "units": 6,
+    "valid": 5,
+    "invalid": 1,
+    "pending": 0,
+    "calls": 7,
+    "input_tokens": 16800,
+    "output_tokens": 2660,
+    "cost_usd": 0.0602,
+    "models_returned": [
+      "claude-sonnet-5-5"
+    ]
+  }
+}
+```
+
+The dry run on a temporary tree with two dev reports (H-001 planted, C-001 clean); invented data:
+
+```text
+DRY RUN: no client is constructed and no API call is made.
+dataset dev | condition plain | 2 reports | 6 units (3 repeats each) | at most 12 calls (2 attempts per unit)
+===== H-001 system message (plain) =====
+You are reviewing a laboratory report before it is signed out. The report is given in the user message, section by section.
+
+Read the whole report and identify every error you can find in it. Do not rewrite the report.
+
+Return only a JSON object, with no text before or after it, in this form: {"findings": [ ... ]}
+Each finding is an object with exactly these fields:
+- "quoted_sentence": the sentence or line from the report that contains the error, copied exactly. If the error is that something is missing, quote the sentence or line that makes the omission evident.
+- "section": the name of the section the quoted text is in, exactly as it appears in the report.
+- "category": a short label, in your own words, for the kind of error.
+- "severity": one of "critical", "major", "minor".
+- "confidence": a number from 0 to 1, your probability that this is a real error.
+- "rationale": one or two sentences explaining the error.
+If you find no error, return {"findings": []}.
+===== H-001 user message =====
+## Clinical details
+Synthetic test case. Lump noted on examination.
+
+## Specimen
+Wide local excision, left side.
+
+## Gross description
+Fatty tissue 40 x 30 x 20 mm with a firm lesion 18 mm across.
+
+## Microscopic description
+Sections show an invasive tumour. Tumour measures 25 mm.
+
+## Diagnosis
+Invasive tumour, grade 2.
+
+## Synoptic summary
+Size 18 mm; grade 2; margins clear; LVI absent; PNI absent; nodes 0/3; pT1c pN0.
+===== C-001 system message (plain) =====
+You are reviewing a laboratory report before it is signed out. The report is given in the user message, section by section.
+
+Read the whole report and identify every error you can find in it. Do not rewrite the report.
+
+Return only a JSON object, with no text before or after it, in this form: {"findings": [ ... ]}
+Each finding is an object with exactly these fields:
+- "quoted_sentence": the sentence or line from the report that contains the error, copied exactly. If the error is that something is missing, quote the sentence or line that makes the omission evident.
+- "section": the name of the section the quoted text is in, exactly as it appears in the report.
+- "category": a short label, in your own words, for the kind of error.
+- "severity": one of "critical", "major", "minor".
+- "confidence": a number from 0 to 1, your probability that this is a real error.
+- "rationale": one or two sentences explaining the error.
+If you find no error, return {"findings": []}.
+===== C-001 user message =====
+## Values
+Hb: 14.0 g/dL (ref 13.0–17.0)
+RBC: 4.70 x10^12/L (ref 4.50–5.50)
+Hct: 42.0 % (ref 40.0–50.0)
+MCV: 89.4 fL (ref 83.0–101.0)
+MCH: 29.8 pg (ref 27.0–32.0)
+MCHC: 33.3 g/dL (ref 31.5–34.5)
+RDW: 13.0 % (ref 11.6–14.0)
+WBC: 8.00 x10^9/L (ref 4.00–11.00)
+Neutrophils %: 60.0 % (ref 40.0–80.0)
+Neutrophils absolute: 4.80 x10^9/L (ref 2.00–7.00)
+Lymphocytes %: 30.0 % (ref 20.0–40.0)
+Lymphocytes absolute: 2.40 x10^9/L (ref 1.00–3.00)
+Monocytes %: 6.0 % (ref 2.0–10.0)
+Monocytes absolute: 0.48 x10^9/L (ref 0.20–1.00)
+Eosinophils %: 3.0 % (ref 1.0–6.0)
+Eosinophils absolute: 0.24 x10^9/L (ref 0.02–0.50)
+Basophils %: 1.0 % (ref 0.0–2.0)
+Basophils absolute: 0.08 x10^9/L (ref 0.02–0.10)
+Platelets: 250 x10^9/L (ref 150–410)
+MPV: 10.0 fL (ref 7.5–11.5)
+
+## Interpretation
+All values within reference ranges.
+
+## Comment/recommendation
+No action needed.
+Estimate (an ASSUMPTION until the dev run measures it): 2,500 input + 4,000 output tokens per call at Sonnet prices = $0.0450 per call; 6 calls (one per unit) = $0.2700; at most 12 calls = $0.5400
+[exit code 0]
+```
+
+The step-8 refusal on the repository is quoted under the gate commands above. `git diff --stat d14b648 51f79be` (from the previous EVAL commit):
+
+```text
+ .gitignore                   |    1 +
+ README.md                    |   36 +-
+ handoff.md                   |    9 +-
+ src/pathqc_eval/cli.py       |  225 ++++++-
+ src/pathqc_eval/findings.py  |  168 ++++++
+ src/pathqc_eval/harness.py   |  871 +++++++++++++++++++++++++++
+ src/pathqc_eval/prompting.py |   17 +-
+ src/pathqc_eval/schema.py    |    7 +
+ src/pathqc_eval/validate.py  |   18 +
+ tests/conftest.py            |    8 +
+ tests/test_eval_isolation.py |  119 ++++
+ tests/test_findings.py       |  248 ++++++++
+ tests/test_harness.py        | 1335 ++++++++++++++++++++++++++++++++++++++++++
+ tests/test_plant.py          |   28 +-
+ tests/test_schema.py         |   28 +
+ tests/test_validate.py       |   73 +++
+ 16 files changed, 3183 insertions(+), 8 deletions(-)
+```
+
+#### Review findings, triage and fixes
+
+Before the first review the lead found and fixed two defects test-first: a failure in flight was hidden when --max-calls had stopped scheduling (exit 0), and an escaped unpaired surrogate in an output stopped the run while the call was logged [RAN].
+
+Round 1 (R1 spec audit, R2 adversarial test: 59 cases, 17 failed; R3 safety and scope) [RAN]:
+
+| finding | verdict | fix (test that failed first) |
+|---|---|---|
+| Ctrl+C, or a calls.jsonl write that fails, lost the lines of every call in flight (billed) and left results.json unbuilt (R2 KB-01/02, R3-2) | CONFIRMED | no new call starts; the calls in flight are waited for and logged; results.json is rebuilt from calls.jsonl; exit 130 after Ctrl+C, 1 after a write failure (test_an_interrupt_logs_every_call_in_flight_and_rebuilds_results; test_a_log_write_failure_stops_the_run_and_still_logs_the_other_calls) |
+| Two files with the same report id: one silently dropped, dry-run counts wrong (R2 HR-05) | CONFIRMED | refused, naming both files (test_two_report_files_with_the_same_id_are_refused) |
+| config.json deleted, then a resume in another condition adopted the old calls.jsonl lines (R2 HR-08) | CONFIRMED | refused: "holds calls.jsonl but no config.json"; every line must belong to this run and condition (test_a_run_folder_with_calls_but_no_config_is_refused; test_a_call_line_of_another_condition_is_refused) |
+| A calls.jsonl line that parses but lacks fields crashed the resume (R2 HR-06) | CONFIRMED | each line validated as an attempt or failure line before the client is built (test_a_call_line_missing_fields_is_refused_cleanly) |
+| HTTP 408 (a timeout) was fatal instead of retried (R2 CL-06/08) | CONFIRMED | 408 is a transport failure (round 2 settled the full list) |
+| Split labels missed: `{'split': 'scored'}`, `data_split: dev`, `**Split:** scored`, `split: “dev”` (R2 ISO-01..04) | CONFIRMED | label regex allows quotes and markdown around the colon and a joined prefix (test_decorated_split_labels_fail) |
+| `--run-id NUL` (a Windows device name) ended in a traceback after the client was built (R2 HR-10) | CONFIRMED | device names and a trailing dot refused (test_run_ids_windows_cannot_create_are_refused) |
+| A prompt file saved as UTF-16 ended in a traceback (R2 HR-11/11b) | CONFIRMED | refused: "is not UTF-8 text; save it as UTF-8" (test_a_prompt_file_that_is_not_utf8_is_refused_naming_it) |
+| Tilde code fences refused (R2 PF-01) | CONFIRMED | accepted (test_tilde_and_longer_code_fences_are_accepted) |
+| Extra keys of a dropped finding not noted (R2 PF-09) | CONFIRMED | noted (test_extra_keys_of_a_dropped_finding_are_noted) |
+| Gate shown rounded to the cent ($0.185 as $0.18) (R2) | CONFIRMED | shown as given (test_the_gate_is_shown_as_given) |
+| Transport lines carry the unit ids, though the stage says "error class and message only" (R2 HR-18, R1) | REJECTED as a defect: a line has to name its unit; no request or response content is stored | Part 5 |
+| `--max-calls` counts attempts, not HTTP requests (R3-3) | REJECTED for S5: the stage text says attempts | Part 4; S8 handles its call cap |
+| The gate is a soft bound: one call at the 16,000-token limit costs about $0.17 against the $0.06 first-call assumption (R3-1) | REJECTED as a defect: the stage text prescribes the rule | README says so; Part 4 (owner) |
+| Seven tests passed with their feature broken (R2 weak tests, mutants A–H and O) | CONFIRMED | new tests: spend read back on resume; dearest not last call; results order independent of completion; call_messages_api argument shape, text joining and 429; prompt_hash over every structured prompt file; resume refuses each changed setting; raw output kept in full. Each mutant re-run: KILLED (lead_mutants_round1.txt) |
+| Pre-flight pytest count missing from the evidence (R1, R3-5) | CONFIRMED | HEAD's suite re-run from a git-archive copy: 440 passed, exit 0 (the start-of-stage output was not kept) |
+| fake_run.txt re-serialised the calls lines (R3-5) | CONFIRMED | the record quotes the stored lines |
+
+Round 2 (R2: 41 cases, 24 failed; R1 item 7 partly) [RAN]:
+
+| finding | verdict | fix (test that failed first) |
+|---|---|---|
+| A model output holding U+2028, U+2029 or U+0085 broke calls.jsonl: read with str.splitlines, the invocation failed after its calls and the run could not be resumed (R2 LS-01..03) | CONFIRMED (serious) | calls.jsonl is split at "\n" only (test_unicode_line_separators_in_an_output_keep_calls_jsonl_readable) |
+| The round-1 fence regex was cubic: 16,000 backticks took 64 s on the run's only writer thread (R2 PF-05) | CONFIRMED | linear fence reader (test_a_long_run_of_fence_characters_is_read_quickly) |
+| Longer closing fence, a space before the info string, `json5` refused (R2 PF-01..03) | CONFIRMED | accepted (test_more_code_fence_forms_are_accepted) |
+| UTF-16 without a byte order mark passed the UTF-8 and placeholder checks; a NUL-interleaved placeholder would reach the model (R2 ENC-01..04) | CONFIRMED | a prompt file holding NUL is refused as not UTF-8 (test_a_prompt_file_in_utf16_without_a_byte_order_mark_is_refused; with a Windows-1252 file for the plain decode path) |
+| Numbers written as text passed the lax line validation and crashed the resume (R2 CL-01..04) | CONFIRMED | strict validation (test_a_call_line_with_a_number_written_as_text_is_refused) |
+| Ctrl+C between starting a call and noting it in flight lost a billed call (R2 KB-01) | CONFIRMED | the clock is read before the call starts; the call is noted in the same statement (test_an_interrupt_while_a_call_is_being_started_loses_no_call) |
+| A write that failed part-way left a fragment, making calls.jsonl unparseable (R2 PW-01) | CONFIRMED | the file is cut back to its size before the write (test_a_write_that_fails_part_way_leaves_no_fragment) |
+| Two invocations on one run id repeated calls and corrupted the run (R2 CC-01/02) | CONFIRMED | an exclusive lock on runs/<id>/.run.lock (gitignored) while a run goes on; the operating system releases it at exit (test_a_second_invocation_on_a_run_that_is_going_is_refused) |
+| A second Ctrl+C skipped the rebuild while the CLI said results.json was rebuilt (R2 KB-03) | CONFIRMED | the rebuild runs after a second Ctrl+C; the message says whether it happened (test_a_second_interrupt_abandons_the_calls_in_flight_and_still_rebuilds_results) |
+| 'split' in single or typographic quotes in prose was refused (R2 ISO-01/02; R3 decision 42) | CONFIRMED | the key is "split" in double quotes, or 'split' in any quotes before a colon; prose passes (test_split_in_quotes_in_prose_passes) |
+| The SDK retry rule went beyond the stage list: 429/5xx with x-should-retry false were fatal, 409 and any status with x-should-retry true retried (R1 item 7) | CONFIRMED | exactly the stage list: connection errors and timeouts, 408, 429, 5xx, whatever the header says (test_rate_limits_server_errors_and_timeouts_are_transport_failures) |
+| Amounts of 1000 or more shown rounded ($1000.005 as $1000) (R2 USD) | CONFIRMED | shown as given (test_amounts_are_shown_to_the_cent_or_as_given) |
+| The user-message variant of '"Split": "dev"' was dropped in round 1 (R3-1) | CONFIRMED | the decorated-label test runs over both messages |
+| Weak tests (R2 M1–M7): drain of calls still running, no new call after Ctrl+C or a write failure, run_id compared, failure lines validated, complete() argument order, check before the client, duplicates across splits | CONFIRMED | new tests; every mutant KILLED (lead_mutants_round2.txt: 45 mutants, all killed after one added test) |
+| --max-calls and transport retries; the soft gate (R3-2, R3-3, carried) | REJECTED for S5 (stage text) | Part 4; S8 |
+| Behaviours beyond the stage text to disclose (R3-4) | CONFIRMED | Part 3 |
+
+Round 3, the last round (R1: all items met or pending the commit; R2: 101 cases, 16 failed from 7 defects; R3: no rule broken) [RAN]. Fixed test-first without a fourth review round (Part 3 item 2); each fix was then checked with the lead's mutation run and by re-running R2's own reproduction scripts on the fixed code (every failing case now passes; one regression the re-run found, LK-06/07, was fixed test-first too):
+
+| finding | verdict | fix (test that failed first) |
+|---|---|---|
+| The config was compared before the lock was taken, so an invocation that another one overtook could resume under its own settings (R2 LK-03, low-medium) | CONFIRMED | the config and calls.jsonl are checked again once the lock is held (test_a_run_another_invocation_creates_meanwhile_is_compared_under_the_lock) |
+| While another invocation held the run and was mid-write, a second one reported calls.jsonl as damaged instead of busy, and built its client first (R2 LK-05, R3-1) | CONFIRMED | the lock is probed before the run's files are read or a client is built (test_a_held_lock_is_reported_before_the_run_files_are_read) |
+| A calls.jsonl whose last newline was removed by an outside edit got the next line glued to it (R2 CL-03) | CONFIRMED | a missing final newline is written before the next line (test_a_calls_file_without_a_final_newline_is_continued_cleanly) |
+| Ctrl+C during the final printout said results.json was not rebuilt when it was (R2 IN-01) | CONFIRMED | flagged as rebuilt (test_an_interrupt_after_results_were_written_says_they_were) |
+| Underscore emphasis after the value hid a label ("Split: _dev_") (R2 IS-05) | CONFIRMED | after the value no letter or digit may follow; "_" may (test_split_labels_with_underscore_emphasis_fail) |
+| JSON beginning on the opening fence line was dropped with the info string, a regression from round 2 (R2 FN-01a/b) | CONFIRMED | content starting with { or [ on the opening line is kept (test_json_that_starts_on_the_opening_fence_line_is_read) |
+| Status codes 600 and above counted as server errors (R2 TR-12) | CONFIRMED (negligible) | 500 to 599 only (test_server_errors_are_the_5xx_statuses) |
+| The lock probe added in this round raised a traceback when .run.lock is a folder or read-only (re-run of R2's LK-06/07) | CONFIRMED (own regression) | refused in plain words (test_a_lock_file_that_cannot_be_used_is_refused_in_plain_words) |
+| Weak tests: the lock test held the lock in-process only (R2 MB, MA2); no test of the "was not rebuilt" message (MC); no line of request text checked (MD); 5xx rows 500, 503, 529 only (ME) | CONFIRMED | a second process holds the lock; the run is checked to hold its own lock while calls are made; results.json made unwritable; every request line of 20 characters or more is checked absent from calls.jsonl; 502 and 599 rows |
+| The gate is a soft bound; --max-calls counts attempts, not HTTP requests (R3-2, R3-3, carried) | REJECTED for S5 (the stage text) | Part 4; S8 |
+| Assignment forms ("split = dev", "'split' = 'dev'") are not refused; round 3 stopped refusing the quoted one (R3-5) | REJECTED as a defect: outside decision 42's forms | Part 4 (owner) |
+| Behaviours beyond the stage text, and the lead's own reversals (R3-4) | CONFIRMED | Part 3; Deviations in the EVAL block |
+
+#### Files changed (51f79be)
+
+```text
+--- git status --short
+M  .gitignore
+M  README.md
+M  handoff.md
+M  src/pathqc_eval/cli.py
+A  src/pathqc_eval/findings.py
+A  src/pathqc_eval/harness.py
+M  src/pathqc_eval/prompting.py
+M  src/pathqc_eval/schema.py
+M  src/pathqc_eval/validate.py
+M  tests/conftest.py
+M  tests/test_eval_isolation.py
+A  tests/test_findings.py
+A  tests/test_harness.py
+M  tests/test_plant.py
+M  tests/test_schema.py
+M  tests/test_validate.py
+--- git diff --cached --stat
+ .gitignore                   |    1 +
+ README.md                    |   36 +-
+ handoff.md                   |    9 +-
+ src/pathqc_eval/cli.py       |  225 ++++++-
+ src/pathqc_eval/findings.py  |  168 ++++++
+ src/pathqc_eval/harness.py   |  871 +++++++++++++++++++++++++++
+ src/pathqc_eval/prompting.py |   17 +-
+ src/pathqc_eval/schema.py    |    7 +
+ src/pathqc_eval/validate.py  |   18 +
+ tests/conftest.py            |    8 +
+ tests/test_eval_isolation.py |  119 ++++
+ tests/test_findings.py       |  248 ++++++++
+ tests/test_harness.py        | 1335 ++++++++++++++++++++++++++++++++++++++++++
+ tests/test_plant.py          |   28 +-
+ tests/test_schema.py         |   28 +
+ tests/test_validate.py       |   73 +++
+ 16 files changed, 3183 insertions(+), 8 deletions(-)
+```
+
+#### What was not tested
+
+- The real API: no call was made (the stage forbids it). `AnthropicEvalClient.complete` and `call_messages_api` were tested over stubs only; whether the API sends 408 or an x-should-retry header was not seen. S8 is the first contact.
+- A console Ctrl+C: interrupts were raised in the main thread by the tests (and with `_thread.interrupt_main` by R2).
+- The run lock on Linux or macOS (the fcntl branch); only Windows (msvcrt) ran. Two processes were tested on Windows (the suite and R1/R2).
+- A whitespace-only API key (the key check is empty or missing).
+
+```text
+=== EVAL REPORT: EVAL-04 Evaluation harness (fake client), isolation and anchor fixes (EVAL-N1 S5) ===
+Status: DONE
+What was asked: the run harness for the evaluated model, built and tested against a fake client and exercised in dry-run mode only; the label-form split check; the omission-anchor rule; the five owner decisions recorded.
+What was done: findings.py and harness.py written and `pathqc-eval run` added [RAN]; RunConfig extended [RAN]; isolation and anchor fixes test-first [RAN]; three review rounds: 32 defects confirmed and fixed, each with a test that failed first, and 18 weak tests strengthened; every mutant of the lead's mutation checks killed [RAN]; README and handoff.md updated [RAN].
+Files changed: .gitignore — runs/*/.run.lock; README.md — the run section, refusals, the anchor rule; handoff.md — decisions 42–46, open items; src/pathqc_eval/cli.py — the run command; src/pathqc_eval/findings.py — new, lenient reading; src/pathqc_eval/harness.py — new, the harness; src/pathqc_eval/prompting.py — split label forms; src/pathqc_eval/schema.py — RunConfig fields; src/pathqc_eval/validate.py — check_omission_anchor; tests/conftest.py — the key blanked for every test; tests/test_findings.py and tests/test_harness.py — new; tests/test_eval_isolation.py, test_plant.py, test_schema.py, test_validate.py — the new rules.
+Commands run: uv run pytest — 0 — 40 s — 673 passed; uv run ruff check . — 0; uv run ruff format --check . — 0; uv run pathqc-eval run --dataset dev --condition plain --dry-run — 1 (the expected refusal) — no dev reports in data/reports/; uv run pathqc-eval freeze --check — 1 — no lock exists.
+Checks: pytest 673 passed, 0 failed | ruff check and format clean
+Git: branch main; commit 51f79be "EVAL-04: evaluation harness, isolation and anchor fixes"; push ok; remote HEAD matches local HEAD: yes
+API spend this task: no API calls
+Deviations from the prompt: the lead's own choices, changed during review before the commit: the SDK retry rule (409, x-should-retry) dropped for the stage's list; the quoted-'split' key narrowed back to decision 42's forms. "Last updated" and the task-log row go in the record commit (Part 5 item 8).
+Claims I could not verify: the real API's behaviour (S8); a console Ctrl+C; the run lock on Linux or macOS.
+Questions for the owner: Part 4 items 7–10 (the soft gate; --max-calls and transport retries; '=' forms of the split; an EVAL-01 test that will fail once reports are built).
+handoff.md updated: yes
+=== END ===
+```
+
 ## Part 8. Known weaknesses, and suggestions that were not acted on
 
 1. S1: `plant` stops with a traceback when an existing report file is read-only (pre-existing; nothing is damaged because the open fails before any truncation). Suggestion: catch OSError per report in write_outputs and list it NOT WRITTEN.
@@ -807,6 +1265,8 @@ handoff.md updated: yes
 3. S1: the test that plant.py's only writer is write_outputs inspects the source (named write calls, no os/shutil imports); a snapshot test checks behaviour on the draft-error paths.
 4. Run procedure (S3 review R3 OF-4): until S3 the reviewers' instructions offered `$env:ANTHROPIC_API_KEY=''` for PowerShell, which in Windows PowerShell deletes the variable, so `cli.main`'s `load_dotenv` would load the key from `.env` into that process. No command the reviewers were allowed to run constructs a client, and data/drafts/_calls.jsonl shows no call other than the lead's (34 lines before S3, 38 after). From S3 on, reviewers run project code only in Git Bash with `ANTHROPIC_API_KEY= PYTHON_DOTENV_DISABLED=1`.
 5. Since S4 the taxonomy is final, so `pathqc-eval plant` in its building form is no longer refused. Section A3 (nothing written under data/reports/ tonight) now rests on never running it on the repository: every later stage uses `plant --check` or a temporary tree, and the reviewers' rules forbid bare `plant` and writing `freeze` on the repository (S4 review R3 F1).
+6. S5: a Ctrl+C still has two narrow gaps: a few bytecodes between starting a call and noting it as in flight, and a second Ctrl+C, which abandons the calls in flight (billed, not logged; they run again on resume and the gate's spend misses them). The README says so.
+7. S5: every run folder keeps an empty, gitignored runs/<id>/.run.lock after the run.
 
 ## Part 9. EVAL report block
 
