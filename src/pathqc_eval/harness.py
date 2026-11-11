@@ -52,9 +52,13 @@ NORMAL_STOP_REASON = "end_turn"
 FIRST_CALL_ASSUMED_USD = 0.06  # assumed cost of a call before any call has been made
 TRANSPORT_RETRIES = 3
 BACKOFF_SECONDS = (2.0, 8.0, 30.0)  # waits before transport retries 1, 2 and 3
-# Dry-run estimate per call: an assumption until the dev run measures it.
-EST_INPUT_TOKENS = 2500
-EST_OUTPUT_TOKENS = 4000
+# Dry-run estimate per call (S8, EVAL-04b): the four plain calls of the smoke test averaged
+# 1,167.5 input and 776.25 output tokens; plus 50%, rounded up. A projection from four calls.
+EST_INPUT_TOKENS = 1752
+EST_OUTPUT_TOKENS = 1165
+# The fake client's default token counts (tests), kept apart from the estimate.
+FAKE_INPUT_TOKENS = 2500
+FAKE_OUTPUT_TOKENS = 4000
 RUNS_DIR = Path("runs")
 REPORTS_DIR = Path("data/reports")
 # The prompt files each condition's system message is built from (hashed into prompt_hash).
@@ -173,8 +177,8 @@ class FakeEvalClient:
         self,
         script: list[Scripted] | Callable[[str, str], Scripted],
         model: str = EVAL_MODEL,
-        input_tokens: int = EST_INPUT_TOKENS,
-        output_tokens: int = EST_OUTPUT_TOKENS,
+        input_tokens: int = FAKE_INPUT_TOKENS,
+        output_tokens: int = FAKE_OUTPUT_TOKENS,
     ) -> None:
         self._script = script if callable(script) else list(script)
         self.model = model
@@ -341,8 +345,9 @@ def dry_run_lines(
         ]
     per_call = cost_usd(EVAL_MODEL, EST_INPUT_TOKENS, EST_OUTPUT_TOKENS)
     lines.append(
-        f"Estimate (an ASSUMPTION until the dev run measures it): {EST_INPUT_TOKENS:,} input + "
-        f"{EST_OUTPUT_TOKENS:,} output tokens per call at Sonnet prices = ${per_call:.4f} per "
+        "Estimate (a projection from the four calls of the S8 smoke test, plain condition: their "
+        f"average plus 50%): {EST_INPUT_TOKENS:,} input + {EST_OUTPUT_TOKENS:,} output tokens "
+        f"per call at Sonnet prices = ${per_call:.4f} per "
         f"call; {units} calls (one per unit) = ${per_call * units:.4f}; at most {most} calls = "
         f"${per_call * most:.4f}"
     )
@@ -549,17 +554,22 @@ class _CallResult:
 
 
 def _call(
-    client: EvalClient, system: str, user: str, max_tokens: int, sleep: Callable[[float], None]
+    client: EvalClient,
+    system: str,
+    user: str,
+    max_tokens: int,
+    sleep: Callable[[float], None],
+    retries: int = TRANSPORT_RETRIES,
 ) -> _CallResult:
-    """One attempt, with transport retries; never raises."""
+    """One attempt, with up to `retries` transport retries; never raises."""
     transport: list[tuple[str, str]] = []
-    for retry in range(TRANSPORT_RETRIES + 1):
+    for retry in range(retries + 1):
         started = time.perf_counter()
         try:
             response = client.complete(system, user, max_tokens)
         except TransportError as exc:
             transport.append((exc.error_class, exc.message))
-            if retry < TRANSPORT_RETRIES:
+            if retry < retries:
                 sleep(BACKOFF_SECONDS[retry])
             continue
         except Exception as exc:  # a rejected request or anything unexpected stops the run
@@ -569,10 +579,15 @@ def _call(
 
 
 def _cost(response: EvalResponse, requested: str) -> float:
+    """Priced at the dearer of the model requested and the model the API names, so that the
+    cost gate never under-counts (an unknown model string is priced as the one requested)."""
+    as_requested = cost_usd(requested, response.input_tokens, response.output_tokens)
     try:
-        return cost_usd(response.model, response.input_tokens, response.output_tokens)
-    except ValueError:  # an unexpected model string: priced as the model requested
-        return cost_usd(requested, response.input_tokens, response.output_tokens)
+        return max(
+            as_requested, cost_usd(response.model, response.input_tokens, response.output_tokens)
+        )
+    except ValueError:
+        return as_requested
 
 
 @dataclass
@@ -682,13 +697,18 @@ def run_units(
     out: Callable[[str], None] = print,
     clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     sleep: Callable[[float], None] = time.sleep,
+    transport_retries: int = TRANSPORT_RETRIES,
+    min_assumed_usd: float = 0.0,
 ) -> RunOutcome:
     """Run every unit not yet finished in calls.jsonl. Calls go out on `workers` threads; this
     thread is the only writer of calls.jsonl and results.json.
 
     If the run is interrupted (Ctrl+C) or a line cannot be written, no new call starts, the
     calls already in flight are waited for and logged (they are billed; a second Ctrl+C
-    abandons them), results.json is rebuilt from calls.jsonl, and the error is raised again."""
+    abandons them), results.json is rebuilt from calls.jsonl, and the error is raised again.
+
+    For the smoke test (EVAL-04b): `transport_retries` 0 makes every call a single request,
+    and `min_assumed_usd` makes each call count at least its ceiling before it starts."""
     calls_path = run_dir / "calls.jsonl"
     attempts = read_attempts(calls_path, run_id, condition)
     done = [a for lines in attempts.values() for a in lines]
@@ -800,6 +820,7 @@ def run_units(
                     stopped = f"--max-calls {max_calls} reached"
                     break
                 assumed = FIRST_CALL_ASSUMED_USD if dearest is None else dearest
+                assumed = max(assumed, min_assumed_usd)  # the smoke test: each call's ceiling
                 if spent + assumed * (len(in_flight) + 1) > cost_gate + _EPS:
                     if not in_flight:
                         stopped = (
@@ -811,7 +832,8 @@ def run_units(
                 system, user = messages[unit[0]]
                 started_at = _stamp(clock())  # before the call starts, so nothing can come
                 queue.popleft()  # between starting it and noting it as in flight
-                in_flight[pool.submit(_call, client, system, user, max_tokens, sleep)] = (
+                call = (_call, client, system, user, max_tokens, sleep, transport_retries)
+                in_flight[pool.submit(*call)] = (
                     unit, attempt, started_at,
                 )  # fmt: skip
                 started_calls += 1

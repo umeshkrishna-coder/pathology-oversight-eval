@@ -1,0 +1,23 @@
+{
+  "purpose": "smoke test; not evaluation data",
+  "run_id": "smoke-20261111-150542",
+  "condition": "plain",
+  "report_ids": [
+    "H-021",
+    "H-022",
+    "H-023",
+    "C-011"
+  ],
+  "model": "claude-sonnet-5-5",
+  "sampling": "default",
+  "effort": "default",
+  "max_tokens": 16000,
+  "prompt_hash": "b96d5cb4f82b1bd5f3a23bcd5729541467bdd7dbc5367640e053b6a461c29f10",
+  "taxonomy_hash": "616f5eb4e0d359d9c49f5d4692033b9d3eb6bf7ddc5e727d356b53643c408335",
+  "created_at": "2026-11-11T15:05:42.113958Z",
+  "cost_gate_usd": 1.0,
+  "max_calls": 8,
+  "assumed_call_usd": 0.166606,
+  "transport_retries": 0,
+  "sdk_version": "2.4.0"
+}

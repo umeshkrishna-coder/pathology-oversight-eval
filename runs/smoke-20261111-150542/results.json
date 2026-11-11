@@ -1,0 +1,78 @@
+{
+  "purpose": "smoke test; not evaluation data",
+  "run_id": "smoke-20261111-150542",
+  "dataset": "dev",
+  "condition": "plain",
+  "units": [
+    {
+      "report_id": "C-011",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The haematocrit of 48% sits at the upper end of the adult male reference range, with haemoglobin of 16.0 g/dL, which is consistent with haemoconcentration from plasma leakage rather than true polycythaemia.",
+          "section": "Interpretation",
+          "category": "overinterpretation",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "Hct and Hb are within reference range and there is no baseline, so attributing them to haemoconcentration from plasma leakage is speculative. The wording should be more cautious."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1241,
+      "output_tokens": 921,
+      "cost_usd": 0.011692
+    },
+    {
+      "report_id": "H-021",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1068,
+      "output_tokens": 845,
+      "cost_usd": 0.010586
+    },
+    {
+      "report_id": "H-022",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1191,
+      "output_tokens": 741,
+      "cost_usd": 0.009792
+    },
+    {
+      "report_id": "H-023",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1170,
+      "output_tokens": 598,
+      "cost_usd": 0.00832
+    }
+  ],
+  "totals": {
+    "units": 4,
+    "valid": 4,
+    "invalid": 0,
+    "pending": 0,
+    "calls": 4,
+    "input_tokens": 4670,
+    "output_tokens": 3105,
+    "cost_usd": 0.04039,
+    "models_returned": [
+      "claude-sonnet-5-5"
+    ]
+  }
+}

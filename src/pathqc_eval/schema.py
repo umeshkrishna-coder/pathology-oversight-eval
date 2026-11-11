@@ -184,6 +184,29 @@ class RunConfig(StrictModel):
     lock_created_at: str | None  # the lock's created_at for a scored run; null for a dev run
 
 
+class SmokeConfig(StrictModel):
+    """A live smoke test of the harness (EVAL-04b): dev drafts, plain condition, one unit per
+    report. Not evaluation data, and never scored (it is not a RunConfig, so loading it as a
+    run fails)."""
+
+    purpose: Literal["smoke test; not evaluation data"] = "smoke test; not evaluation data"
+    run_id: str
+    condition: Literal["plain"] = "plain"
+    report_ids: list[str]
+    model: str
+    sampling: Literal["default"] = "default"
+    effort: Literal["default"] = "default"
+    max_tokens: int
+    prompt_hash: str = Field(pattern=_SHA256)
+    taxonomy_hash: str = Field(pattern=_SHA256)
+    created_at: datetime
+    cost_gate_usd: float = Field(gt=0)
+    max_calls: int = Field(gt=0)  # one call per report and one retry each at most (section B)
+    assumed_call_usd: float = Field(gt=0)  # each call's ceiling, assumed before it starts
+    transport_retries: Literal[0] = 0  # a retry would be another call
+    sdk_version: str
+
+
 ReviewReason = Literal[
     "unmapped_category", "borderline_overlap", "section_mismatch", "omission_other_section"
 ]

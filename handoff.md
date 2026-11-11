@@ -90,6 +90,7 @@ Severity: critical = would change patient management; major = would need an amen
 ## Open items
 - PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
 - PENDING — Dev run (24 calls) once the four dev reports are in data/reports/ and the owner texts are in place.
+- REPORTED — Cost projection from four calls (EVAL-04b smoke test, 2026-11-11: claude-sonnet-5-5, plain condition, dev drafts H-021, H-022, H-023, C-011; 4,670 input + 3,105 output tokens, $0.040390 in total, $0.0101 a call). Dev run, 24 calls: about $0.24 at the measured average, $0.36 at the dry-run estimate (average plus 50%, $0.0152 a call). Scored run, 180 calls: about $1.82 at the measured average, $2.73 at the dry-run estimate. A projection only: the structured condition's prompts are longer, planted reports may draw more findings, and every attempt 2 adds a call (at most twice the calls).
 - PENDING — Owner confirms or changes the scorer defaults in decision 47; until OWNER_CONFIRMED is True in src/pathqc_eval/scoring_config.py, scoring the scored split refuses.
 - PENDING — Owner's questions from the EVAL-N1 run about CLAUDE.md and handoff.md (OVERNIGHT_REPORT.md Part 4).
 

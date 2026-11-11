@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import math
+import os
+import re
 import subprocess
 import sys
 import time
@@ -18,6 +21,7 @@ from pydantic import ValidationError
 
 from pathqc_eval import adjudication
 from pathqc_eval.cbc import load_reference_ranges
+from pathqc_eval.cost import cost_usd
 from pathqc_eval.draft import (
     DEFAULT_DRAFTS_DIR,
     AnthropicDraftClient,
@@ -35,6 +39,7 @@ from pathqc_eval.harness import (
     RunInUse,
     build_run_messages,
     default_run_id,
+    eval_request_args,
     read_attempts,
     run_hashes,
     run_is_busy,
@@ -45,7 +50,7 @@ from pathqc_eval.harness import (
     valid_run_id,
 )
 from pathqc_eval.harness import dry_run_lines as run_dry_run_lines
-from pathqc_eval.io import read_report_json, write_report_json
+from pathqc_eval.io import read_report_json, unique_keys, write_report_json
 from pathqc_eval.plant import (
     REPORTS_DIR,
     SHEET_FILE,
@@ -56,7 +61,7 @@ from pathqc_eval.plant import (
 )
 from pathqc_eval.readable import write_readable
 from pathqc_eval.render import render_cbc_values
-from pathqc_eval.schema import CBCValues, RunConfig
+from pathqc_eval.schema import CBCValues, Report, RunConfig, SmokeConfig
 from pathqc_eval.score_output import map_list, run_score
 from pathqc_eval.scoring import classify_runs, load_inputs, review_findings
 from pathqc_eval.spec import DEFAULT_SPEC_PATH, DatasetSpec, load_spec, spec_summary
@@ -181,6 +186,13 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument(
         "--dry-run", action="store_true", help="print the messages and an estimate; no client"
     )
+
+    smoke = sub.add_parser(
+        "smoke", help="live smoke test: dev drafts, plain condition, one call each (EVAL-04b)"
+    )
+    smoke.add_argument("--ids", required=True, help="comma-separated dev draft ids")
+    smoke.add_argument("--cost-gate", type=float, help="USD limit; required")
+    smoke.add_argument("--condition", default="plain", help="plain only (structured is refused)")
 
     two_runs = {"nargs": 2, "required": True, "metavar": ("PLAIN_RUN_ID", "STRUCTURED_RUN_ID")}
     map_cmd = sub.add_parser(
@@ -383,8 +395,8 @@ def _plant(args: argparse.Namespace) -> int:
     return 0 if run.ok else 1
 
 
-def _refuse(problems: list[str]) -> int:
-    print("run refused:")
+def _refuse(problems: list[str], what: str = "run") -> int:
+    print(f"{what} refused:")
     for problem in problems:
         print(f"  - {problem}")
     return 1
@@ -553,6 +565,231 @@ def _run(args: argparse.Namespace) -> int:
     return 0 if outcome.complete or stopped_cleanly else 1
 
 
+SMOKE_MAX_CALLS = 8  # section B, for the whole stage
+SMOKE_HARD_STOP_USD = 1.00  # section B, for the whole stage
+SMOKE_WRAPPING_TOKENS = 100  # room for the message wrapping around the texts
+SMOKE_STAGE_DIR = "_smoke_stage"  # runs/_smoke_stage/.run.lock: one smoke run at a time
+
+
+def _earlier_smoke_spend(root: Path) -> tuple[int, float, str]:
+    """Calls made and dollars spent by every earlier smoke run (each line of a calls.jsonl is
+    one request: an attempt, a transport failure or a refused call), or why they cannot be
+    read."""
+    calls, spent = 0, 0.0
+    for path in sorted((root / RUNS_DIR).glob("smoke-*/calls.jsonl")):
+        try:
+            for line in path.read_text(encoding="utf-8").split("\n"):
+                if line.strip():
+                    calls += 1
+                    cost = json.loads(line).get("cost_usd", 0.0)
+                    if isinstance(cost, bool) or not isinstance(cost, (int, float)):
+                        raise ValueError(f"cost_usd {cost!r} is not a number")
+                    if not math.isfinite(cost) or cost < 0:
+                        raise ValueError(f"cost_usd {cost!r} is not a finite amount of 0 or more")
+                    spent += cost
+        except (OSError, ValueError, AttributeError, TypeError, OverflowError) as exc:
+            rel = path.relative_to(root).as_posix()
+            return 0, 0.0, f"{rel} cannot be read to count earlier calls ({str(exc)[:200]})"
+    return calls, spent, ""
+
+
+def _smoke(args: argparse.Namespace) -> int:
+    """`pathqc-eval smoke` (EVAL-04b): the first live contact between the harness and the API.
+
+    Dev drafts from data/drafts/ are read as reports in memory (nothing is written under
+    data/); plain condition only; one unit per report; the same client, request arguments,
+    isolation check and parsing as `run`. Section B limits the whole stage, over every
+    invocation, to 8 calls and $1.00, so the retry rule and the gate are stricter than `run`'s:
+    a transport failure is not retried (a retry would be another call); at most two calls are
+    made per report (one call and one retry after an unreadable answer); the calls and spend
+    of every earlier smoke run count against the 8 calls and the $1.00; and every call is
+    assumed to cost its ceiling before it starts (input no larger than the texts' UTF-8 bytes
+    plus 100 tokens of wrapping, output the whole max_tokens), one call at a time, so the total
+    cannot pass the gate. ANTHROPIC_INFERENCE_GEO must be unset (checked by name). Writes
+    runs/smoke-<UTC timestamp>/config.json, calls.jsonl and results.json, both JSON files
+    marked "smoke test; not evaluation data"; the output is never scored."""
+    root = RUN_ROOT
+
+    def refuse(problems: list[str]) -> int:
+        return _refuse(problems, "smoke")
+
+    if args.condition != "plain":
+        return refuse(["the smoke test runs the plain condition only"])
+    gate = args.cost_gate
+    if gate is None:
+        return refuse(["--cost-gate is required for the smoke test (there is no default)"])
+    if not math.isfinite(gate) or gate <= 0:
+        return refuse(["--cost-gate must be a positive number of US dollars"])
+    if round(gate, 6) <= 0:
+        return refuse([f"--cost-gate {gate!r} is below $0.000001, the smallest amount recorded"])
+    if gate > SMOKE_HARD_STOP_USD + 1e-9:
+        stop = usd(SMOKE_HARD_STOP_USD)
+        return refuse([f"--cost-gate {usd(gate)} is above section B's hard stop of {stop}"])
+    if "ANTHROPIC_INFERENCE_GEO" in os.environ:  # the name only; the value is never shown
+        return refuse(["ANTHROPIC_INFERENCE_GEO is set; section B requires it unset"])
+    ids = [part.strip() for part in args.ids.split(",") if part.strip()]
+    problems: list[str] = []
+    if not ids:
+        problems.append("--ids names no report")
+    if len(set(ids)) != len(ids):
+        problems.append("--ids names a report twice")
+    reports = []
+    for report_id in dict.fromkeys(ids):
+        if not re.fullmatch(r"[HC]-\d{3}", report_id):
+            problems.append(f"'{report_id[:40]}' is not a report id")
+            continue
+        path = root / "data" / "drafts" / f"{report_id}.json"
+        try:
+            text = path.read_text(encoding="utf-8")
+            report = Report.model_validate(json.loads(text, object_pairs_hook=unique_keys))
+        except (OSError, ValueError, RecursionError) as exc:
+            problems.append(
+                f"data/drafts/{report_id}.json cannot be read as a draft ({str(exc)[:200]})"
+            )
+            continue
+        if report.id != report_id:
+            problems.append(f"data/drafts/{report_id}.json holds report {report.id}")
+            continue
+        if report.split != "dev":
+            problems.append(
+                f"{report_id} is a {report.split} report; the smoke test uses dev drafts only"
+            )
+            continue
+        reports.append(report)
+    if problems:
+        return refuse(problems)
+    try:
+        taxonomy = load_taxonomy(root / "data" / "taxonomy.json")
+    except (OSError, ValueError) as exc:
+        return refuse([f"data/taxonomy.json cannot be loaded ({exc})"])
+    try:
+        messages, breaches = build_run_messages(reports, "plain", taxonomy, root / "prompts")
+    except (OSError, ValueError) as exc:
+        return refuse([f"the prompts cannot be read ({exc})"])
+    if breaches:
+        return refuse([f"isolation: {breach}" for breach in breaches])
+    for report in reports:
+        system, user = messages[report.id]
+        shape = eval_request_args(EVAL_MODEL, f"<{len(system)} characters>", "", EVAL_MAX_TOKENS)
+        shape["messages"][0]["content"] = f"<{len(user)} characters>"
+        print(f"request {report.id}: {json.dumps(shape)}")
+    # The dearest a call can be: no more input tokens than the texts' UTF-8 bytes (a token covers
+    # at least one byte) plus the message wrapping, and the whole max_tokens of output.
+    longest = max(len(s.encode("utf-8")) + len(u.encode("utf-8")) for s, u in messages.values())
+    ceiling = cost_usd(EVAL_MODEL, longest + SMOKE_WRAPPING_TOKENS, EVAL_MAX_TOKENS)
+    stage = root / RUNS_DIR / SMOKE_STAGE_DIR
+    with contextlib.ExitStack() as held:
+        try:  # one smoke run at a time: the stage's limits cover them all
+            held.enter_context(run_lock(stage))
+        except RunInUse:
+            busy = "another smoke run is going on; section B's limits cover every invocation"
+            return refuse([f"{busy}, so wait"])
+        except OSError as exc:
+            return refuse([f"runs/{SMOKE_STAGE_DIR}/.run.lock cannot be used ({exc})"])
+        return _smoke_in_stage(root, reports, messages, ceiling, gate, refuse)
+
+
+def _mark_smoke_results(path: Path, purpose: str) -> None:
+    """Put the purpose line first in a smoke run's results.json, if one was written."""
+    try:
+        results = read_report_json(path)
+    except (OSError, ValueError):
+        return  # not written (the run stopped before it) or not readable: nothing to mark
+    write_report_json(path, {"purpose": purpose} | results)
+
+
+def _smoke_in_stage(root, reports, messages, ceiling: float, gate: float, refuse) -> int:
+    """The part of `smoke` that runs under the stage lock: the earlier smoke runs' calls and
+    spend, the limits left, and the run itself."""
+    earlier_calls, earlier_usd, problem = _earlier_smoke_spend(root)
+    if problem:
+        return refuse([problem])
+    calls_left = SMOKE_MAX_CALLS - earlier_calls
+    if calls_left <= 0:
+        return refuse(
+            [
+                f"section B's {SMOKE_MAX_CALLS} calls are used up ({earlier_calls} made in "
+                "earlier smoke runs)"
+            ]
+        )
+    gate = min(gate, SMOKE_HARD_STOP_USD - earlier_usd)
+    if round(gate, 6) <= 0:
+        stop = usd(SMOKE_HARD_STOP_USD)
+        return refuse([f"section B's hard stop of {stop} is used up by earlier smoke runs"])
+    max_calls = min(2 * len(reports), calls_left)
+    now = RUN_CLOCK()
+    run_id = f"smoke-{now.astimezone(UTC):%Y%m%d-%H%M%S}"
+    run_dir = root / RUNS_DIR / run_id
+    if run_dir.exists():
+        return refuse([f"runs/{run_id} exists already; start the smoke test again"])
+    try:
+        hashes = run_hashes(root, "dev", "plain")
+    except OSError as exc:
+        return refuse([f"the prompts, taxonomy or reports cannot be hashed ({exc})"])
+    config = SmokeConfig(
+        run_id=run_id,
+        report_ids=[r.id for r in reports],
+        model=EVAL_MODEL,
+        max_tokens=EVAL_MAX_TOKENS,
+        prompt_hash=hashes["prompt_hash"],
+        taxonomy_hash=hashes["taxonomy_hash"],
+        created_at=now,
+        cost_gate_usd=round(gate, 6),
+        max_calls=max_calls,
+        assumed_call_usd=round(ceiling, 6),
+        sdk_version=package_version("anthropic"),
+    )
+    try:
+        client = EVAL_CLIENT_FACTORY()
+    except MissingAPIKeyError as exc:
+        print(f"FAIL {exc}")
+        return 1
+    try:
+        with run_lock(run_dir):
+            write_report_json(run_dir / "config.json", config.model_dump(mode="json"))
+            print(
+                f"smoke {run_id}: {len(reports)} report(s) x 1, plain, gate {usd(round(gate, 6))}"
+                f" (earlier smoke runs: {earlier_calls} calls, ${earlier_usd:.4f}), at most "
+                f"{max_calls} calls, each assumed to cost {usd(round(ceiling, 4))} before it starts"
+            )
+            try:
+                outcome = run_units(
+                    run_dir=run_dir,
+                    run_id=run_id,
+                    dataset="dev",
+                    condition="plain",
+                    model=EVAL_MODEL,
+                    messages=messages,
+                    client=client,
+                    cost_gate=gate,
+                    workers=1,
+                    max_calls=max_calls,
+                    repeats=1,
+                    clock=RUN_CLOCK,
+                    sleep=RUN_SLEEP,
+                    transport_retries=0,
+                    min_assumed_usd=ceiling,
+                )
+            finally:  # however the run ends, its results.json says what it is
+                _mark_smoke_results(run_dir / "results.json", config.purpose)
+    except RunInUse:
+        return refuse([f"runs/{run_id} is being run by another invocation"])
+    except CallsFileError as exc:
+        print(f"FAIL {exc}")
+        return 1
+    except KeyboardInterrupt:
+        print(f"interrupted: the calls made are in runs/{run_id}/calls.jsonl")
+        return 130
+    except OSError as exc:
+        print(f"FAIL the run's files could not be written ({exc})")
+        return 1
+    others = [m for m in outcome.results["totals"]["models_returned"] if m != EVAL_MODEL]
+    if others:
+        print(f"FAIL the API returned {', '.join(others)}, not {EVAL_MODEL} (section B)")
+        return 1
+    return 0 if outcome.complete and outcome.failure is None else 1
+
+
 def _adjudicate(args: argparse.Namespace) -> int:
     root = SCORE_ROOT
     if args.action == "prepare":
@@ -612,6 +849,8 @@ def main(argv: list[str] | None = None) -> int:
         return _plant(args)
     if args.command == "run":
         return _run(args)
+    if args.command == "smoke":
+        return _smoke(args)
     if args.command in ("map-list", "score"):
         if args.command == "map-list":
             outcome = map_list(SCORE_ROOT, args.runs)

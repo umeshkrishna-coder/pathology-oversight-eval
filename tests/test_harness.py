@@ -521,10 +521,13 @@ def test_dry_run_needs_no_cost_gate_and_no_client(tree, capsys):
     ) in out
     assert "===== H-001 system message (plain) =====" in out
     assert "===== C-001 user message =====\n## Values\n" in out
+    # S8 (EVAL-04b): the smoke test's four plain calls averaged 1,167.5 input and 776.25 output
+    # tokens; plus 50% and rounded up: 1,752 and 1,165. At $2 and $10 per million tokens:
+    # 0.003504 + 0.01165 = $0.015154 a call; 6 calls $0.090924; 12 calls $0.181848.
     assert (
-        "Estimate (an ASSUMPTION until the dev run measures it): 2,500 input + 4,000 output "
-        "tokens per call at Sonnet prices = $0.0450 per call; 6 calls (one per unit) = $0.2700; "
-        "at most 12 calls = $0.5400"
+        "Estimate (a projection from the four calls of the S8 smoke test, plain condition: "
+        "their average plus 50%): 1,752 input + 1,165 output tokens per call at Sonnet prices = "
+        "$0.0152 per call; 6 calls (one per unit) = $0.0909; at most 12 calls = $0.1818"
     ) in out
     assert not (tree / "runs").exists()
 
@@ -1333,3 +1336,16 @@ def test_a_lock_file_that_cannot_be_used_is_refused_in_plain_words(tree, monkeyp
             os.chmod(lock, stat.S_IREAD | stat.S_IWRITE)
     assert client.calls == []
     assert f"runs/{RUN_ID}/.run.lock cannot be used" in capsys.readouterr().out
+
+
+def test_a_call_is_priced_at_the_dearer_of_the_model_requested_and_returned():
+    """S8 (EVAL-04b) review: the gate must never under-count, for `run` and `smoke` alike."""
+    from pathqc_eval.cost import cost_usd
+
+    sonnet = EvalResponse(EMPTY, "claude-sonnet-5-5", 1000, 1000, "end_turn")
+    haiku = EvalResponse(EMPTY, "claude-haiku-5-5", 1000, 1000, "end_turn")
+    unknown = EvalResponse(EMPTY, "claude-unknown-1", 1000, 1000, "end_turn")
+    dear = cost_usd("claude-sonnet-5-5", 1000, 1000)
+    assert harness._cost(sonnet, "claude-haiku-5-5") == dear  # returned is dearer
+    assert harness._cost(haiku, "claude-sonnet-5-5") == dear  # requested is dearer
+    assert harness._cost(unknown, "claude-sonnet-5-5") == dear  # unknown: as requested
