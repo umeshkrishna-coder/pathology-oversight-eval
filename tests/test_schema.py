@@ -115,6 +115,11 @@ def _run_config(**overrides) -> dict:
         "taxonomy_hash": "c" * 64,
         "created_at": "2026-11-04T12:00:00Z",
         "cost_gate_usd": 5.0,
+        # EVAL-04 fields
+        "effort": "default",
+        "max_tokens": 16000,
+        "sdk_version": "2.4.0",
+        "lock_created_at": None,
     }
     return data | overrides
 
@@ -134,6 +139,8 @@ def test_run_config_round_trip():
         {"condition": "other"},
         {"dataset_hash": "not-a-hash"},
         {"cost_gate_usd": 0},
+        {"effort": "high"},
+        {"effort": None},
     ],
 )
 def test_run_config_rejects(overrides):
@@ -184,6 +191,27 @@ def test_run_config_sampling_defaults_to_default():
     config = RunConfig.model_validate(data)
     assert config.sampling == "default"
     assert "temperature" not in config.model_dump()
+
+
+def test_run_config_effort_defaults_to_default():
+    data = _run_config()
+    del data["effort"]
+    assert RunConfig.model_validate(data).effort == "default"
+
+
+@pytest.mark.parametrize("field", ["max_tokens", "sdk_version", "lock_created_at"])
+def test_run_config_requires_the_eval04_fields(field):
+    data = _run_config()
+    del data[field]
+    with pytest.raises(ValidationError):
+        RunConfig.model_validate(data)
+
+
+def test_run_config_holds_the_lock_time_for_a_scored_run():
+    config = RunConfig.model_validate(
+        _run_config(dataset="scored", lock_created_at="2026-11-15T08:00:00Z")
+    )
+    assert config.lock_created_at == "2026-11-15T08:00:00Z"
 
 
 def test_planted_error_kind_defaults_to_statement(histo):

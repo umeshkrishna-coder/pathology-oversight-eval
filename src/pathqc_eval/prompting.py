@@ -22,6 +22,17 @@ STRUCTURED_OWNER_PROMPTS: dict[str, str] = {
 }
 OWNER_TEXT_PLACEHOLDER = "<<OWNER TEXT REQUIRED>>"
 TAXONOMY_HEADING = "## Error taxonomy"
+# Owner decision (EVAL-04): only label forms of the split are refused: `split:` followed by dev
+# or scored, or the quoted key "split". The bare words occur in ordinary report text ("HER2
+# scored 2+", a core received 'split'). Any case; spaces, quotes (straight or typographic) and
+# markdown emphasis may stand around the colon ("**Split:** scored", {'split': 'dev'}); a
+# prefix joined to the label ("data_split: dev") is still a label. The key is "split" in
+# double quotes, or 'split' in any quotes followed by a colon.
+_QUOTES = "\"'“”‘’"
+_AROUND = rf"[\s*_`{_QUOTES}]*"
+# After the value no letter or digit may follow; "_" may (underscore emphasis: "_dev_").
+_SPLIT_LABEL = re.compile(rf"split{_AROUND}:{_AROUND}(dev|scored)(?![^\W_])", re.IGNORECASE)
+_SPLIT_KEY = re.compile(rf'"split"|[{_QUOTES}]split[{_QUOTES}]\s*:', re.IGNORECASE)
 
 
 def read_prompt(path: Path | str) -> str:
@@ -93,8 +104,10 @@ def check_eval_isolation(
     for label, text in messages:
         if report.id in text:
             problems.append(f"{label} message contains the report id {report.id}")
-        if _has_word(report.split, text.lower()):
-            problems.append(f"{label} message contains the split '{report.split}'")
+        for value in sorted({match.group(1).lower() for match in _SPLIT_LABEL.finditer(text)}):
+            problems.append(f"{label} message contains the split '{value}'")
+        if _SPLIT_KEY.search(text):
+            problems.append(f'{label} message contains the quoted key "split"')
         for field_name in ("is_clean_control", "provenance", "error_id"):
             if field_name in text:
                 problems.append(f"{label} message contains '{field_name}'")

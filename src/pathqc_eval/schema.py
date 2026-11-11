@@ -163,18 +163,25 @@ class Finding(StrictModel):
 
 
 class RunConfig(StrictModel):
+    """One run: one dataset (dev or scored) in one condition (EVAL-04)."""
+
     run_id: str
     dataset: Split
     condition: Condition
     model: str
     # Decision 32 (amends 3): the API takes no temperature; runs use default sampling.
     sampling: Literal["default"] = "default"
+    # Owner decision (EVAL-04): the API's default reasoning effort; no effort setting is sent.
+    effort: Literal["default"] = "default"
+    max_tokens: int
     repeats: Literal[3] = 3
     dataset_hash: str = Field(pattern=_SHA256)
     prompt_hash: str = Field(pattern=_SHA256)
     taxonomy_hash: str = Field(pattern=_SHA256)
     created_at: datetime
     cost_gate_usd: float = Field(gt=0)
+    sdk_version: str
+    lock_created_at: str | None  # the lock's created_at for a scored run; null for a dev run
 
 
 class AdjudicationItem(StrictModel):

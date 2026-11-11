@@ -99,6 +99,23 @@ def check_quoted_sentences(report: Report, taxonomy: Taxonomy) -> list[str]:
     return reasons
 
 
+# Owner decision (EVAL-04, amends 34): where an omission's anchor may lie.
+OMISSION_ANCHOR_SECTIONS: dict[str, tuple[str, ...]] = {
+    "cbc": ("Values",),
+    "histopathology": ("Synoptic summary", "Diagnosis"),
+}
+
+
+def check_omission_anchor(report: Report, taxonomy: Taxonomy) -> list[str]:
+    allowed = OMISSION_ANCHOR_SECTIONS[report.modality]
+    shown = " or ".join(f"'{name}'" for name in allowed)
+    return [
+        f"{err.error_id}: an omission's anchor must be in {shown}, not in '{err.section}'"
+        for err in report.errors
+        if err.kind == "omission" and err.section not in allowed
+    ]
+
+
 def check_section_order(report: Report, taxonomy: Taxonomy) -> list[str]:
     convention = SECTION_CONVENTIONS[report.modality]
     order = {name: i for i, (name, _) in enumerate(convention)}
@@ -195,6 +212,7 @@ RULES: tuple[Callable[[Report, Taxonomy], list[str]], ...] = (
     check_error_ids,
     check_error_types,
     check_quoted_sentences,
+    check_omission_anchor,
     check_section_order,
     check_cbc_indices,
     check_cbc_units,

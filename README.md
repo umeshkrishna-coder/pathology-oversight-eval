@@ -19,6 +19,8 @@ uv run pathqc-eval plant --check          # apply the sheet in memory and list p
 uv run pathqc-eval plant                  # build data/reports/ from drafts + sheet (taxonomy final)
 uv run pathqc-eval freeze [--replace]      # hash taxonomy, prompts and dataset into data/prompts.lock.json
 uv run pathqc-eval freeze --check          # exit 0 only if every hash still matches the lock
+uv run pathqc-eval run --dataset dev --condition plain --dry-run          # messages and estimate; no API call
+uv run pathqc-eval run --dataset dev|scored --condition plain|structured --cost-gate USD [--run-id ID] [--workers 4] [--max-calls N]
 uv run pytest                              # run the tests
 uv run ruff check .                        # lint
 uv run ruff format --check .               # formatting check
@@ -121,7 +123,7 @@ description: The critical platelet count is not flagged.
 rationale: A critical value needs a flag and a recommendation.
 ```
 
-Decision 34 sets the anchor rules: for CBC, the Values line carrying the number concerned; for histopathology, the Synoptic summary line next to where the missing element belongs, or the Diagnosis line if there is none. The validator checks the anchor like any quoted sentence, and its summary counts omissions (`omissions N`). At scoring, an omission is detected when the mapped type matches and the finding's section equals the anchor's section; sentence overlap is not required. A finding with the matching type in another section goes to blind adjudication.
+Decision 34 sets the anchor rules: for CBC, the Values line carrying the number concerned; for histopathology, the Synoptic summary line next to where the missing element belongs, or the Diagnosis line if there is none. The validator checks the anchor like any quoted sentence, requires it to be in Values (CBC) or in the Synoptic summary or Diagnosis (histopathology) (decision 43), and its summary counts omissions (`omissions N`). At scoring, an omission is detected when the mapped type matches and the finding's section equals the anchor's section; sentence overlap is not required. A finding with the matching type in another section goes to blind adjudication.
 
 ## Evaluation prompts and the two conditions
 
@@ -141,6 +143,38 @@ The user message is the same in both conditions: the report's sections in stored
 5. `uv run pathqc-eval freeze --check`. Scored runs (EVAL-04) call this and refuse to start unless it passes; dev runs do not.
 
 The lock records `created_at`, the taxonomy version, the sha256 of `data/taxonomy.json`, of the four prompt files and of `prompts/manifest.json`, and the dataset hash (sha256 over the sorted lines `<file name>:<sha256>`, one per `data/reports/*.json`) with each report's hash and the report count. All hashes are taken on the file bytes with CRLF normalised to LF.
+
+## Evaluation runs (EVAL-04)
+
+A run covers one dataset (`dev` or `scored`) in one condition (`plain` or `structured`). Each report is reviewed in 3 repeats; a (report, repeat) pair is a unit. The evaluated model is claude-sonnet-5-5 at the API's default reasoning effort and default sampling, with max_tokens 16,000, the same in both conditions (decision 44). Each call sends the system message, one user message and max_tokens only.
+
+Before any call the run refuses, and says why, if:
+
+- scored: `freeze --check` does not pass (the same check);
+- dev: there are no dev reports in `data/reports/`, a dev report fails the validator's per-report rules, or (structured) an owner text for a modality in scope still holds the placeholder;
+- two files in `data/reports/` hold the same report id (a copy such as `H-001 - Copy.json`), or a report file cannot be read;
+- a prompt file the run uses is missing or is not UTF-8 text;
+- the messages of any report fail the isolation check;
+- resuming: the config differs (below), `runs/<run_id>/` holds calls.jsonl but no config.json, or a line of calls.jsonl is not a call line of this run;
+- another invocation is running on the same run id, or the lock file cannot be used. A run holds a lock on `runs/<run_id>/.run.lock` (gitignored) while it goes on; the operating system releases it when the process ends. The lock is checked before the run's files are read, and the config is compared again once it is held.
+
+`--dry-run` constructs no client and needs no `--cost-gate`. It prints the number of reports, units and maximum calls, the full system and user messages for the first report of each modality, and an estimate at 2,500 input and 4,000 output tokens per call at Sonnet prices. The estimate is an assumption until the dev run measures it.
+
+An output that cannot be read as findings, or a call that does not end its turn normally, gets one more attempt; after two such attempts the unit is `invalid` (decision 45). Transport failures are retried up to 3 times, after 2, 8 and 30 seconds, and logged as transport lines; they are not attempts. They are connection errors and timeouts, a request timeout (HTTP 408), a rate limit (429) and server errors (5xx); the SDK's own retries are off, so that each one is logged. A call still failing after its retries, or a call the API rejects for another reason, stops the run once the calls in flight have finished. Findings are read leniently (decision 46): extra keys are ignored and noted, an unusable severity or confidence becomes null, and a finding without a usable quoted_sentence, section or category is dropped and counted.
+
+Each run folder `runs/<run_id>/` holds:
+
+- `config.json`: the run config (dataset, condition, model, sampling, effort, max_tokens, repeats, the dataset, prompt and taxonomy hashes, created_at, cost_gate_usd, the anthropic SDK version and lock_created_at). A scored run takes its hashes from the lock and records the lock's created_at; a dev run computes them with the freeze's own functions, and lock_created_at is null. prompt_hash combines the hashes of the condition's prompt files (plain: `plain.md`; structured: `structured_output.md` and the two owner texts) the way the dataset hash combines the reports.
+- `calls.jsonl`: one line per attempt with the ids, attempt number, start time, duration, the model requested and returned, the sha256 of the system and user messages, the full raw output, stop reason, tokens, cost, parse status, parsed findings, dropped findings and notes. A transport failure gets a line with the unit's ids, the error class and the message only; a failure that stopped the run gets the same line marked `"fatal": true`. No request text is stored; the hashes identify it. The file is gitignored and stays local until release (decision 14).
+- `results.json`: rebuilt from calls.jsonl at the end of every invocation. One entry per unit, by report id and then repeat (status `valid`, `invalid` or `pending`, attempts, findings, dropped count, model returned, tokens, cost), then the totals: units, valid, invalid, pending, calls, tokens, cost and the distinct models returned. It is committed with the run.
+
+The run id is `<YYYYMMDD-HHMMSS>-<dataset>-<condition>` (UTC) unless `--run-id` is given.
+
+**Resume.** Run the same command again with the same `--run-id`. Units already valid or invalid in calls.jsonl are skipped, and an unfinished unit continues at its next attempt. The config must be identical apart from created_at, including the cost gate and the SDK version; otherwise the run refuses and names the fields that differ. To change any of them, start a new run id.
+
+**The gate.** `--cost-gate USD` is required for every real run; there is no default. Spend is cumulative over the run, read from calls.jsonl. Before starting a call the run assumes it will cost as much as the dearest call so far ($0.06 before any call), counting the calls already in flight, and it does not start a call that would take the total past the gate on that assumption; it stops and reports what it has. The gate is therefore not a hard ceiling: a call can cost more than the dearest so far (one call at the 16,000-token limit costs about $0.17), and the total can pass the gate by that difference for each call in flight. Where the gate is a hard stop, use `--workers 1` and a gate that leaves room for one such call. `--max-calls N` stops cleanly after N attempts in this invocation, for running in pieces. `--workers N` (default 4) sets how many calls run at once; one thread writes every file.
+
+A real run needs `ANTHROPIC_API_KEY` in `.env`; without it the run stops with a message naming the variable before any call. It prints one line per finished unit (report, repeat, status, findings, tokens, cost, running total), then the totals, and `stopped early: …` with the reason when the gate, `--max-calls` or a failure stopped it. If the run is interrupted (Ctrl+C) or a line cannot be written, no new call starts, the calls already in flight are waited for and logged (they are billed; Ctrl+C again abandons them), and results.json is rebuilt; resume with the same `--run-id`. The exit code is 0 when every unit is finished or `--max-calls` stopped the run, 130 after Ctrl+C, and 1 otherwise.
 
 ## Licences
 

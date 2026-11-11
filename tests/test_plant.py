@@ -521,7 +521,33 @@ def test_anchor_in_a_section_the_validator_does_not_allow_fails(histo_draft, fix
     )
     result = _apply(_row("H-001", planned=["H5"]), histo_draft, body, fixed_taxonomy)
     assert result.problems == [
-        "validation: H-001-E1: section 'Final diagnosis' is not in the report"
+        "validation: H-001-E1: section 'Final diagnosis' is not in the report",
+        # EVAL-04: the validator also restricts where an omission's anchor may be.
+        "validation: H-001-E1: an omission's anchor must be in 'Synoptic summary' or "
+        "'Diagnosis', not in 'Final diagnosis'",
+    ]
+
+
+def test_anchor_in_an_existing_section_the_validator_does_not_allow_fails(
+    histo_draft, fixed_taxonomy
+):
+    """EVAL-04 (decision on omission anchors): the Microscopic description exists and holds
+    the anchor verbatim, but an omission's anchor must be in Synoptic summary or Diagnosis."""
+    body = "verified: no\n" + _error(
+        "H5",
+        "major",
+        """
+        kind: omission
+        remove_from: Synoptic summary
+        remove: Perineural invasion: Absent
+        anchor_section: Microscopic description
+        anchor: Margins are clear.
+        """,
+    )
+    result = _apply(_row("H-001", planned=["H5"]), histo_draft, body, fixed_taxonomy)
+    assert result.problems == [
+        "validation: H-001-E1: an omission's anchor must be in 'Synoptic summary' or "
+        "'Diagnosis', not in 'Microscopic description'"
     ]
 
 

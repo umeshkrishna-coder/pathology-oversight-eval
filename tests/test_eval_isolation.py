@@ -141,3 +141,122 @@ def test_user_message_must_be_the_report_text(report, condition, fixed_taxonomy,
     assert check_eval_isolation(report, condition, system, altered, fixed_taxonomy) == [
         "user message is not the report text (it must be the same in both)"
     ]
+
+
+# EVAL-04 (owner decision): only label forms of the split are refused, not the bare words.
+
+
+@pytest.mark.parametrize("condition", ["plain", "structured"])
+@pytest.mark.parametrize(
+    ("split", "words"),
+    [("scored", "HER2 scored 2+ in the invasive tumour."), ("dev", "The dev slide was reviewed.")],
+)
+def test_the_split_as_an_ordinary_word_passes_in_both_messages(
+    histo, fixed_taxonomy, real_prompts, condition, split, words
+):
+    histo["split"] = split
+    histo["sections"]["Comment"] = words
+    report = Report.model_validate(histo)
+    system, user = _messages(report, condition, fixed_taxonomy, real_prompts)
+    assert words in user
+    system += f"\n{words}"
+    assert check_eval_isolation(report, condition, system, user, fixed_taxonomy) == []
+
+
+@pytest.mark.parametrize(
+    ("label", "problem"),
+    [
+        ("split: scored", "contains the split 'scored'"),
+        ("Split : dev", "contains the split 'dev'"),
+        ("SPLIT:dev", "contains the split 'dev'"),
+        ("split: 'scored'", "contains the split 'scored'"),
+        ('"split"', 'contains the quoted key "split"'),
+    ],
+)
+@pytest.mark.parametrize("where", ["system", "user"])
+def test_split_label_forms_fail(histo, fixed_taxonomy, real_prompts, label, problem, where):
+    if where == "user":
+        histo["sections"]["Comment"] = f"Invented note, {label}."
+    report = Report.model_validate(histo)
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    if where == "system":
+        system += f"\n{label}"
+    assert check_eval_isolation(report, "plain", system, user, fixed_taxonomy) == [
+        f"{where} message {problem}"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("label", "problems"),
+    [
+        ("{'split': 'scored'}", ["contains the split 'scored'", 'contains the quoted key "split"']),
+        ('"Split": "dev"', ["contains the split 'dev'", 'contains the quoted key "split"']),
+        ("data_split: dev", ["contains the split 'dev'"]),
+        ("**Split:** scored", ["contains the split 'scored'"]),
+        ("**Split**: dev", ["contains the split 'dev'"]),
+        ("split: “dev”", ["contains the split 'dev'"]),
+        ("‘split’: dev", ["contains the split 'dev'", 'contains the quoted key "split"']),
+        ("“Split” : x", ['contains the quoted key "split"']),
+    ],
+)
+@pytest.mark.parametrize("where", ["system", "user"])
+def test_decorated_split_labels_fail(histo, fixed_taxonomy, real_prompts, label, problems, where):
+    """S5 review rounds 1 and 2: quotes and markdown around a split label, or a prefix joined
+    to it by an underscore, are still label forms; 'split' in any quotes before a colon is a
+    key."""
+    if where == "user":
+        histo["sections"]["Comment"] = f"Invented note, {label}."
+    report = Report.model_validate(histo)
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    if where == "system":
+        system += f"\n{label}"
+    assert check_eval_isolation(report, "plain", system, user, fixed_taxonomy) == [
+        f"{where} message {p}" for p in problems
+    ]
+
+
+@pytest.mark.parametrize(
+    "prose",
+    [
+        "The core was received ‘split’ and both halves were embedded.",
+        "The specimen was 'split' longitudinally.",
+        "A “split” biopsy was sent.",
+    ],
+)
+@pytest.mark.parametrize("where", ["system", "user"])
+def test_split_in_quotes_in_prose_passes(histo, fixed_taxonomy, real_prompts, prose, where):
+    """Decision 42: the bare words pass. Only the double-quoted key "split", or 'split' in
+    any quotes before a colon, is a key form."""
+    if where == "user":
+        histo["sections"]["Comment"] = prose
+    report = Report.model_validate(histo)
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    if where == "system":
+        system += f"\n{prose}"
+    assert check_eval_isolation(report, "plain", system, user, fixed_taxonomy) == []
+
+
+@pytest.mark.parametrize("words", ["Split: developed nodes.", "split: scoreds", "The split dev"])
+def test_words_after_a_split_label_must_be_the_split_itself(
+    histo, fixed_taxonomy, real_prompts, words
+):
+    report = Report.model_validate(histo)
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    assert check_eval_isolation(report, "plain", system + f"\n{words}", user, fixed_taxonomy) == []
+
+
+@pytest.mark.parametrize("label", ["Split: _dev_", "**SPLIT** : _scored_", "split: __dev__"])
+@pytest.mark.parametrize("where", ["system", "user"])
+def test_split_labels_with_underscore_emphasis_fail(
+    histo, fixed_taxonomy, real_prompts, label, where
+):
+    """Review round 3: '_' is a word character, so underscore emphasis after the value must
+    not hide a label."""
+    if where == "user":
+        histo["sections"]["Comment"] = f"Invented note, {label}."
+    report = Report.model_validate(histo)
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    if where == "system":
+        system += f"\n{label}"
+    problems = check_eval_isolation(report, "plain", system, user, fixed_taxonomy)
+    assert len(problems) == 1 and problems[0].startswith(f"{where} message contains the split")

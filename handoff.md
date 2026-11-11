@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–41 on 2026-11-10)
+## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–46 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -52,6 +52,11 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 39. The Project Harness Kit is adopted for this pilot at Light size. The Operating Charter, the decision register and the roadmap are kept by the orchestrator outside the repo; handoff.md stays the session's notes; the repo gets a CLAUDE.md. Three typed words, each typed by the owner in a session: `freeze approved`, `scored run approved`, `release approved`. Nothing in this prompt [the EVAL-N1 prompt] is one of those words. For small API tasks, pasting a prompt that states model, estimate and hard stop is the owner's yes. Status labels gain REPORTED and NOT TESTED. A fix to existing behaviour ships with a test that fails on the old code and passes on the new.
 40. Drafting instructions corrected after the audit of the first drafts: the brief's pT and pN are used exactly and no stage group or risk class is added that the brief does not give; the CBC drafting message shows the reference ranges. H-009, H-021, C-008 and C-009 were drafted again. Single-sentence corrections elsewhere are the owner's [fix] entries.
 41. Taxonomy final as version 1.0. C2 now names MCV with MCH and MCHC.
+42. Isolation, split check: only label forms are refused (`split:` followed by dev or scored, or the quoted key "split"), not the bare words. The user message must still equal the report's section text exactly.
+43. Omission anchors: the validator requires an omission's anchor to be in Values (CBC) or in Synoptic summary or Diagnosis (histopathology).
+44. Evaluated-model settings: claude-sonnet-5-5 at the API's default reasoning effort (no effort setting is sent), default sampling, max_tokens 16,000, identical in both conditions, recorded in every run config.
+45. Unreadable outputs: a call whose output cannot be read as findings is repeated once; both attempts are logged. If the second is also unreadable the repeat is marked invalid and counted. Majority is computed over the valid repeats: with 3 valid, 2 of 3; with 2 valid, both; with fewer than 2 valid, the report has no majority result in that condition and is listed separately, never scored silently.
+46. Lenient reading of findings: extra keys are ignored and recorded; an unusable severity or confidence becomes null (excluded from calibration, counted); a finding without a usable quoted_sentence, section or category is dropped and counted. The raw output of every call is kept.
 
 ## Error taxonomy (OWNER VERIFIED, final, version 1.0, 2026-11-10)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -83,7 +88,7 @@ Severity: critical = would change patient management; major = would need an amen
 
 ## Open items
 - PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
-- PENDING — Evaluated-model settings (effort, max_tokens) decided before EVAL-04.
+- PENDING — Dev run (24 calls) once the four dev reports are in data/reports/ and the owner texts are in place.
 - PENDING — Owner's questions from the EVAL-N1 run about CLAUDE.md and handoff.md (OVERNIGHT_REPORT.md Part 4).
 
 ## Task log

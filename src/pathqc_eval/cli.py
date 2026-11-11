@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
+import time
 from collections import Counter
-from datetime import date
+from datetime import UTC, date, datetime
+from importlib.metadata import version as package_version
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -21,6 +24,25 @@ from pathqc_eval.draft import (
     run_drafts,
 )
 from pathqc_eval.freeze import check_lock, freeze
+from pathqc_eval.harness import (
+    EVAL_MAX_TOKENS,
+    EVAL_MODEL,
+    RUNS_DIR,
+    AnthropicEvalClient,
+    CallsFileError,
+    RunInUse,
+    build_run_messages,
+    default_run_id,
+    read_attempts,
+    run_hashes,
+    run_is_busy,
+    run_lock,
+    run_units,
+    select_reports,
+    usd,
+    valid_run_id,
+)
+from pathqc_eval.harness import dry_run_lines as run_dry_run_lines
 from pathqc_eval.io import read_report_json, write_report_json
 from pathqc_eval.plant import (
     REPORTS_DIR,
@@ -32,7 +54,7 @@ from pathqc_eval.plant import (
 )
 from pathqc_eval.readable import write_readable
 from pathqc_eval.render import render_cbc_values
-from pathqc_eval.schema import CBCValues
+from pathqc_eval.schema import CBCValues, RunConfig
 from pathqc_eval.spec import DEFAULT_SPEC_PATH, DatasetSpec, load_spec, spec_summary
 from pathqc_eval.taxonomy import REPO_ROOT, load_taxonomy
 from pathqc_eval.validate import validate_reports
@@ -45,6 +67,18 @@ FREEZE_ROOT = REPO_ROOT
 SPEC_PATH = DEFAULT_SPEC_PATH
 # Replaced in tests with a temporary tree (spec, taxonomy, drafts, sheet, reports).
 PLANT_ROOT = REPO_ROOT
+
+
+def _utc_now() -> datetime:
+    return datetime.now(UTC)
+
+
+# `run` (EVAL-04). Replaced in tests: a temporary tree, a fake client factory (the real client is
+# never constructed in a test), a fixed clock and no waiting between transport retries.
+RUN_ROOT = REPO_ROOT
+EVAL_CLIENT_FACTORY = AnthropicEvalClient
+RUN_CLOCK = _utc_now
+RUN_SLEEP = time.sleep
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -93,6 +127,21 @@ def _build_parser() -> argparse.ArgumentParser:
     plant_mode.add_argument("--init", action="store_true", help="write the empty template sheet")
     plant_mode.add_argument(
         "--check", action="store_true", help="parse and apply in memory; write nothing"
+    )
+
+    run = sub.add_parser(
+        "run", help="run the evaluated model over one dataset in one condition (EVAL-04)"
+    )
+    run.add_argument("--dataset", required=True, choices=["dev", "scored"])
+    run.add_argument("--condition", required=True, choices=["plain", "structured"])
+    run.add_argument(
+        "--cost-gate", type=float, help="USD limit for the whole run; required for a real run"
+    )
+    run.add_argument("--run-id", help="default: <YYYYMMDD-HHMMSS>-<dataset>-<condition> (UTC)")
+    run.add_argument("--workers", type=int, default=4, help="calls in parallel (default 4)")
+    run.add_argument("--max-calls", type=int, help="stop cleanly after this many attempts")
+    run.add_argument(
+        "--dry-run", action="store_true", help="print the messages and an estimate; no client"
     )
     return parser
 
@@ -267,6 +316,176 @@ def _plant(args: argparse.Namespace) -> int:
     return 0 if run.ok else 1
 
 
+def _refuse(problems: list[str]) -> int:
+    print("run refused:")
+    for problem in problems:
+        print(f"  - {problem}")
+    return 1
+
+
+def _print_refusal(lines: list[str]) -> int:
+    for line in lines:
+        print(line)
+    return 1
+
+
+def _resume_check(run_dir: Path, run_id: str, config: RunConfig, condition: str) -> list[str]:
+    """The lines to refuse a start or a resume with, or [] when the run may go on: the
+    config must be identical apart from created_at, calls.jsonl needs a config.json, and
+    every line of calls.jsonl must be a call line of this run."""
+    config_path = run_dir / "config.json"
+    refused = "run refused:"
+    if config_path.is_file():
+        try:
+            existing = RunConfig.model_validate(read_report_json(config_path))
+        except (OSError, ValueError) as exc:
+            return [refused, f"  - runs/{run_id}/config.json cannot be read ({str(exc)[:200]})"]
+        changed = [
+            name
+            for name in RunConfig.model_fields
+            if name != "created_at" and getattr(existing, name) != getattr(config, name)
+        ]
+        if changed:
+            return [
+                refused,
+                f"  - runs/{run_id} exists with a different config ({', '.join(changed)}); "
+                "resuming needs the identical config, or start a new --run-id",
+            ]
+    elif (run_dir / "calls.jsonl").exists():
+        return [
+            refused,
+            f"  - runs/{run_id} holds calls.jsonl but no config.json, so it cannot be resumed "
+            "safely; start a new --run-id",
+        ]
+    try:
+        read_attempts(run_dir / "calls.jsonl", run_id, condition)  # every line must be this run's
+    except CallsFileError as exc:
+        return [f"FAIL {exc}"]
+    return []
+
+
+def _run(args: argparse.Namespace) -> int:
+    """`pathqc-eval run`: checks, isolation, then the units (or the dry run)."""
+    root = RUN_ROOT
+    if args.workers < 1:
+        return _refuse(["--workers must be 1 or more"])
+    if args.max_calls is not None and args.max_calls < 1:
+        return _refuse(["--max-calls must be 1 or more"])
+    if args.run_id is not None and not valid_run_id(args.run_id):
+        return _refuse(
+            [
+                "--run-id must be letters, digits, '.', '_' or '-' (at most 100 characters, "
+                "starting with a letter or digit, not ending in '.', and not a Windows device "
+                "name such as NUL or COM1)"
+            ]
+        )
+    try:
+        taxonomy = load_taxonomy(root / "data" / "taxonomy.json")
+    except (OSError, ValueError) as exc:
+        return _refuse([f"data/taxonomy.json cannot be loaded ({exc})"])
+    selection = select_reports(root, args.dataset, args.condition, taxonomy)
+    if selection.problems:
+        return _refuse(selection.problems)
+    messages, breaches = build_run_messages(
+        selection.reports, args.condition, taxonomy, root / "prompts"
+    )
+    if breaches:
+        return _refuse([f"isolation: {breach}" for breach in breaches])
+    if args.dry_run:
+        for line in run_dry_run_lines(args.dataset, args.condition, selection.reports, messages):
+            print(line)
+        return 0
+    gate = args.cost_gate
+    if gate is None:
+        return _refuse(["--cost-gate is required for a real run (there is no default)"])
+    if not math.isfinite(gate) or gate <= 0:
+        return _refuse(["--cost-gate must be a positive number of US dollars"])
+    now = RUN_CLOCK()
+    run_id = args.run_id or default_run_id(now, args.dataset, args.condition)
+    config = RunConfig(
+        run_id=run_id,
+        dataset=args.dataset,
+        condition=args.condition,
+        model=EVAL_MODEL,
+        max_tokens=EVAL_MAX_TOKENS,
+        created_at=now,
+        cost_gate_usd=gate,
+        sdk_version=package_version("anthropic"),
+        **run_hashes(root, args.dataset, args.condition),
+    )
+    run_dir = root / RUNS_DIR / run_id
+    config_path = run_dir / "config.json"
+    busy = [
+        f"runs/{run_id} is being run by another invocation; wait for it to finish, or use "
+        "another --run-id"
+    ]
+    if run_dir.is_dir():  # before its files are read
+        try:
+            if run_is_busy(run_dir):
+                return _refuse(busy)
+        except OSError as exc:  # the lock file is a folder, or cannot be opened
+            return _refuse(
+                [
+                    f"runs/{run_id}/.run.lock cannot be used ({exc}); remove or repair it, or "
+                    "use another --run-id"
+                ]
+            )
+    lines = _resume_check(run_dir, run_id, config, args.condition)
+    if lines:
+        return _print_refusal(lines)
+    try:
+        client = EVAL_CLIENT_FACTORY()
+    except MissingAPIKeyError as exc:
+        print(f"FAIL {exc}")
+        return 1
+    try:
+        with run_lock(run_dir):  # a second invocation on this run id refuses
+            # Again under the lock: another invocation may have created the run meanwhile.
+            lines = _resume_check(run_dir, run_id, config, args.condition)
+            if lines:
+                return _print_refusal(lines)
+            if not config_path.is_file():
+                write_report_json(config_path, config.model_dump(mode="json"))
+            print(
+                f"run {run_id}: {len(selection.reports)} reports x 3 repeats, {args.dataset}, "
+                f"{args.condition}, gate {usd(gate)}"
+            )
+            outcome = run_units(
+                run_dir=run_dir,
+                run_id=run_id,
+                dataset=args.dataset,
+                condition=args.condition,
+                model=EVAL_MODEL,
+                messages=messages,
+                client=client,
+                cost_gate=gate,
+                workers=args.workers,
+                max_calls=args.max_calls,
+                clock=RUN_CLOCK,
+                sleep=RUN_SLEEP,
+            )
+    except RunInUse:
+        return _refuse(busy)
+    except CallsFileError as exc:
+        print(f"FAIL {exc}")
+        return 1
+    except KeyboardInterrupt as exc:
+        rebuilt = getattr(exc, "results_written", False)
+        print(
+            f"interrupted: the calls made are in runs/{run_id}/calls.jsonl; results.json "
+            + ("was rebuilt" if rebuilt else "was not rebuilt (the next invocation rebuilds it)")
+            + f"; resume with --run-id {run_id}"
+        )
+        return 130
+    except OSError as exc:
+        print(f"FAIL the run's files could not be written ({exc}); resume with --run-id {run_id}")
+        return 1
+    if outcome.failure is not None:
+        return 1
+    stopped_cleanly = (outcome.stopped or "").startswith("--max-calls")
+    return 0 if outcome.complete or stopped_cleanly else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     load_dotenv(override=False)
     if hasattr(sys.stdout, "reconfigure"):
@@ -302,6 +521,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if ok else 1
     if args.command == "plant":
         return _plant(args)
+    if args.command == "run":
+        return _run(args)
     if args.command == "freeze":
         outcome = check_lock(FREEZE_ROOT) if args.check else freeze(FREEZE_ROOT, args.replace)
         for line in outcome.lines:

@@ -27,6 +27,14 @@ def fixture_text(name: str) -> str:
     return (FIXTURES / name).read_text(encoding="utf-8").replace("\r\n", "\n")
 
 
+@pytest.fixture(autouse=True)
+def _no_model_api(monkeypatch):
+    """No test can reach a model API (EVAL-04): the key is blanked and dotenv loading is off,
+    so cli.main cannot load the key from .env and every real client refuses to construct."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "")
+    monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
+
+
 @pytest.fixture
 def fixed_taxonomy() -> Taxonomy:
     """Copy of the draft taxonomy v0.1, so goldens do not move when the owner edits it."""

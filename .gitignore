@@ -5,3 +5,4 @@ __pycache__/
 data/drafts/_failed/
 data/drafts/_readable/
 data/reports/_review/
+runs/*/.run.lock

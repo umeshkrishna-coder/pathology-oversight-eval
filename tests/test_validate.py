@@ -13,6 +13,7 @@ from pathqc_eval.validate import (
     check_clean_control,
     check_error_ids,
     check_error_types,
+    check_omission_anchor,
     check_quoted_sentences,
     check_report,
     check_section_order,
@@ -441,3 +442,75 @@ def test_summary_counts_omissions(tmp_path, histo, cbc, taxonomy):
     result = validate_reports(tmp_path, taxonomy)
     assert result.ok, result.failures
     assert result.summary.endswith("| overrides 0 | omissions 1 | OK")
+
+
+# EVAL-04 (owner decision, amends 34): an omission's anchor is in Values (CBC) or in the
+# Synoptic summary or the Diagnosis (histopathology).
+
+
+def _anchored_in(histo: dict, section: str, anchor: str) -> Report:
+    data = _omission(histo)
+    data["errors"][0] |= {"section": section, "quoted_sentence": anchor}
+    return _report(data)
+
+
+@pytest.mark.parametrize(
+    ("section", "anchor"),
+    [
+        ("Synoptic summary", "Lymphovascular invasion: Absent"),
+        ("Diagnosis", "Invasive tumour, grade 2."),
+    ],
+)
+def test_histopathology_omission_anchor_in_an_allowed_section_passes(
+    histo, taxonomy, section, anchor
+):
+    report = _anchored_in(histo, section, anchor)
+    assert check_omission_anchor(report, taxonomy) == []
+    assert check_report(report, taxonomy) == []
+
+
+def test_histopathology_omission_anchor_elsewhere_fails(histo, taxonomy):
+    report = _anchored_in(histo, "Microscopic description", "Tumour measures 25 mm.")
+    assert check_quoted_sentences(report, taxonomy) == []  # the anchor itself is verbatim
+    assert check_omission_anchor(report, taxonomy) == [
+        "H-001-E1: an omission's anchor must be in 'Synoptic summary' or 'Diagnosis', "
+        "not in 'Microscopic description'"
+    ]
+
+
+def _cbc_omission(cbc: dict, section: str, anchor: str) -> Report:
+    cbc |= {"is_clean_control": False}
+    cbc["errors"] = [
+        {
+            "error_id": "C-001-E1",
+            "type": "C3",
+            "kind": "omission",
+            "section": section,
+            "quoted_sentence": anchor,
+            "severity": "critical",
+            "description": "No flag or comment for the value.",
+            "rationale": "A critical value needs a flag and a recommendation.",
+        }
+    ]
+    return _report(cbc)
+
+
+def test_cbc_omission_anchor_in_values_passes(cbc, taxonomy):
+    line = next(x for x in cbc["sections"]["Values"].splitlines() if x.startswith("Hb:"))
+    report = _cbc_omission(cbc, "Values", line)
+    assert check_omission_anchor(report, taxonomy) == []
+
+
+def test_cbc_omission_anchor_elsewhere_fails(cbc, taxonomy):
+    report = _cbc_omission(cbc, "Interpretation", "All values within reference ranges.")
+    assert check_quoted_sentences(report, taxonomy) == []
+    assert check_omission_anchor(report, taxonomy) == [
+        "C-001-E1: an omission's anchor must be in 'Values', not in 'Interpretation'"
+    ]
+    assert check_report(report, taxonomy) == [
+        "C-001-E1: an omission's anchor must be in 'Values', not in 'Interpretation'"
+    ]
+
+
+def test_a_statement_error_is_not_held_to_the_anchor_sections(histo, taxonomy):
+    assert check_omission_anchor(_report(histo), taxonomy) == []  # H1 in Microscopic description
