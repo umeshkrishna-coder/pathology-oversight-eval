@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 to S7 done.
+Run status: IN PROGRESS — S0 to S8 done.
 
 ## Part 1. Stages
 
@@ -17,6 +17,7 @@ Run status: IN PROGRESS — S0 to S7 done.
 | S5 EVAL-04 evaluation harness (fake client) | PASS | 51f79be | 673 | 3 | 32 confirmed and fixed test-first (11, 13, 8; one the lead's own regression), 2 more before review, 18 weak tests strengthened; 4 rejected with reasons (3 to the owner) |
 | S6 EVAL-05 scorer, blind adjudication, metrics | PASS | 61982e3 | 816 | 3 | 27 confirmed and fixed test-first (10, 11, 6), 28 weak tests strengthened; 58 mutants, all killed; 1 reading; 7 items to the owner |
 | S7 EVAL-05b end-to-end rehearsal | PASS | d09cc0e | 818 | 3 | 1 breach of A4 by the test's own isolation check, caught in review and replaced; 21 confirmed and fixed; 27 mutants, all killed; no src defect found; 1 deviation (bootstrap intervals pinned) |
+| S8 EVAL-04b live smoke test | PASS | f188afd | 866 | 3 | 1 live run (4 calls, $0.040390); 25 confirmed and fixed test-first (12, 8, 5) before and after the call; 26 mutants, all killed; 2 departures disclosed |
 
 ## Part 2. For the owner
 
@@ -51,6 +52,8 @@ Run status: IN PROGRESS — S0 to S7 done.
 25. S6 `prepare --replace` is blocked by a verdict, a reason or any other text line in the sheet, or an unreadable adjudication.json; comment lines are not protected (README) [RAN].
 26. S6 the scorer commit carries "-dirty" when src/ has uncommitted changes and is "unknown" when git fails; `adjudicate apply` and `status` take --dataset; a scored `prepare` needs what a scored `score` needs (lock, approved map, OWNER_CONFIRMED) [RAN].
 27. S6 extra output fields (title, provisional, the two hashes, models_returned, drafted_by, warnings, undefined_resamples, more counts, per-finding mapped type, overlap, reason and verdict); BOOTSTRAP_SEED also seeds the item-id shuffle; the handoff Decisions header reads "OWNER VERIFIED unless marked PENDING" [RAN].
+28. S8 the smoke test counts every line of every runs/smoke-*/calls.jsonl as a call against section B's 8 calls and $1.00 (a transport failure or a refused call is a request too), runs one smoke run at a time under runs/_smoke_stage/.run.lock (gitignored), refuses a gate above $1.00, a draft whose id differs from its file name, a key given twice, a set ANTHROPIC_INFERENCE_GEO (even empty) and an earlier cost that is not a finite amount of 0 or more, and fails when a response names a model other than claude-sonnet-5-5 [RAN].
+29. S8 the dry-run estimate is a projection from four plain calls; the fake client keeps its own defaults (2,500 / 4,000 tokens), so the existing tests did not change [RAN].
 
 ## Part 4. Left for the owner
 
@@ -71,6 +74,9 @@ Run status: IN PROGRESS — S0 to S7 done.
 15. Decision 8 says right sentence but wrong type is a miss logged as a near-miss; 47(c) counts a near-miss as 1 in calibration. Both are as written; confirm with 47 (S6 R3) [READ].
 16. results/ is not gitignored, so adjudication_hidden.json (which item came from which condition) and the provisional outputs could be committed before the reveal. Gitignore them, or keep results/ unstaged during adjudication; decide before the scored adjudication (S6 R3) [RAN].
 17. Smaller S6 points: a deleted provisional_log.json cannot be detected (the summary then says it records no provisional score; README asks to keep the file); PENDING_DEFAULTS is the literal text of decision 47, so a changed constant needs both updated; running map-list on the scored runs while the sheet is open is warned against in the README, not prevented; item ids past 999 become "A1000" [RAN; READ].
+18. (reserved: S7 raised no question for the owner.)
+19. S8 changed how `run` prices a call: at the dearer of the model requested and the model the API returns (before: the returned model, or the requested one if unknown), so the cost gate can never under-count. It was found in the smoke test's review and made test-first; keep it or revert it (S8 reviews) [RAN].
+20. S8: a call abandoned by a second Ctrl+C is billed but not logged, so later smoke runs (and `run`'s gate on resume) cannot count it; with one worker this is at most one call (README) [READ].
 
 ## Part 5. Contradictions between this prompt and the repository, and how each was read
 
@@ -86,6 +92,7 @@ Run status: IN PROGRESS — S0 to S7 done.
 10. S6 6.2 "drop a trailing colon or full stop" is read as the trailing run of colons and full stops, so "Diagnosis.:" still matches "Diagnosis" (S6 R1) [READ].
 11. S6 6.8's output list names the per-error table and the outcome of every finding; decision 9 keeps condition and repeat hidden until every verdict is entered. Under the corrections rule the decision wins, so a provisional score leaves those two tables out; the final score has them (S6 reviews) [READ].
 12. S7 step 7 asks that every headline number equal a value worked out by hand. The comparison's bootstrap intervals come from 10,000 seeded resamples and cannot be worked by hand; the test pins them at the scorer's values, so a change to the resampling still shows. Every other headline number is worked in the docstrings [RAN].
+13. S8 step 1 asks for "the same ... retry rule and cost gate as `run`"; section B caps the stage at 8 calls (one retry each) and a $1.00 hard stop. `run`'s rule retries a transport failure up to 3 times (each a call) and assumes the next call costs as much as the dearest so far, which can pass a hard stop. Read as section B wins: no transport retry, and every call assumed to cost its ceiling before it starts, one at a time. The attempt-2 rule for an unreadable answer and the gate machinery are `run`'s own code [READ].
 
 ## Part 6. API spend, per stage, from the logs
 
@@ -99,6 +106,7 @@ Run status: IN PROGRESS — S0 to S7 done.
 | S5 | — | 0 | 0 (fake client only; R3 confirmed each round that no real client was built) |
 | S6 | — | 0 | 0 (no API path in the scorer; R3 checked each round) |
 | S7 | — | 0 | 0 (fake client only; R3 checked each round) |
+| S8 | claude-sonnet-5-5 | 4 | 0.040390 (runs/smoke-20261111-150542/calls.jsonl: 0.011692 + 0.010586 + 0.009792 + 0.008320; estimate $0.25, hard stop $1.00) |
 
 ## Part 7. Stage records
 
@@ -1594,6 +1602,131 @@ API spend this task: no API calls
 Deviations from the prompt: the bootstrap intervals are pinned at the seeded scorer's values, not worked by hand (Part 5 item 12); the round-1 isolation check opened .env to hash it before review caught it (contents never printed; replaced).
 Claims I could not verify: the watch's stated limits.
 Questions for the owner: none new.
+handoff.md updated: yes
+=== END ===
+```
+
+### S8 — EVAL-04b: live smoke test of the harness — PASS
+
+Stage commit `f188afd` "EVAL-04b: live smoke test", pushed; `git rev-parse HEAD` = `git ls-remote origin main` = f188afdd9d7d9f674186af0f027e179026cc67c3 [RAN]. Three review rounds: round 1 reviewed the code before any call, rounds 2 and 3 the round-1 and round-2 fixes and the live run's evidence; the round-3 findings were fixed test-first without a fourth round (Part 3 item 2), each checked with the lead's mutation run [RAN]. One live invocation, inside section B (Part 6).
+
+#### Pre-flight for the live call [RAN]
+
+- `.env` exists and is gitignored (`git check-ignore .env` prints `.env`); `grep -c "^ANTHROPIC_API_KEY=." .env` — exit 0 — `1` (the line itself was never printed); `grep -c "^ANTHROPIC_INFERENCE_GEO" .env` — exit 1 — `0`; ANTHROPIC_INFERENCE_GEO not set in the environment (checked by name).
+- No earlier smoke run (runs/ held only .gitkeep).
+- A dry check on copies of the four dev drafts with the fake client (no API): every draft loads, the isolation check passes, request shapes as below, ceiling $0.1632 (round-1 formula; $0.1666 after the round-1 byte bound).
+
+#### Checklist (round-3 wording)
+
+1. `pathqc-eval smoke --ids <ids> --cost-gate <USD>`: named dev drafts read in memory (nothing written under data/), plain only, one unit per report, the same client, request arguments, isolation check and parsing as `run` — **met**; the retry rule and the gate are stricter than `run`'s because section B requires it (Part 5 item 13) [RAN].
+2. Refuses a non-dev id, the structured condition, a missing gate — **met** [RAN].
+3. Writes runs/smoke-<UTC timestamp>/config.json and results.json, both with `"purpose": "smoke test; not evaluation data"`, and calls.jsonl (gitignored) — **met** [RAN].
+4. Unit tests with the fake client for the refusals and the output shape — **met** (tests/test_smoke.py, 47 tests) [RAN].
+5. The run, once, with each request printed before the first call, texts replaced by their lengths — **met** (below) [RAN].
+6. The record of the run — **met** (below) [RAN].
+7. A rejected request shape — **not triggered**: the API accepted the request first time [RAN].
+8. The dry-run estimate set to the measured average plus 50%; handoff.md projections labelled as from four calls — **met** [RAN].
+9. Section B: claude-sonnet-5-5 only, at most 8 calls, hard stop $1.00, ANTHROPIC_INFERENCE_GEO unset, spend from the logs — **met** (Part 6) [RAN].
+10. Commit with code, tests, the run's config.json and results.json, handoff.md — **met** [RAN].
+11. Run rules — **met**, with one change beyond the stage: harness._cost now prices every call, in `run` too, at the dearer of the model requested and the model returned (Part 4) [RAN].
+12. The output is never scored: the scorer refuses a smoke folder (its config is not a RunConfig) — **met** [RAN].
+13. Section B's limits hold for the whole stage: the calls and spend of every earlier smoke run count, one smoke run at a time (a stage lock), a gate above $1.00 refused — **met** [RAN].
+14. The departures from "same retry rule and cost gate as run" are recorded — **met** (Part 5 item 13).
+
+#### Gate commands (final state, f188afd) [RAN]
+
+- `uv run pytest` — exit 0 — 866 passed
+- `uv run ruff check .` — exit 0 — All checks passed!
+- `uv run ruff format --check .` — exit 0 — 59 files already formatted
+- `uv run pathqc-eval run --dataset dev --condition plain --dry-run` — exit 1 — `no dev reports in data/reports/` (the expected refusal; the reports are not built yet)
+
+#### The live run [RAN]
+
+Command: `uv run pathqc-eval smoke --ids H-021,H-022,H-023,C-011 --cost-gate 1.00` — exit 0. Printed before the first call:
+
+```text
+request H-021: {"model": "claude-sonnet-5-5", "max_tokens": 16000, "system": "<976 characters>", "messages": [{"role": "user", "content": "<1971 characters>"}]}
+request H-022: {"model": "claude-sonnet-5-5", "max_tokens": 16000, "system": "<976 characters>", "messages": [{"role": "user", "content": "<2218 characters>"}]}
+request H-023: {"model": "claude-sonnet-5-5", "max_tokens": 16000, "system": "<976 characters>", "messages": [{"role": "user", "content": "<2227 characters>"}]}
+request C-011: {"model": "claude-sonnet-5-5", "max_tokens": 16000, "system": "<976 characters>", "messages": [{"role": "user", "content": "<1836 characters>"}]}
+smoke smoke-20261111-150542: 4 report(s) x 1, plain, gate $1.00 (earlier smoke runs: 0 calls, $0.0000), at most 8 calls, each assumed to cost $0.1666 before it starts
+```
+
+From runs/smoke-20261111-150542/calls.jsonl (allowed fields only; the quoted sentences stay in results.json):
+
+| report | attempt | model returned | stop reason | input tokens | output tokens | cost (USD) | parse status | findings |
+|---|---|---|---|---|---|---|---|---|
+| C-011 | 1 | claude-sonnet-5-5 | end_turn | 1,241 | 921 | 0.011692 | valid | 1 |
+| H-021 | 1 | claude-sonnet-5-5 | end_turn | 1,068 | 845 | 0.010586 | valid | 0 |
+| H-022 | 1 | claude-sonnet-5-5 | end_turn | 1,191 | 741 | 0.009792 | valid | 0 |
+| H-023 | 1 | claude-sonnet-5-5 | end_turn | 1,170 | 598 | 0.008320 | valid | 0 |
+| total | 4 calls | | | 4,670 | 3,105 | 0.040390 | | 1 |
+
+The one finding: C-011, section Interpretation, category "overinterpretation", severity minor, confidence 0.2.
+
+- No response needed a code change: every answer was plain JSON (no code fence), with no extra keys, no dropped finding and no note [RAN].
+- Three answers were the 16-character `{"findings": []}` yet billed 598–845 output tokens: most output is not returned as text, presumably reasoning at the API's default effort [INFERRED].
+- Step 5: averages 1,167.5 input and 776.25 output tokens; plus 50%, rounded up: EST_INPUT_TOKENS 1,752, EST_OUTPUT_TOKENS 1,165 ($0.015154 a call). Projections in handoff.md: dev run (24 calls) about $0.24 at the measured average, $0.36 at the estimate; scored run (180 calls) about $1.82 and $2.73 — a projection from four plain calls only [RAN].
+
+#### Review findings, triage and fixes
+
+| round | finding | verdict | fix |
+|---|---|---|---|
+| 1 (code, before the call) | 8 calls and $1.00 held per invocation only; a gate above $1.00 accepted; more than 4 ids could make more than 8 calls (R3, R2) | CONFIRMED | earlier smoke runs counted; gate above $1.00 refused; stage cap of 8 |
+| 1 | a draft holding another report, or with a key given twice, accepted (R2) | CONFIRMED | refused |
+| 1 | a cheaper model string under-counted spend; the 2-characters-a-token ceiling was an estimate; ANTHROPIC_INFERENCE_GEO not checked; results.json unmarked (R3, R1) | CONFIRMED | dearer-model pricing; UTF-8 byte bound plus 100 tokens; geo refused; purpose line |
+| 1 | weak tests: the call cap, the ceiling formula, print order and lengths, workers (R2) | CONFIRMED | tests; 11 mutants killed |
+| 2 | overlapping invocations each got 8 calls (R2, medium) | CONFIRMED | a stage lock (runs/_smoke_stage/.run.lock, gitignored) |
+| 2 | NaN, negative or infinite earlier costs; a gate rounding to $0; an empty geo variable; another returned model (R2, R3) | CONFIRMED | refused; 9 mutants killed |
+| 3 (last) | a 400-digit earlier cost raised a traceback; a hashing error was blamed on the lock; results.json unmarked after Ctrl+C (R2, R3) | CONFIRMED | fixed test-first; 6 mutants killed |
+| 3 | weak tests: the lock across two processes, spend read under the lock, the leftover gate, another model in attempt 1, an unusable lock (R2) | CONFIRMED | tests |
+| all | no transport retry and the ceiling gate depart from "same as run"; _cost changes `run` (R1, R3) | ACCEPTED, DISCLOSED | Part 5 item 13; Part 4 item 19 |
+
+#### Files changed (f188afd)
+
+```text
+--- git status --short
+M  README.md
+M  handoff.md
+A  runs/smoke-20261111-150542/config.json
+A  runs/smoke-20261111-150542/results.json
+M  src/pathqc_eval/cli.py
+M  src/pathqc_eval/harness.py
+M  src/pathqc_eval/schema.py
+M  tests/test_harness.py
+A  tests/test_smoke.py
+--- git diff --cached --stat
+ README.md                               |   7 +-
+ handoff.md                              |   1 +
+ runs/smoke-20261111-150542/config.json  |  23 ++
+ runs/smoke-20261111-150542/results.json |  78 +++++
+ src/pathqc_eval/cli.py                  | 247 ++++++++++++++-
+ src/pathqc_eval/harness.py              |  54 +++-
+ src/pathqc_eval/schema.py               |  23 ++
+ tests/test_harness.py                   |  22 +-
+ tests/test_smoke.py                     | 523 ++++++++++++++++++++++++++++++++
+ 9 files changed, 954 insertions(+), 24 deletions(-)
+```
+
+#### What was not tested
+
+- The structured condition against the real API (the smoke test is plain only by the stage text); the owner texts are still placeholders.
+- A rejected request, a transport failure or an abnormal stop reason from the real API (none happened).
+- A call abandoned by a second Ctrl+C is billed but not logged, so later smoke runs cannot count it (README; at most one call with one worker).
+
+```text
+=== EVAL REPORT: EVAL-04b Live smoke test of the harness (EVAL-N1 S8) ===
+Status: DONE
+What was asked: the smoke command, one live run of four dev drafts in the plain condition, its record, the dry-run estimate from the measured tokens and the cost projections in handoff.md.
+What was done: `pathqc-eval smoke` [RAN]; one live run, 4 calls, all valid [RAN]; the estimate set to 1,752/1,165 [RAN]; projections written [RAN]; three review rounds, every confirmed finding fixed with a test that failed first; 26 mutants across three checks, all killed [RAN].
+Files changed: src/pathqc_eval/cli.py — the smoke command; src/pathqc_eval/harness.py — run_units options, pricing, the estimate; src/pathqc_eval/schema.py — SmokeConfig; tests/test_smoke.py — new; tests/test_harness.py — the estimate text, pricing; README.md; handoff.md — the projection; runs/smoke-20261111-150542/config.json and results.json.
+Commands run: uv run pathqc-eval smoke --ids H-021,H-022,H-023,C-011 --cost-gate 1.00 — 0 — 4 calls, $0.040390; uv run pytest — 0 — 76 s — 866 passed; uv run ruff check . — 0; uv run ruff format --check . — 0.
+Checks: pytest 866 passed, 0 failed | ruff check and format clean
+Git: branch main; commit f188afd "EVAL-04b: live smoke test"; push ok; remote HEAD matches local HEAD: yes
+API spend this task: $0.040390 (claude-sonnet-5-5, 4 calls, from calls.jsonl)
+Deviations from the prompt: no transport retry and a ceiling-based gate, stricter than `run` as section B requires (Part 5 item 13); calls in `run` are now priced at the dearer of the model requested and returned (Part 4 item 19).
+Claims I could not verify: the reason most output tokens are not returned as text.
+Questions for the owner: Part 4 item 19.
 handoff.md updated: yes
 === END ===
 ```
