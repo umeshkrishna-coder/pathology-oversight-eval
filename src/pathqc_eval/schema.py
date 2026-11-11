@@ -184,8 +184,13 @@ class RunConfig(StrictModel):
     lock_created_at: str | None  # the lock's created_at for a scored run; null for a dev run
 
 
+ReviewReason = Literal[
+    "unmapped_category", "borderline_overlap", "section_mismatch", "omission_other_section"
+]
+
+
 class AdjudicationItem(StrictModel):
-    """Blind adjudication view: no condition, repeat or model."""
+    """Blind adjudication view: no condition, repeat, model or run (EVAL-05)."""
 
     item_id: str
     report_id: str
@@ -193,13 +198,17 @@ class AdjudicationItem(StrictModel):
     quoted_sentence: str
     category: str
     rationale: str
+    candidate_error_id: str
+    review_reason: ReviewReason
     verdict: Verdict | None = None
     verdict_reason: str | None = None
 
 
 class AdjudicationHidden(StrictModel):
-    """Hidden fields for one item; stored in adjudication_hidden.json keyed by item_id."""
+    """One finding behind an item; adjudication_hidden.json maps each item_id to a list."""
 
+    run_id: str
     condition: Condition
     repeat: int = Field(ge=1, le=3)
+    finding_index: int = Field(ge=1)  # 1-based position of the finding in its unit
     model: str

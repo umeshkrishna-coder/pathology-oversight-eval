@@ -12,6 +12,17 @@ def read_report_json(path: Path | str) -> Any:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def unique_keys(pairs: list[tuple[str, Any]]) -> dict:
+    """json.loads object_pairs_hook: a key given twice in one object is refused, so that a
+    later copy cannot silently replace the first."""
+    out: dict = {}
+    for key, value in pairs:
+        if key in out:
+            raise ValueError(f"key '{key[:60]}' is given twice")
+        out[key] = value
+    return out
+
+
 def write_report_json(path: Path | str, data: Any) -> None:
     """Indented UTF-8 JSON with LF line endings and exactly one trailing newline.
 

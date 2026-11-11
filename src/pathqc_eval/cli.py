@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import subprocess
 import sys
 import time
 from collections import Counter
@@ -15,6 +16,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
+from pathqc_eval import adjudication
 from pathqc_eval.cbc import load_reference_ranges
 from pathqc_eval.draft import (
     DEFAULT_DRAFTS_DIR,
@@ -55,6 +57,8 @@ from pathqc_eval.plant import (
 from pathqc_eval.readable import write_readable
 from pathqc_eval.render import render_cbc_values
 from pathqc_eval.schema import CBCValues, RunConfig
+from pathqc_eval.score_output import map_list, run_score
+from pathqc_eval.scoring import classify_runs, load_inputs, review_findings
 from pathqc_eval.spec import DEFAULT_SPEC_PATH, DatasetSpec, load_spec, spec_summary
 from pathqc_eval.taxonomy import REPO_ROOT, load_taxonomy
 from pathqc_eval.validate import validate_reports
@@ -79,6 +83,40 @@ RUN_ROOT = REPO_ROOT
 EVAL_CLIENT_FACTORY = AnthropicEvalClient
 RUN_CLOCK = _utc_now
 RUN_SLEEP = time.sleep
+
+
+def _scorer_commit() -> str:
+    """The git commit of the scorer's code, with "-dirty" when src/ has uncommitted
+    changes, or "unknown"."""
+    try:
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain", "--", "src"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return "unknown"
+    if head.returncode != 0 or dirty.returncode != 0:
+        return "unknown"
+    return head.stdout.strip() + ("-dirty" if dirty.stdout.strip() else "")
+
+
+# `map-list`, `adjudicate` and `score` (EVAL-05). Replaced in tests: a temporary tree, a
+# clock, and a fixed scorer commit.
+SCORE_ROOT = REPO_ROOT
+SCORE_CLOCK = _utc_now
+SCORER_COMMIT = _scorer_commit
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -142,6 +180,35 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--max-calls", type=int, help="stop cleanly after this many attempts")
     run.add_argument(
         "--dry-run", action="store_true", help="print the messages and an estimate; no client"
+    )
+
+    two_runs = {"nargs": 2, "required": True, "metavar": ("PLAIN_RUN_ID", "STRUCTURED_RUN_ID")}
+    map_cmd = sub.add_parser(
+        "map-list", help="list the runs' distinct categories and whether each is mapped"
+    )
+    map_cmd.add_argument("--runs", nargs="+", required=True, metavar="RUN_ID")
+    adjudicate = sub.add_parser("adjudicate", help="blind adjudication of review findings")
+    action = adjudicate.add_subparsers(dest="action", required=True)
+    prepare = action.add_parser("prepare", help="write the items, the hidden map and the sheet")
+    prepare.add_argument("--dataset", required=True, choices=["dev", "scored"])
+    prepare.add_argument("--runs", **two_runs)
+    prepare.add_argument(
+        "--replace", action="store_true", help="start again (only while no verdict is entered)"
+    )
+    for name, text in (
+        ("apply", "read the sheet's verdicts into adjudication.json"),
+        ("status", "how many verdicts are filled"),
+    ):
+        action.add_parser(name, help=text).add_argument(
+            "--dataset", required=True, choices=["dev", "scored"]
+        )
+    score = sub.add_parser("score", help="score a plain and a structured run of one dataset")
+    score.add_argument("--dataset", required=True, choices=["dev", "scored"])
+    score.add_argument("--runs", **two_runs)
+    score.add_argument(
+        "--provisional",
+        action="store_true",
+        help="score before the adjudication is complete; affected numbers become ranges",
     )
     return parser
 
@@ -486,6 +553,28 @@ def _run(args: argparse.Namespace) -> int:
     return 0 if outcome.complete or stopped_cleanly else 1
 
 
+def _adjudicate(args: argparse.Namespace) -> int:
+    root = SCORE_ROOT
+    if args.action == "prepare":
+        inputs, problems = load_inputs(root, args.dataset, args.runs)
+        if inputs is None:
+            print("adjudicate prepare refused:")
+            for problem in problems:
+                print(f"  - {problem}")
+            return 1
+        found = review_findings(classify_runs(inputs))
+        outcome = adjudication.prepare(
+            root, args.dataset, found, inputs.reports, SCORE_CLOCK, args.replace
+        )
+    elif args.action == "apply":
+        outcome = adjudication.apply(root, args.dataset, SCORE_CLOCK)
+    else:
+        outcome = adjudication.status(root, args.dataset)
+    for line in outcome.lines:
+        print(line)
+    return 0 if outcome.ok else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     load_dotenv(override=False)
     if hasattr(sys.stdout, "reconfigure"):
@@ -523,6 +612,18 @@ def main(argv: list[str] | None = None) -> int:
         return _plant(args)
     if args.command == "run":
         return _run(args)
+    if args.command in ("map-list", "score"):
+        if args.command == "map-list":
+            outcome = map_list(SCORE_ROOT, args.runs)
+        else:
+            outcome = run_score(
+                SCORE_ROOT, args.dataset, args.runs, args.provisional, SCORE_CLOCK, SCORER_COMMIT()
+            )
+        for line in outcome.lines:
+            print(line)
+        return 0 if outcome.ok else 1
+    if args.command == "adjudicate":
+        return _adjudicate(args)
     if args.command == "freeze":
         outcome = check_lock(FREEZE_ROOT) if args.check else freeze(FREEZE_ROOT, args.replace)
         for line in outcome.lines:

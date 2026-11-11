@@ -10,7 +10,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (all OWNER VERIFIED; 1–28 on 2026-11-04, 29–46 on 2026-11-10)
+## Decisions (OWNER VERIFIED unless marked PENDING; 1–28 on 2026-11-04, 29–46 on 2026-11-10)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -57,6 +57,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 44. Evaluated-model settings: claude-sonnet-5-5 at the API's default reasoning effort (no effort setting is sent), default sampling, max_tokens 16,000, identical in both conditions, recorded in every run config.
 45. Unreadable outputs: a call whose output cannot be read as findings is repeated once; both attempts are logged. If the second is also unreadable the repeat is marked invalid and counted. Majority is computed over the valid repeats: with 3 valid, 2 of 3; with 2 valid, both; with fewer than 2 valid, the report has no majority result in that condition and is listed separately, never scored silently.
 46. Lenient reading of findings: extra keys are ignored and recorded; an unusable severity or confidence becomes null (excluded from calibration, counted); a finding without a usable quoted_sentence, section or category is dropped and counted. The raw output of every call is kept.
+47. PENDING — Scorer defaults awaiting the owner's confirmation; scoring of the scored split refuses until they are confirmed: (a) a finding goes to blind adjudication when its category is unmapped, when the overlap is between 0.4 and 0.6 with type and section right, when type and sentence are right but the section differs, or when an omission is reported under another section; (b) false alarms per report are the mean count per valid unit, and a clean control passes when a unit has none; (c) for calibration a hit, a duplicate or a near-miss counts as 1 and a false alarm as 0; (d) severity weights 3, 2, 1; (e) Wilson intervals for per-type recall; (f) bootstrap of 10,000 resamples with seed 20261115.
 
 ## Error taxonomy (OWNER VERIFIED, final, version 1.0, 2026-11-10)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -89,6 +90,7 @@ Severity: critical = would change patient management; major = would need an amen
 ## Open items
 - PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
 - PENDING — Dev run (24 calls) once the four dev reports are in data/reports/ and the owner texts are in place.
+- PENDING — Owner confirms or changes the scorer defaults in decision 47; until OWNER_CONFIRMED is True in src/pathqc_eval/scoring_config.py, scoring the scored split refuses.
 - PENDING — Owner's questions from the EVAL-N1 run about CLAUDE.md and handoff.md (OVERNIGHT_REPORT.md Part 4).
 
 ## Task log

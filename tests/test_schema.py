@@ -156,6 +156,9 @@ def _adjudication_item(**overrides) -> dict:
         "quoted_sentence": "Tumour measures 25 mm.",
         "category": "size mismatch",
         "rationale": "Differs from the gross size.",
+        # EVAL-05 fields
+        "candidate_error_id": "H-001-E1",
+        "review_reason": "unmapped_category",
     }
     return data | overrides
 
@@ -167,7 +170,7 @@ def test_adjudication_item_starts_without_verdict():
 
 
 def test_adjudication_item_is_blind():
-    for hidden in ("condition", "repeat", "model"):
+    for hidden in ("condition", "repeat", "model", "run_id"):
         assert hidden not in AdjudicationItem.model_fields
         with pytest.raises(ValidationError):
             AdjudicationItem.model_validate(_adjudication_item(**{hidden: "x"}))
@@ -179,10 +182,23 @@ def test_adjudication_item_verdict_values():
 
 
 def test_adjudication_hidden_round_trip():
-    hidden = AdjudicationHidden(condition="structured", repeat=2, model="claude-sonnet-5-5")
+    hidden = AdjudicationHidden(
+        run_id="r1", condition="structured", repeat=2, finding_index=1, model="claude-sonnet-5-5"
+    )
     assert AdjudicationHidden.model_validate_json(hidden.model_dump_json()) == hidden
     with pytest.raises(ValidationError):
-        AdjudicationHidden(condition="plain", repeat=4, model="claude-sonnet-5-5")
+        AdjudicationHidden(
+            run_id="r1", condition="plain", repeat=4, finding_index=1, model="claude-sonnet-5-5"
+        )
+    with pytest.raises(ValidationError):
+        AdjudicationHidden(
+            run_id="r1", condition="plain", repeat=1, finding_index=0, model="claude-sonnet-5-5"
+        )
+
+
+def test_adjudication_item_review_reason_values():
+    with pytest.raises(ValidationError):
+        AdjudicationItem.model_validate(_adjudication_item(review_reason="other"))
 
 
 def test_run_config_sampling_defaults_to_default():
