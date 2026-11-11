@@ -1,5 +1,5 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-11 by agent (EVAL-N1 S5: EVAL-04)
+Last updated: 2026-11-11 by agent (EVAL-N1 S6: EVAL-05)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · REPORTED (stated, not checked) · NOT TESTED · PENDING (not yet done)
 
 ## Purpose
@@ -109,6 +109,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-02d | 2026-11-11 | Drafting instructions corrected; H-009, H-021, C-008, C-009 drafted again (EVAL-N1 S3; decision 40) | DONE ($0.0044 measured) | AGENT VERIFIED |
 | EVAL-02e | 2026-11-11 | Taxonomy final, version 1.0 (EVAL-N1 S4; decision 41) | DONE | AGENT VERIFIED |
 | EVAL-04 | 2026-11-11 | Evaluation harness (fake client), isolation and anchor fixes | DONE | AGENT VERIFIED |
+| EVAL-05 | 2026-11-11 | Scorer, blind adjudication, metrics (EVAL-N1 S6; decision 47 PENDING, OWNER_CONFIRMED False) | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

@@ -3,7 +3,7 @@
 Written stage by stage as the run goes (prompt section E5). Every claim carries [RAN], [READ] or
 [INFERRED]; every command carries its exit code. Starting commit: `a699037` (EVAL-02c) [RAN].
 
-Run status: IN PROGRESS — S0 to S5 done.
+Run status: IN PROGRESS — S0 to S6 done.
 
 ## Part 1. Stages
 
@@ -15,6 +15,7 @@ Run status: IN PROGRESS — S0 to S5 done.
 | S3 EVAL-02d drafting fixes and four redrafts | PASS | 2269b0d | 440 | 3 | 15 confirmed and fixed (tests first); 0 rejected |
 | S4 EVAL-02e taxonomy final 1.0 | PASS | eafc0f0 | 440 | 1 | 0 defects; 2 recorded (exit codes, plant guard); 2 rejected (out of scope) |
 | S5 EVAL-04 evaluation harness (fake client) | PASS | 51f79be | 673 | 3 | 32 confirmed and fixed test-first (11, 13, 8; one the lead's own regression), 2 more before review, 18 weak tests strengthened; 4 rejected with reasons (3 to the owner) |
+| S6 EVAL-05 scorer, blind adjudication, metrics | PASS | 61982e3 | 816 | 3 | 27 confirmed and fixed test-first (10, 11, 6), 28 weak tests strengthened; 58 mutants, all killed; 1 reading; 7 items to the owner |
 
 ## Part 2. For the owner
 
@@ -40,6 +41,15 @@ Run status: IN PROGRESS — S0 to S5 done.
 16. S5 split labels: quotes, markdown emphasis and a joined prefix around `split:` still count; the key is "split" in double quotes, or 'split' in any quotes before a colon; 'split' in quotes in prose passes (decision 42) [RAN].
 17. S5 tests/conftest.py blanks ANTHROPIC_API_KEY and disables dotenv for every test, so no test can load the key [RAN].
 18. S5 the README's decision-34 paragraph names the anchor sections (decision 43) [RAN].
+19. S6 normalise_category drops every trailing Unicode punctuation character, closing brackets and quotes included ("C2 (indices)." becomes "c2 (indices"); map keys must be written that way, and the map refuses a key that is not [RAN].
+20. S6 provisional scores: the per-error and per-finding tables are left out; counts by condition are ranges like the metrics; intervals are bracketed; each provisional score made while a verdict is missing is logged in results/<dataset>/provisional/provisional_log.json, copied into adjudication_log.json at the reveal, and its count disclosed (decision 9) [RAN].
+21. S6 the disclosure goes beyond "how many items were adjudicated by hand": it says the sheet names no condition, repeat or model, that a finding's category can still suggest its condition, and what the provisional log records [RAN].
+22. S6 refusals beyond the stage text: pending units; runs that do not cover exactly the split's reports in repeats 1 to 3; one report id in two files; config.json and results.json disagreeing; category-map checks (unknown keys, keys not normalised, keys equal to a taxonomy id or "other", a key given twice); map-list with a run named twice or runs of different splits; log files read strictly [RAN].
+23. S6 dev scoring goes on with a warning when data/reports/ or the taxonomy changed after the runs; the scored split refuses [RAN].
+24. S6 after the reveal, apply and prepare --replace refuse; score refuses an adjudication that no longer matches the runs (other findings, none left, a changed candidate error or review reason) and an adjudication.json changed after the reveal [RAN].
+25. S6 `prepare --replace` is blocked by a verdict, a reason or any other text line in the sheet, or an unreadable adjudication.json; comment lines are not protected (README) [RAN].
+26. S6 the scorer commit carries "-dirty" when src/ has uncommitted changes and is "unknown" when git fails; `adjudicate apply` and `status` take --dataset; a scored `prepare` needs what a scored `score` needs (lock, approved map, OWNER_CONFIRMED) [RAN].
+27. S6 extra output fields (title, provisional, the two hashes, models_returned, drafted_by, warnings, undefined_resamples, more counts, per-finding mapped type, overlap, reason and verdict); BOOTSTRAP_SEED also seeds the item-id shuffle; the handoff Decisions header reads "OWNER VERIFIED unless marked PENDING" [RAN].
 
 ## Part 4. Left for the owner
 
@@ -53,6 +63,13 @@ Run status: IN PROGRESS — S0 to S5 done.
 8. `--max-calls` counts attempts; each attempt can send up to 3 more requests through transport retries. Section B counts calls; S8 states how it counts them (S5 review R3) [RAN].
 9. Assignment forms of the split ("split = dev", "'split' = 'dev'") are not refused: decision 42 names `split:` and the quoted key only. Say whether '=' forms should count; no draft or prompt holds 'split' today (S5 review R3) [RAN].
 10. The EVAL-01 test tests/test_validate.py::test_cli_empty_reports_folder_exits_zero reads the repository's data/reports/ and expects it to be empty, so it will fail once `plant` builds the reports. Outside S5; listed for the final audit (S5 review R1) [READ].
+11. Decision 9 against S6's `--provisional` (6.8): ranges and counts by condition, shown before every verdict is entered, can reveal where an item came from. The scorer leaves out the per-item tables, logs each provisional score and discloses the count, and the README says a provisional score is not blind. Accept, or forbid provisional scoring of the scored split while the sheet is open (S6 reviews) [RAN].
+12. Decision 10's "nothing is remapped after scoring" is recorded (the map's version and sha256 in score.json), not enforced: an approved map can be edited and the split scored again without a warning (S6 R2) [RAN].
+13. Decision 10's "unmapped strings go to adjudication" and the wording of 47(a) against 6.4: an unmapped finding goes to adjudication only when its section and quoted sentence match a planted error; otherwise it is a false alarm. The code follows 6.4; confirm 47(a) before setting OWNER_CONFIRMED (S6 R3) [READ].
+14. Decision 9 says the adjudication file shows report, section, quoted sentence, category and rationale only; 6.7 adds the candidate planted error and the review reason. The stage text was followed (S6 R3) [READ].
+15. Decision 8 says right sentence but wrong type is a miss logged as a near-miss; 47(c) counts a near-miss as 1 in calibration. Both are as written; confirm with 47 (S6 R3) [READ].
+16. results/ is not gitignored, so adjudication_hidden.json (which item came from which condition) and the provisional outputs could be committed before the reveal. Gitignore them, or keep results/ unstaged during adjudication; decide before the scored adjudication (S6 R3) [RAN].
+17. Smaller S6 points: a deleted provisional_log.json cannot be detected (the summary then says it records no provisional score; README asks to keep the file); PENDING_DEFAULTS is the literal text of decision 47, so a changed constant needs both updated; running map-list on the scored runs while the sheet is open is warned against in the README, not prevented; item ids past 999 become "A1000" [RAN; READ].
 
 ## Part 5. Contradictions between this prompt and the repository, and how each was read
 
@@ -65,6 +82,8 @@ Run status: IN PROGRESS — S0 to S5 done.
 7. S5 step 4 says transport lines carry "the error class and message only". A line has to name its unit, so the lines also carry run_id, report_id, condition and repeat, and a failure that stopped the run is the same line marked "fatal": true. Read as: no request or response content on these lines (S5 reviews) [READ].
 8. S5 step 7 lists "Last updated" EVAL-04 and the task-log row with the handoff.md edits before the step-8 commit; run rule D9 puts them in the record commit. Read as D9, as S3 and S4 did [READ].
 9. S5 step 9 says "In the reply"; under the corrections rule it is the S5 record [READ].
+10. S6 6.2 "drop a trailing colon or full stop" is read as the trailing run of colons and full stops, so "Diagnosis.:" still matches "Diagnosis" (S6 R1) [READ].
+11. S6 6.8's output list names the per-error table and the outcome of every finding; decision 9 keeps condition and repeat hidden until every verdict is entered. Under the corrections rule the decision wins, so a provisional score leaves those two tables out; the final score has them (S6 reviews) [READ].
 
 ## Part 6. API spend, per stage, from the logs
 
@@ -76,6 +95,7 @@ Run status: IN PROGRESS — S0 to S5 done.
 | S3 | claude-haiku-5-5 | 4 | 0.004447 (data/drafts/_calls.jsonl lines 35–38: 0.001354 + 0.001758 + 0.000576 + 0.000759) |
 | S4 | — | 0 | 0 |
 | S5 | — | 0 | 0 (fake client only; R3 confirmed each round that no real client was built) |
+| S6 | — | 0 | 0 (no API path in the scorer; R3 checked each round) |
 
 ## Part 7. Stage records
 
@@ -1254,6 +1274,144 @@ API spend this task: no API calls
 Deviations from the prompt: the lead's own choices, changed during review before the commit: the SDK retry rule (409, x-should-retry) dropped for the stage's list; the quoted-'split' key narrowed back to decision 42's forms. "Last updated" and the task-log row go in the record commit (Part 5 item 8).
 Claims I could not verify: the real API's behaviour (S8); a console Ctrl+C; the run lock on Linux or macOS.
 Questions for the owner: Part 4 items 7–10 (the soft gate; --max-calls and transport retries; '=' forms of the split; an EVAL-01 test that will fail once reports are built).
+handoff.md updated: yes
+=== END ===
+```
+
+### S6 — EVAL-05: scorer, blind adjudication, metrics — PASS
+
+Stage commit `61982e3` "EVAL-05: scorer, blind adjudication, metrics", pushed; `git rev-parse HEAD` = `git ls-remote origin main` = 61982e3f9feb2e61fa1a45cf197d708b70b183c4 [RAN]. Three review rounds; the round-3 findings were fixed test-first without a fourth round (Part 3 item 2), each fix checked with the lead's mutation run. Review round 2 was interrupted when the overnight session ended; on resume R1 and R3 were taken from the run's journal and R2 was run again on the unchanged tree [RAN]. No model API call was made in this stage [RAN; R3 each round: client factories replaced by raising stubs, anthropic not imported].
+
+#### Pre-flight [RAN]
+
+- On `main`; HEAD 3bc68ce (EVAL-N1: record S5) = `git ls-remote origin main`; the working tree held only the stage's files.
+- `uv run pytest` at the S5 commit: 673 passed, exit 0 (S5 record).
+
+#### Checklist (items 0–12; the round-3 checklist restates the stage text in full)
+
+0. Decisions 4, 7, 8, 9, 10, 34 and 45 — **met**, with two clauses recorded rather than enforced and sent to the owner: decision 9 against 6.8's `--provisional` (ranges by condition), and decision 10's "nothing is remapped after scoring" (the map's version and sha256 are in score.json) (Part 4) [RAN; R1 round 3].
+1. (6.1) scoring_config.py: the eight named constants with one-line comments; OWNER_CONFIRMED False; `score --dataset scored` refuses and lists (a)–(f) — **met** [RAN].
+2. (6.2) normalise_section, tokens (a point kept only between digits), overlap (the larger direction) — **met** [RAN].
+3. (6.3) category map file and checks; normalise_category drops every trailing Unicode punctuation character (Part 3); map-list writes results/<dataset>/category_strings.json and never the map; no data/category_map.json created — **met** [RAN].
+4. (6.4) every rule, precedence hit > review > near_miss, highest overlap then lowest error id, duplicates, verdicts — **met**; boundary tests at ov 0.6 and 0.4 [RAN].
+5. (6.5) units, majority over valid units, fewer than two valid listed — **met** [RAN].
+6. (6.6) primary and secondary metrics, Wilson intervals, Brier and ECE, consistency, severity-weighted recall, paired bootstrap (10,000 resamples, seed 20261115, percentile interval), counts — **met** [RAN].
+7. (6.7) prepare / apply / status; merged items; ids "A" + three digits in a seeded shuffle; owner files name no condition, repeat, model or run (tested); the reveal only in `score`, only when every verdict is filled; adjudication_log.json with prepared_at, completed_at, joined_at, items and sha256 — **met** [RAN].
+8. (6.8) checks; refusal until adjudicated, or `--provisional` ranges in results/<dataset>/provisional/ with PROVISIONAL in every title; score.json and summary.md as listed; no clock time; byte-identical reruns, also across processes with different hash seeds — **met**, except that provisional output leaves out the per-error and per-finding tables to protect decision 9 (Part 3, Part 4) [RAN].
+9. (6.9) the tests the stage lists, in temporary folders with invented data — **met** [RAN].
+10. (6.10) README "Scoring and adjudication (EVAL-05)" with the owner's steps; handoff decision 47 PENDING word for word (R1 string comparison) and the open item — **met** [RAN].
+11. Checks and commit — **met** (below) [RAN].
+12. Run rules: no API call; owner files untouched; no new dependency; no test weakened (R3 each round); every fix to existing behaviour with a test that failed first — **met** [RAN].
+
+#### Gate commands (final state, 61982e3) [RAN]
+
+- `uv run pytest` — exit 0 — 816 passed
+- `uv run ruff check .` — exit 0 — All checks passed!
+- `uv run ruff format --check .` — exit 0 — 57 files already formatted
+- No stage command runs on the repository's data: there are no reports or runs yet, and map-list, adjudicate and score were exercised only in temporary trees (tests and reviewers' probes).
+
+#### Review findings, triage and fixes
+
+Round 1 (R1 spec audit; R2: 36 cases, 9 failed; R3 safety and scope) [RAN]. Failing output: 12 failed before the fixes; 4 more round-1 tests were shown failing on the round-1 code by R1 and R3 (16 failed) and by the lead's revert mutants.
+
+| finding | verdict | fix (test that failed first) |
+|---|---|---|
+| Verdicts keyed by run, repeat and finding index: two review findings in different reports took one verdict, or the join refused for good (R2 HIGH) | CONFIRMED | keys carry the report id; a hidden file putting one finding in two items is refused (test_review_findings_in_different_reports_keep_their_own_verdicts) |
+| `--provisional` listed condition, run and repeat of every open review finding, breaking decision 9 (R1, R3) | CONFIRMED | provisional output without the per-error and per-finding tables; counts as ranges; each provisional score logged and disclosed at the reveal; README warning (5 tests) |
+| The disclosure claimed the adjudication was "blind to the condition, the repeat and the model" (R3) | CONFIRMED | factual wording; "A finding's category can still suggest its condition." |
+| `prepare --replace` overwrote a verdict typed in a second block (R2) | CONFIRMED | any non-template line blocks --replace |
+| An unreadable adjudication_log.json crashed apply, status and score (R2) | CONFIRMED | plain-words refusals |
+| `map-list --runs p1 p1` counted the run twice (R2) | CONFIRMED | refused |
+| normalise_category kept closing brackets and quotes (R1, R2) | CONFIRMED | every trailing P character dropped (Part 3) |
+| The sheet's borderline band hard-coded (R1) | CONFIRMED | built from the settings |
+| Seven tests passed with their feature broken (R2) | CONFIRMED | new tests; 22 mutants, all killed |
+| Checklist left out the decisions line and shortened items 4 and 6 (R1, R3) | CONFIRMED | restated in full |
+| normalise_section drops a trailing run, not one character (R1) | NOT A DEFECT (reading) | Part 5 |
+
+Round 2 (R2: 49 cases, 14 failed; 15 surviving mutants) [RAN]. Failing output: 13 failed before the fixes.
+
+| finding | verdict | fix (test that failed first) |
+|---|---|---|
+| Provisional text said no item could be traced while its per-condition counts could (R2, R3) | CONFIRMED (wording) | "...no review item is listed with its condition or repeat; the counts and ranges by condition can still show where an item came from."; decision 9 vs 6.8 to the owner |
+| A prepared adjudication was ignored when the runs gave no review findings; logged provisional scores went undisclosed (R2) | CONFIRMED | stale refusal; the log is read without a join |
+| Provisional interval cells read "a to b to c to d" (R2, R3) | CONFIRMED | bracketed intervals |
+| Deleting the provisional folder made the summary say no provisional score was made (R2, R3) | CONFIRMED | the disclosure states what the log records; README says to keep it |
+| Unwritable outputs and an unreadable adjudication.json gave a traceback or "not prepared" (R2) | CONFIRMED | plain-words refusals |
+| A CR-only sheet was overwritten by --replace (R2) | CONFIRMED | CRLF, CR and LF accepted |
+| The join did not check the review reason; duplicate map keys; lax log types (R2) | CONFIRMED | each fixed |
+| 15 surviving mutants (R2) | CONFIRMED | new tests; 26 mutants (with reverts of each fix), all killed |
+
+Round 3, the last (R1: all items met or pending the commit; R2: 28 cases, 3 failed, 6 surviving mutants; R3: no rule broken) [RAN]. Fixed test-first (6 failed first); 10 mutants, all killed:
+
+| finding | verdict | fix |
+|---|---|---|
+| A refused write could leave a new score.json beside an old summary.md (R2, R3) | CONFIRMED | every target is checked writable before anything is written |
+| A key given twice in a log could hide provisional scores (R2) | CONFIRMED | both logs refuse a key given twice |
+| adjudication.json as a folder reported as missing (R2); map-list's write unguarded (R1); "Review items: 0 ()." (R2); a garbled README sentence (R1) | CONFIRMED | each fixed |
+| Six untested paths (R2 mutants N1–N6) | CONFIRMED | new tests |
+| A deleted provisional log; results/ not gitignored; PENDING_DEFAULTS literal text (R3) | OWNER | Part 4 |
+
+#### Files changed (61982e3)
+
+```text
+--- git status --short
+M  README.md
+M  handoff.md
+A  src/pathqc_eval/adjudication.py
+M  src/pathqc_eval/cli.py
+M  src/pathqc_eval/io.py
+A  src/pathqc_eval/matching.py
+M  src/pathqc_eval/schema.py
+A  src/pathqc_eval/score_output.py
+A  src/pathqc_eval/scoring.py
+A  src/pathqc_eval/scoring_config.py
+A  src/pathqc_eval/stats.py
+A  tests/scoring_fixtures.py
+A  tests/test_matching.py
+M  tests/test_schema.py
+A  tests/test_score_cli.py
+A  tests/test_scoring.py
+A  tests/test_stats.py
+--- git diff --cached --stat
+ README.md                         |   26 +
+ handoff.md                        |    4 +-
+ src/pathqc_eval/adjudication.py   |  581 +++++++++++++++++++++
+ src/pathqc_eval/cli.py            |  101 ++++
+ src/pathqc_eval/io.py             |   11 +
+ src/pathqc_eval/matching.py       |  178 +++++++
+ src/pathqc_eval/schema.py         |   13 +-
+ src/pathqc_eval/score_output.py   |  535 +++++++++++++++++++
+ src/pathqc_eval/scoring.py        |  691 +++++++++++++++++++++++++
+ src/pathqc_eval/scoring_config.py |   42 ++
+ src/pathqc_eval/stats.py          |  100 ++++
+ tests/scoring_fixtures.py         |  180 +++++++
+ tests/test_matching.py            |  257 +++++++++
+ tests/test_schema.py              |   22 +-
+ tests/test_score_cli.py           | 1031 +++++++++++++++++++++++++++++++++++++
+ tests/test_scoring.py             |  286 ++++++++++
+ tests/test_stats.py               |  111 ++++
+ 17 files changed, 4163 insertions(+), 6 deletions(-)
+```
+
+#### What was not tested
+
+- Real runs: there are no reports in data/reports/ and no runs yet; the scorer was exercised on invented trees only (tests, reviewers' probes; S7 rehearses the whole flow).
+- The scored split with real owner verdicts; the owner's reading of the sheet.
+- Linux or macOS file permissions for the write check (Windows only).
+
+```text
+=== EVAL REPORT: EVAL-05 Scorer, blind adjudication, metrics (EVAL-N1 S6) ===
+Status: DONE
+What was asked: the scorer (6.1–6.10): settings, text handling, category mapping, classification, majority, metrics with intervals and a paired bootstrap, blind adjudication with a logged reveal, score and map-list, README and handoff decision 47 PENDING.
+What was done: six new modules and the CLI commands [RAN]; three review rounds, every confirmed finding fixed with a test that failed first; 58 mutants across three mutation checks, all killed [RAN]; README and handoff updated [RAN].
+Files changed: README.md, handoff.md, src/pathqc_eval/{adjudication,matching,score_output,scoring,scoring_config,stats}.py (new), src/pathqc_eval/{cli,io,schema}.py, tests/{scoring_fixtures,test_matching,test_score_cli,test_scoring,test_stats}.py (new), tests/test_schema.py.
+Commands run: uv run pytest — 0 — 58 s — 816 passed; uv run ruff check . — 0; uv run ruff format --check . — 0.
+Checks: pytest 816 passed, 0 failed | ruff check and format clean
+Git: branch main; commit 61982e3 "EVAL-05: scorer, blind adjudication, metrics"; push ok; remote HEAD matches local HEAD: yes
+API spend this task: no API calls
+Deviations from the prompt: provisional output leaves out the per-error and per-finding tables, and adds a provisional log (decision 9); further behaviour beyond the stage text is listed in Part 3.
+Claims I could not verify: behaviour on real runs and real owner verdicts; file permissions outside Windows.
+Questions for the owner: Part 4 items 11–17.
 handoff.md updated: yes
 === END ===
 ```
