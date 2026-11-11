@@ -387,7 +387,8 @@ def _omission(histo: dict) -> dict:
     """H5 omission: PNI is missing; the anchor is the Synoptic line next to where it belongs."""
     histo["sections"]["Synoptic summary"] = (
         "Tumour size: 18 mm\nHistologic grade: 2\nMargins: Clear\n"
-        "Lymphovascular invasion: Absent\nLymph nodes (positive/total): 0/3\npT: pT1c\npN: pN0"
+        "Lymphovascular invasion: Absent\nLymph nodes (positive/total): 0/3\npT: pT1c\npN: pN0\n"
+        "Staging edition: AJCC 8th edition"  # decision 27, checked since EVAL-09 H8
     )
     histo["errors"][0] |= {
         "type": "H5",
@@ -516,3 +517,99 @@ def test_cbc_omission_anchor_elsewhere_fails(cbc, taxonomy):
 
 def test_a_statement_error_is_not_held_to_the_anchor_sections(histo, taxonomy):
     assert check_omission_anchor(_report(histo), taxonomy) == []  # H1 in Microscopic description
+
+
+# EVAL-09 H7 and H8 (owner decisions, 2026-11-11; decisions 23 and 27)
+
+STAGING = "Staging edition: AJCC 8th edition"
+NO_STAGING = "Size 18 mm; grade 2; margins clear; LVI absent; PNI absent; nodes 0/3; pT1c pN0."
+STAGING_PROBLEM = f"the last line of 'Synoptic summary' must be '{STAGING}' (decision 27)"
+
+
+def _with_synoptic(histo: dict, text: str) -> dict:
+    histo["sections"]["Synoptic summary"] = text
+    return histo
+
+
+def _extra_errors(histo: dict, count: int) -> dict:
+    first = histo["errors"][0]
+    histo["errors"] = [first | {"error_id": f"H-001-E{i}"} for i in range(1, count + 1)]
+    return histo
+
+
+@pytest.mark.parametrize("count", [1, 2, 3])
+def test_one_to_three_planted_errors_pass(histo, taxonomy, count):
+    _with_synoptic(histo, f"{NO_STAGING}\n{STAGING}")
+    assert check_report(_report(_extra_errors(histo, count)), taxonomy) == []
+
+
+def test_four_planted_errors_fail(histo, taxonomy):
+    _with_synoptic(histo, f"{NO_STAGING}\n{STAGING}")
+    assert check_report(_report(_extra_errors(histo, 4)), taxonomy) == [
+        "4 planted errors; a planted report carries at most 3 (decision 23)"
+    ]
+
+
+def test_the_staging_line_last_passes(histo, taxonomy):
+    assert check_report(_report(_with_synoptic(histo, f"{NO_STAGING}\n{STAGING}")), taxonomy) == []
+
+
+@pytest.mark.parametrize(
+    "text",
+    [NO_STAGING, f"{STAGING}\n{NO_STAGING}", f"{NO_STAGING}\nStaging edition: AJCC 7th edition"],
+)
+@pytest.mark.parametrize("drafts", [False, True])
+def test_a_synoptic_summary_not_ending_with_the_staging_line_fails(histo, taxonomy, text, drafts):
+    _with_synoptic(histo, text)
+    assert check_report(_report(histo), taxonomy, drafts=drafts) == [STAGING_PROBLEM]
+
+
+def test_a_clean_control_needs_the_staging_line_too(histo, taxonomy):
+    histo |= {"is_clean_control": True, "errors": []}
+    _with_synoptic(histo, NO_STAGING)
+    assert check_report(_report(histo), taxonomy) == [STAGING_PROBLEM]
+
+
+def test_trailing_blank_lines_after_the_staging_line_pass(histo, taxonomy):
+    _with_synoptic(histo, f"{NO_STAGING}\n{STAGING}  \n\n")
+    assert check_report(_report(histo), taxonomy) == []
+
+
+def test_a_planted_error_quoting_the_last_line_allows_another_edition(histo, taxonomy):
+    changed = "Staging edition: AJCC 7th edition"
+    _with_synoptic(histo, f"{NO_STAGING}\n{changed}")
+    histo["errors"] = [
+        histo["errors"][0]
+        | {
+            "type": "H3",
+            "section": "Synoptic summary",
+            "quoted_sentence": changed,
+            "severity": "critical",
+        }
+    ]
+    assert check_report(_report(histo), taxonomy) == []
+
+
+def test_an_omission_anchored_on_the_last_line_allows_the_staging_line_to_go(histo, taxonomy):
+    _with_synoptic(histo, f"{NO_STAGING}\nnodes 0/3")
+    histo["errors"] = [
+        histo["errors"][0]
+        | {
+            "type": "H5",
+            "section": "Synoptic summary",
+            "quoted_sentence": "nodes 0/3",
+            "severity": "minor",
+            "kind": "omission",
+        }
+    ]
+    assert check_report(_report(histo), taxonomy) == []
+
+
+def test_a_planted_error_elsewhere_does_not_excuse_the_staging_line(histo, taxonomy):
+    assert histo["errors"][0]["section"] == "Microscopic description"
+    _with_synoptic(histo, NO_STAGING)
+    assert check_report(_report(histo), taxonomy) == [STAGING_PROBLEM]
+
+
+def test_cbc_reports_have_no_staging_line(cbc, taxonomy):
+    assert check_report(_report(cbc), taxonomy) == []

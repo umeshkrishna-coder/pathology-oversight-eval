@@ -17,6 +17,7 @@ from scoring_fixtures import (
     SYNOPTIC,
     Clock,
     all_units,
+    error,
     finding,
     report,
     standard_reports,
@@ -427,7 +428,8 @@ def test_a_run_with_pending_units_is_refused(tree, capsys):
 @pytest.fixture
 def scored(tmp_path, histo, cbc, real_prompts, monkeypatch):
     """A frozen tree (34 verified reports, final taxonomy, approved prompts, a lock), scored
-    runs whose hashes come from the lock, an approved map and OWNER_CONFIRMED True."""
+    runs whose hashes come from the lock, an approved map and OWNER_CONFIRMED True (the
+    module's own value since EVAL-09 G; set here too so these tests do not depend on it)."""
     root = tmp_path
     reports = []
     for i in range(1, 26):
@@ -481,13 +483,15 @@ def test_scored_refuses_a_map_that_is_not_approved(scored, capsys):
     ]
 
 
-def test_scored_refuses_while_the_owner_has_not_confirmed_the_defaults(scored, capsys, monkeypatch):
+def test_scored_refuses_if_the_confirmation_is_ever_withdrawn(scored, capsys, monkeypatch):
+    """EVAL-09 G: the owner confirmed the defaults (OWNER_CONFIRMED True) and the list of
+    pending defaults is gone; the flag set back to False still refuses, in one line."""
     monkeypatch.setattr(cfg, "OWNER_CONFIRMED", False)
     assert _main(*SCORED) == 1
-    lines = _refusal(capsys)
-    assert lines[0].startswith("  - scoring_config.OWNER_CONFIRMED is False")
-    assert len(lines) == 1 + len(cfg.PENDING_DEFAULTS)
-    assert lines[-1] == "  - (f) bootstrap of 10,000 resamples with seed 20261115"
+    assert _refusal(capsys) == [
+        "  - scoring_config.OWNER_CONFIRMED is False: the scorer defaults are not confirmed "
+        "by the owner"
+    ]
 
 
 def test_scored_refuses_runs_whose_hashes_differ_from_the_lock(scored, capsys):
@@ -643,7 +647,8 @@ def test_the_disclosure_states_what_the_sheet_hides_and_claims_no_more(tree):
     summary = (tree / "results" / "dev" / "summary.md").read_text(encoding="utf-8")
     assert (
         "2 review item(s) were adjudicated by hand by the owner, from a sheet that names no "
-        "condition, repeat or model. A finding's category can still suggest its condition."
+        "condition, repeat, model or run (decision 9). A finding's "
+        "category can still suggest its condition."
     ) in summary
     assert "blind to the condition" not in summary
 
@@ -1029,3 +1034,210 @@ def test_map_list_reports_an_output_it_cannot_write_in_plain_words(tree, capsys)
     (tree / "results" / "dev" / "category_strings.json").mkdir(parents=True)
     assert _main("map-list", "--runs", PLAIN) == 1
     assert "results/dev/category_strings.json cannot be written" in capsys.readouterr().out
+
+
+# EVAL-09 (owner decisions, 2026-11-11)
+
+# B: provisional scoring is refused on the scored split; it stays available on the dev split.
+
+
+def test_provisional_scoring_of_the_scored_split_is_refused(scored, capsys):
+    assert _main(*SCORED, "--provisional") == 1
+    assert _refusal(capsys) == [
+        "  - --provisional is refused on the scored split (owner decision, 2026-11-11): the "
+        "scored split is scored only once every review item has a verdict; provisional scores "
+        "stay available on the dev split"
+    ]
+    assert not (scored / "results" / "scored").exists()
+
+
+def test_provisional_scoring_of_the_dev_split_still_works(tree):
+    _review_runs(tree)
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED, "--provisional") == 0
+    assert (tree / "results" / "dev" / "provisional" / "score.json").is_file()
+
+
+# H6: once the scored split is scored, a category map with another sha256 is refused.
+
+
+def test_scoring_the_scored_split_again_refuses_a_changed_category_map(scored, capsys):
+    assert _main(*SCORED) == 0
+    first = read_report_json(scored / "results" / "scored" / "score.json")
+    recorded = first["inputs"]["category_map"]["sha256"]
+    capsys.readouterr()
+    write_map(scored, {"size mismatch": "H1", "odd wording": "H2"}, "approved", "1.1")
+    assert _main(*SCORED) == 1
+    lines = _refusal(capsys)
+    assert len(lines) == 1
+    assert lines[0].startswith(
+        "  - data/category_map.json has changed since the scored split was scored: "
+        f"results/scored/score.json records sha256 {recorded}, the map now has "
+    )
+    assert lines[0].endswith("; nothing is remapped after scoring (decision 10)")
+    assert read_report_json(scored / "results" / "scored" / "score.json") == first
+
+
+def test_scoring_the_scored_split_again_with_the_same_map_works(scored):
+    assert _main(*SCORED) == 0
+    before = (scored / "results" / "scored" / "score.json").read_bytes()
+    assert _main(*SCORED) == 0
+    assert (scored / "results" / "scored" / "score.json").read_bytes() == before
+
+
+def test_an_unreadable_scored_score_json_is_refused_in_plain_words(scored, capsys):
+    assert _main(*SCORED) == 0
+    (scored / "results" / "scored" / "score.json").write_text("{not json", encoding="utf-8")
+    capsys.readouterr()
+    assert _main(*SCORED) == 1
+    lines = _refusal(capsys)
+    assert len(lines) == 1 and lines[0].startswith(
+        "  - results/scored/score.json cannot be read, so the category map recorded at the "
+        "first scoring cannot be checked ("
+    )
+
+
+def test_the_dev_split_may_be_scored_again_with_another_map(tree):
+    write_run(tree, PLAIN, "plain", all_units(IDS))
+    write_run(tree, STRUCTURED, "structured", all_units(IDS))
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    write_map(tree, {"size mismatch": "H1"})
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+
+
+# G: the defaults are confirmed; recall by severity beside the weighted figure.
+
+
+def test_the_scorer_defaults_are_confirmed_by_the_owner():
+    assert cfg.OWNER_CONFIRMED is True
+    assert not hasattr(cfg, "PENDING_DEFAULTS")
+    assert cfg.config_values()["OWNER_CONFIRMED"] is True
+
+
+def test_scored_scoring_needs_no_confirmation_step(scored, monkeypatch):
+    monkeypatch.undo()  # the module's own OWNER_CONFIRMED, not the fixture's
+    monkeypatch.setattr(cli, "SCORE_ROOT", scored)
+    monkeypatch.setattr(cli, "SCORE_CLOCK", Clock())
+    monkeypatch.setattr(cli, "SCORER_COMMIT", lambda: "0123abc")
+    assert _main(*SCORED) == 0
+
+
+def test_recall_by_severity_is_given_as_k_of_n_with_wilson_intervals(tree):
+    """H-001-E1 (major) found in every unit; H-002-E1 (critical) and H-002-E2 (minor) never."""
+    found = all_units(IDS)
+    for rep in (1, 2, 3):
+        found[("H-001", rep)] = [finding("H1", MICRO, TUMOUR)]
+    write_run(tree, PLAIN, "plain", found)
+    write_run(tree, STRUCTURED, "structured", found)
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    score = read_report_json(tree / "results" / "dev" / "score.json")
+    by_severity = score["metrics"]["plain"]["recall_by_severity"]
+    assert list(by_severity) == ["critical", "major", "minor"]
+    assert {s: (p["k"], p["n"]) for s, p in by_severity.items()} == {
+        "critical": (0, 1),
+        "major": (1, 1),
+        "minor": (0, 1),
+    }
+    assert by_severity["major"]["interval"] == [0.206549, 1.0]
+    assert by_severity["critical"]["interval"] == [0.0, 0.793451]
+    assert score["metrics"]["plain"]["severity_weighted_recall"]["value"] == 0.333333
+    summary = (tree / "results" / "dev" / "summary.md").read_text(encoding="utf-8")
+    section = summary.split("## Recall by severity")[1].split("\n## ")[0]
+    assert "| Critical | 0/1 = 0.0% (95% CI 0.0%–79.3%) |" in section
+    assert "| Major | 1/1 = 100.0% (95% CI 20.7%–100.0%) |" in section
+    assert "| Minor | 0/1 = 0.0% (95% CI 0.0%–79.3%) |" in section
+    assert summary.index("## Recall by severity") < summary.index("## Severity-weighted recall")
+
+
+# C: an unmapped finding in a report with an omission error becomes a review item for it.
+
+VAGUE = "Sections show an invasive tumour."
+
+
+def test_an_unmapped_finding_in_a_report_with_an_omission_is_reviewed_for_the_omission(tree):
+    plain = all_units(IDS)
+    plain[("H-002", 1)] = [finding("something seems missing", MICRO, VAGUE)]
+    write_run(tree, PLAIN, "plain", plain)
+    write_run(tree, STRUCTURED, "structured", all_units(IDS))
+    assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    items = _items(tree)
+    assert [(i["candidate_error_id"], i["review_reason"]) for i in items] == [
+        ("H-002-E2", "unmapped_omission")
+    ]
+    sheet = (tree / ADJ / "adjudication_sheet.md").read_text(encoding="utf-8")
+    assert (
+        "# why it needs you: its category is not in the category map, and this report has "
+        "an omission error; the finding may be reporting what is missing"
+    ) in sheet
+    assert "H-002-E2 (H5, omission) in Diagnosis" in sheet
+
+
+def test_an_unmapped_finding_in_a_report_without_an_omission_stays_a_false_alarm(tree):
+    plain = all_units(IDS)
+    plain[("H-001", 1)] = [finding("something seems missing", "Diagnosis", VAGUE)]
+    write_run(tree, PLAIN, "plain", plain)
+    write_run(tree, STRUCTURED, "structured", all_units(IDS))
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    score = read_report_json(tree / "results" / "dev" / "score.json")
+    assert score["counts"]["review_findings"] == 0
+    assert score["counts"]["by_condition"]["plain"]["false_alarms"] == 1
+
+
+def _two_omissions(root, histo):
+    """H-003: two omission errors (E1 in Diagnosis, E2 in Synoptic summary), nothing else;
+    plain repeat 1 has one unmapped finding in another section."""
+    data = report(
+        histo,
+        "H-003",
+        "dev",
+        [
+            error("H5", "Diagnosis", DIAGNOSIS, "minor", kind="omission"),
+            error("H5", "Synoptic summary", SYNOPTIC, "major", kind="omission"),
+        ],
+    )
+    write_report_json(root / "data" / "reports" / "H-003.json", data)
+    ids = (*IDS, "H-003")
+    plain = all_units(ids)
+    plain[("H-003", 1)] = [finding("something seems missing", MICRO, VAGUE)]
+    write_run(root, PLAIN, "plain", plain)
+    write_run(root, STRUCTURED, "structured", all_units(ids))
+
+
+def test_with_two_omissions_one_finding_gives_one_item_per_omission(tree, histo):
+    _two_omissions(tree, histo)
+    assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    items = sorted((i["candidate_error_id"], i["review_reason"]) for i in _items(tree))
+    assert items == [("H-003-E1", "unmapped_omission"), ("H-003-E2", "unmapped_omission")]
+    hidden = read_report_json(tree / ADJ / "adjudication_hidden.json")
+    refs = [(r["run_id"], r["repeat"], r["finding_index"]) for v in hidden.values() for r in v]
+    assert refs == [(PLAIN, 1, 1), (PLAIN, 1, 1)]
+
+
+@pytest.mark.parametrize(
+    ("e1", "e2", "outcome", "error_ids", "false_alarms"),
+    [
+        ("detected", "false_alarm", "hit", ["H-003-E1"], 0),
+        ("false_alarm", "detected", "hit", ["H-003-E2"], 0),
+        ("detected", "detected", "hit", ["H-003-E1", "H-003-E2"], 0),
+        ("false_alarm", "false_alarm", "false_alarm", [], 1),
+        ("near_miss", "false_alarm", "near_miss", ["H-003-E1"], 0),
+        ("miss", "false_alarm", "miss", ["H-003-E1"], 0),
+        ("miss", "near_miss", "near_miss", ["H-003-E2"], 0),
+    ],
+)
+def test_the_verdicts_on_each_omission_decide_the_finding(
+    tree, histo, e1, e2, outcome, error_ids, false_alarms
+):
+    _two_omissions(tree, histo)
+    assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    items = {i["candidate_error_id"]: i["item_id"] for i in _items(tree)}
+    _fill(tree, {items["H-003-E1"]: (e1, "invented"), items["H-003-E2"]: (e2, "invented")})
+    assert _main("adjudicate", "apply", "--dataset", "dev") == 0
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    score = read_report_json(tree / "results" / "dev" / "score.json")
+    row = next(f for f in score["findings"] if f["report_id"] == "H-003")
+    assert (row["outcome"], row["error_ids"]) == (outcome, error_ids)
+    assert row["verdict"] == {"H-003-E1": e1, "H-003-E2": e2}
+    assert score["counts"]["by_condition"]["plain"]["false_alarms"] == false_alarms
+    errors = {e["error_id"]: e["plain"]["detected_by_repeat"] for e in score["errors"]}
+    for eid in ("H-003-E1", "H-003-E2"):
+        assert errors[eid][0] is (eid in error_ids and outcome == "hit")

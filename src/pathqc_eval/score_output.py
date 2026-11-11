@@ -27,6 +27,7 @@ from pathqc_eval.scoring import (
     Inputs,
     classify_runs,
     error_table,
+    finding_count,
     finding_table,
     load_category_map,
     load_inputs,
@@ -41,6 +42,15 @@ TABLES_LEFT_OUT = (
     "The per-error and per-finding tables are left out of provisional scores, so that no "
     "review item is listed with its condition or repeat; the counts and ranges by condition "
     "can still show where an item came from."
+)
+
+
+# Owner decision (EVAL-09 B): no provisional score of the scored split, so that no range by
+# condition is ever shown before every verdict is entered there.
+PROVISIONAL_SCORED_REFUSED = (
+    "--provisional is refused on the scored split (owner decision, 2026-11-11): the scored "
+    "split is scored only once every review item has a verdict; provisional scores stay "
+    "available on the dev split"
 )
 
 
@@ -91,6 +101,8 @@ def run_score(
     clock: Callable[[], datetime],
     commit: str,
 ) -> Outcome:
+    if provisional and dataset == "scored":
+        return _refused([PROVISIONAL_SCORED_REFUSED])
     inputs, problems = load_inputs(root, dataset, run_ids)
     if inputs is None:
         return _refused(problems)
@@ -112,7 +124,8 @@ def run_score(
             if not provisional:
                 return _refused(
                     [
-                        f"{len(found)} review finding(s) need the owner's blind adjudication "
+                        f"{finding_count(found)} review finding(s) need the owner's blind "
+                        "adjudication "
                         f"({state}); finish it, or score with --provisional"
                     ]
                 )
@@ -137,12 +150,12 @@ def run_score(
             return _refused([problem])
         before = len(logged)
 
-    def verdict_of(unit, index):
-        return verdicts.get((unit.run_id, unit.report_id, unit.repeat, index))
+    def verdict_of(unit, index, error_id):
+        return verdicts.get((unit.run_id, unit.report_id, unit.repeat, index, error_id))
 
     tables: dict = {}
     if mode == "final":
-        body = score_body(inputs, views, lambda unit, i, o: verdict_of(unit, i))
+        body = score_body(inputs, views, lambda unit, i, o: verdict_of(unit, i, o.error_id))
         metrics, comparison, by_condition = body["conditions"], body["comparison"], body["counts"]
         tables = {
             "errors": error_table(inputs, views, body["resolved"], body["facts"]),
@@ -166,7 +179,9 @@ def run_score(
         }
     if mode == "provisional":
         entry = adjudication.ProvisionalScore(
-            scored_at=adjudication.stamp(clock()), review_findings=len(found), adjudication=state
+            scored_at=adjudication.stamp(clock()),
+            review_findings=finding_count(found),
+            adjudication=state,
         )
         problem = adjudication.record_provisional(root, dataset, entry)
         if problem:
@@ -190,7 +205,7 @@ def run_score(
         "counts": {
             "reports": len(inputs.reports),
             "planted_errors_by_type": planted_by_type(inputs),
-            "review_findings": len(found),
+            "review_findings": finding_count(found),
             "review_items": review_items,
             **({} if before is None else {"provisional_scores_before_completion": before}),
             "by_condition": by_condition,
@@ -338,6 +353,14 @@ def summary_markdown(score: dict, inputs: Inputs) -> str:
                 lambda m, k=key: _pct(m["repeat_consistency"][k]["share_same_in_every_unit"]),
             )
         )
+    out += ["", f"## {prefix}Recall by severity", "", head]
+    for severity in cfg.SEVERITIES:
+        out.append(
+            row(
+                severity.capitalize(),
+                lambda m, s=severity: _prop(m["recall_by_severity"][s], True),
+            )
+        )
     out += ["", f"## {prefix}Severity-weighted recall", "", head]
     out.append(
         row(
@@ -435,8 +458,8 @@ def summary_markdown(score: dict, inputs: Inputs) -> str:
     elif items:
         by_hand = (
             f"{adjudicated} review item(s) were adjudicated by hand by the owner, from a sheet "
-            "that names no condition, repeat or model. A finding's category can still suggest "
-            "its condition."
+            "that names no condition, repeat, model or run (decision 9). A finding's category "
+            "can still suggest its condition."
         )
     else:
         by_hand = f"{adjudicated} review item(s) were adjudicated by hand."

@@ -1385,7 +1385,7 @@ def test_readable_goes_on_after_a_file_it_cannot_write(tmp_path, histo, capsys):
 
 def test_readable_keeps_the_last_sections_trailing_line_breaks(histo):
     histo["sections"]["Synoptic summary"] += "\n\n"
-    assert readable_markdown(histo).endswith("pT1c pN0.\n\n\n")
+    assert readable_markdown(histo).endswith("Staging edition: AJCC 8th edition\n\n\n")
 
 
 def test_draft_problems_never_write_under_data_drafts(tree, capsys):
@@ -1396,3 +1396,36 @@ def test_draft_problems_never_write_under_data_drafts(tree, capsys):
     assert cli.main(["plant", "--check"]) == 1
     assert cli.main(["plant"]) == 1
     assert _snapshot(tree / "data" / "drafts") == drafts
+
+
+# EVAL-09 H9 (owner decision, 2026-11-11): a report file that cannot be written is listed as
+# NOT WRITTEN in plain words, and plant carries on with the others.
+
+
+def test_a_report_file_that_cannot_be_written_is_listed_and_the_others_are_written(tree, capsys):
+    import os
+    import stat
+
+    sheet = _complete_sheet(tree / "data" / "specs" / "dataset.json")
+    (tree / SHEET_FILE).write_text(sheet, encoding="utf-8")
+    assert cli.main(["plant"]) == 0
+    capsys.readouterr()
+    reports = tree / "data" / "reports"
+    locked = reports / "H-001.json"
+    before = locked.read_bytes()
+    other = reports / "H-002.json"
+    other.unlink()  # so that its writing again is visible
+    os.chmod(locked, stat.S_IREAD)
+    try:
+        assert cli.main(["plant"]) == 1
+    finally:
+        os.chmod(locked, stat.S_IREAD | stat.S_IWRITE)
+    out = capsys.readouterr().out
+    assert "Traceback" not in out
+    assert (
+        "H-001 NOT WRITTEN: data/reports/H-001.json cannot be written (Permission denied); "
+        "the other reports are written. Make the file writable and run plant again."
+    ) in out
+    assert "H-002 built | 1 planted error(s)" in out
+    assert other.is_file()
+    assert locked.read_bytes() == before

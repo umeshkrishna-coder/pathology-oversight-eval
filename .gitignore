@@ -6,3 +6,5 @@ data/drafts/_failed/
 data/drafts/_readable/
 data/reports/_review/
 runs/*/.run.lock
+results/*/adjudication/adjudication_hidden.json
+results/*/provisional/

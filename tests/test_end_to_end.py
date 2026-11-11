@@ -500,6 +500,16 @@ def test_scored_split(world, capsys, monkeypatch):
 
     Structured minus plain, over all 30 reports: recall +1/22; false alarms -13/180;
     specificity (by majority) 8/8 - 7/8 = +1/8. Review items: 3 (2 detected, 1 near_miss).
+
+    Recall by severity (EVAL-09 G): critical 8 (H2, H3, H6 and C3, two each), major 9 (H-001,
+    H-015, H4 2, H-005, H-012, C1 3), minor 5 (H-008 overridden, H-007, H-014, C2 2). Plain
+    misses H-002 (H2) and H-006 (H6), both critical: critical 6/8 (Wilson 0.4093 to 0.9285),
+    major 9/9 (0.7009 to 1), minor 5/5 (0.5655 to 1). Structured misses H-013 (H6, critical):
+    critical 7/8 (0.5291 to 0.9776), major 9/9, minor 5/5.
+    EVAL-09 C (an unmapped finding in a report with an omission error goes to review for it)
+    changes none of these numbers: no report with an omission error (H-007, H-014, C-003,
+    C-006) gets an unmapped finding here; the one unmapped category is in H-004 (a statement
+    error), which was already a review item.
     The bootstrap intervals are not worked by hand; they are pinned as the seeded scorer gives
     them, so that a change to the resampling shows."""
     root = world
@@ -516,7 +526,7 @@ def test_scored_split(world, capsys, monkeypatch):
         root / "data" / "category_map.json",
         {"version": "1.0", "status": "approved", "map": CATEGORY_MAP},
     )
-    monkeypatch.setattr(cfg, "OWNER_CONFIRMED", True)  # inside this test only
+    assert cfg.OWNER_CONFIRMED is True  # the owner's confirmation (EVAL-09 G)
     assert _main("adjudicate", "prepare", "--dataset", "scored", "--runs", plain, structured) == 0
     _assert_blind(root, "scored", [plain, structured])
     _fill_sheet(root, "scored", {
@@ -542,6 +552,18 @@ def test_scored_split(world, capsys, monkeypatch):
                     m["severity_weighted_recall"]["planted_weight"])
                 for c, m in (("plain", p), ("structured", s))}  # fmt: skip
     assert weighted == {"plain": (41, 47), "structured": (44, 47)}
+    by_severity = {c: {k: (v["k"], v["n"], [round(x, 4) for x in v["interval"]])
+                       for k, v in m["recall_by_severity"].items()}
+                   for c, m in (("plain", p), ("structured", s))}  # fmt: skip
+    major, minor = (9, 9, [0.7009, 1.0]), (5, 5, [0.5655, 1.0])
+    assert by_severity == {
+        "plain": {"critical": (6, 8, [0.4093, 0.9285]), "major": major, "minor": minor},
+        "structured": {"critical": (7, 8, [0.5291, 0.9776]), "major": major, "minor": minor},
+    }
+    summary = (out / "summary.md").read_text(encoding="utf-8")
+    assert "| Critical | 6/8 = 75.0% (95% CI 40.9%–92.9%) | 7/8 = 87.5% (95% CI 52.9%–97.8%) |" in (
+        summary
+    )
     wilson = {(1, 2): [0.0945, 0.9055], (2, 2): [0.3424, 1.0], (3, 3): [0.4385, 1.0],
               (4, 4): [0.5101, 1.0]}  # fmt: skip
     for m in (p, s):
@@ -634,7 +656,8 @@ def test_dev_split(world, capsys, monkeypatch):
     conditions find every error in every unit and nothing else, except that plain gives H-021
     an unmapped category in repeat 1: one review item, adjudicated detected, so it is a hit.
     Recall 3/3 in each (Wilson 0.4385 to 1), per type H1, H3 and C2 1/1 (0.2065 to 1);
-    severity-weighted (H1 major 2 + H3 critical 3 + C2 minor 1) 6/6; no false alarms;
+    severity-weighted (H1 major 2 + H3 critical 3 + C2 minor 1) 6/6, and by severity
+    (EVAL-09 G) critical, major and minor 1/1 each (0.2065 to 1); no false alarms;
     specificity 1/1 by majority and 3/3 per unit; calibration 9 findings, all outcome 1 at
     0.8: Brier 0.04, ECE 0.2; consistency 1.0 with every unit the same (3 errors; the one
     clean control too); differences 0 with bootstrap intervals [0, 0]; review items 1."""
@@ -684,6 +707,10 @@ def test_dev_split(world, capsys, monkeypatch):
         assert [round(x, 4) for x in m["overall_recall"]["interval"]] == [0.4385, 1.0]
         weighted = m["severity_weighted_recall"]
         assert (weighted["detected_weight"], weighted["planted_weight"]) == (6, 6)
+        assert {
+            k: (v["k"], v["n"], [round(x, 4) for x in v["interval"]])
+            for k, v in m["recall_by_severity"].items()
+        } == {k: (1, 1, [0.2065, 1.0]) for k in ("critical", "major", "minor")}
         assert (m["specificity"]["per_unit"]["k"], m["specificity"]["per_unit"]["n"]) == (3, 3)
         cal = m["calibration"]
         assert cal["findings"] == 9

@@ -208,7 +208,11 @@ class SmokeConfig(StrictModel):
 
 
 ReviewReason = Literal[
-    "unmapped_category", "borderline_overlap", "section_mismatch", "omission_other_section"
+    "unmapped_category",
+    "borderline_overlap",
+    "section_mismatch",
+    "omission_other_section",
+    "unmapped_omission",  # EVAL-09 C
 ]
 
 

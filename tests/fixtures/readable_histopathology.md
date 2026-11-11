@@ -17,3 +17,4 @@ Invasive tumour, grade 2.
 
 ## Synoptic summary
 Size 18 mm; grade 2; margins clear; LVI absent; PNI absent; nodes 0/3; pT1c pN0.
+Staging edition: AJCC 8th edition

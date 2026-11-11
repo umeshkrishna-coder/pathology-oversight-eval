@@ -845,20 +845,32 @@ def review_markdown(result: BlockResult) -> str:
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
-def write_outputs(run: PlantRun, root: Path) -> list[str]:
-    """Write each block without problems; leave every other report file untouched."""
+def write_outputs(run: PlantRun, root: Path) -> tuple[list[str], list[str]]:
+    """Write each block without problems; leave every other report file untouched. Returns
+    the lines to print and the ids of reports whose files could not be written: such a report
+    is listed as NOT WRITTEN and the others are still written (owner decision, EVAL-09 H9)."""
     reports = root / REPORTS_DIR
     review = reports / REVIEW_DIR
     reports.mkdir(parents=True, exist_ok=True)
     review.mkdir(exist_ok=True)
     lines = [f"sheet {p}" for p in run.problems]
+    not_written: list[str] = []
     for r in run.results:
         if r.ok:
             assert r.report is not None
-            write_report_json(reports / f"{r.report_id}.json", r.report)
-            (review / f"{r.report_id}.md").write_text(
-                review_markdown(r), encoding="utf-8", newline="\n"
-            )
+            target = REPORTS_DIR / f"{r.report_id}.json"
+            try:
+                write_report_json(root / target, r.report)
+                target = REPORTS_DIR / REVIEW_DIR / f"{r.report_id}.md"
+                (root / target).write_text(review_markdown(r), encoding="utf-8", newline="\n")
+            except OSError as exc:
+                not_written.append(r.report_id)
+                lines.append(
+                    f"{r.report_id} NOT WRITTEN: {target.as_posix()} cannot be written "
+                    f"({exc.strerror or exc}); the other reports are written. Make the file "
+                    "writable and run plant again."
+                )
+                continue
             lines.append(
                 f"{r.report_id} built | {len(r.report['errors'])} planted error(s), "
                 f"{len(r.fixes)} fix(es) | verified {'yes' if r.verified else 'no'}"
@@ -866,7 +878,7 @@ def write_outputs(run: PlantRun, root: Path) -> list[str]:
         else:
             lines.append(f"{r.report_id} NOT UPDATED")
             lines += [f"  {p}" for p in r.problems]
-    return lines
+    return lines, not_written
 
 
 TEMPLATE_HEADER = """\

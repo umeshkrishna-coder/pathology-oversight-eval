@@ -260,3 +260,66 @@ def test_split_labels_with_underscore_emphasis_fail(
         system += f"\n{label}"
     problems = check_eval_isolation(report, "plain", system, user, fixed_taxonomy)
     assert len(problems) == 1 and problems[0].startswith(f"{where} message contains the split")
+
+
+# EVAL-09 H4 and H5 (owner decisions, 2026-11-11)
+
+
+@pytest.mark.parametrize(
+    ("addition", "expected"),
+    [
+        (
+            "Look for size, number, laterality or site in the gross contradicted in microscopy "
+            "or synoptic.",
+            "plain system message contains the type definition of H1",
+        ),
+        (
+            "Flag any Interpretation Text Contradicts The Numbers",
+            "plain system message contains the type definition of C1",
+        ),
+    ],
+)
+def test_plain_system_with_a_type_definition_fails(
+    report, addition, expected, fixed_taxonomy, real_prompts
+):
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    problems = check_eval_isolation(report, "plain", f"{system}\n{addition}", user, fixed_taxonomy)
+    assert problems == [expected]
+
+
+def test_plain_system_with_a_severity_definition_still_fails(report, fixed_taxonomy, real_prompts):
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    system += "\nMajor: would need an amended report."
+    problems = check_eval_isolation(report, "plain", system, user, fixed_taxonomy)
+    assert problems == ["plain system message contains the major severity definition"]
+
+
+@pytest.mark.parametrize(
+    ("label", "problem"),
+    [
+        ("split = dev", "contains the split 'dev'"),
+        ("split = scored", "contains the split 'scored'"),
+        ("SPLIT=scored", "contains the split 'scored'"),
+        ("**Split** = _dev_", "contains the split 'dev'"),
+    ],
+)
+@pytest.mark.parametrize("where", ["system", "user"])
+def test_split_equals_forms_fail(histo, fixed_taxonomy, real_prompts, label, problem, where):
+    if where == "user":
+        histo["sections"]["Comment"] = f"Invented note, {label}."
+    report = Report.model_validate(histo)
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    if where == "system":
+        system += f"\n{label}"
+    assert check_eval_isolation(report, "plain", system, user, fixed_taxonomy) == [
+        f"{where} message {problem}"
+    ]
+
+
+@pytest.mark.parametrize("words", ["The split = developed", "split = scoreds", "split equals dev"])
+def test_words_after_split_equals_must_be_the_split_itself(
+    histo, fixed_taxonomy, real_prompts, words
+):
+    report = Report.model_validate(histo)
+    system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
+    assert check_eval_isolation(report, "plain", f"{system}\n{words}", user, fixed_taxonomy) == []

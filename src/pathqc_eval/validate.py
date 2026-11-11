@@ -207,8 +207,46 @@ def check_severity(report: Report, taxonomy: Taxonomy) -> list[str]:
     return reasons
 
 
+MAX_PLANTED_ERRORS = 3  # decision 23: one to three planted errors per planted report
+# Decision 27: every histopathology Synoptic summary ends with this line (draft.py writes it).
+STAGING_EDITION_LINE = "Staging edition: AJCC 8th edition"
+
+
+def check_error_count(report: Report, taxonomy: Taxonomy) -> list[str]:
+    """Owner decision (EVAL-09 H7): at most three planted errors in a report."""
+    if len(report.errors) > MAX_PLANTED_ERRORS:
+        return [
+            f"{len(report.errors)} planted errors; a planted report carries at most "
+            f"{MAX_PLANTED_ERRORS} (decision 23)"
+        ]
+    return []
+
+
+def check_staging_line(report: Report, taxonomy: Taxonomy) -> list[str]:
+    """Owner decision (EVAL-09 H8): the last line of a histopathology Synoptic summary is the
+    staging-edition line, unless one of the report's planted errors quotes that last line."""
+    text = report.sections.get("Synoptic summary")
+    if report.modality != "histopathology" or text is None:
+        return []  # a missing Synoptic summary is reported by check_section_order
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    last = lines[-1] if lines else ""
+    if last == STAGING_EDITION_LINE:
+        return []
+    quoted = [
+        err
+        for err in report.errors
+        if err.section == "Synoptic summary"
+        and err.quoted_sentence.strip()
+        and err.quoted_sentence.strip() in last
+    ]
+    if quoted:
+        return []
+    return [f"the last line of 'Synoptic summary' must be '{STAGING_EDITION_LINE}' (decision 27)"]
+
+
 RULES: tuple[Callable[[Report, Taxonomy], list[str]], ...] = (
     check_clean_control,
+    check_error_count,
     check_error_ids,
     check_error_types,
     check_quoted_sentences,
@@ -218,6 +256,7 @@ RULES: tuple[Callable[[Report, Taxonomy], list[str]], ...] = (
     check_cbc_units,
     check_cbc_values_text,
     check_severity,
+    check_staging_line,
 )
 
 

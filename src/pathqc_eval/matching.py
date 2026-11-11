@@ -3,7 +3,9 @@
 Decisions 8 and 34: a statement error is detected when the mapped type, the section and the
 quoted sentence (token containment, the larger of the two directions) all match; an omission
 when the type and the anchor's section match. Ambiguous cases go to the owner's blind
-adjudication (decision 9).
+adjudication (decision 9). Owner decision (EVAL-09 C): in a report with an omission error, an
+unmapped finding that is not already a hit or a review item for another error becomes a review
+item for each omission error of the report.
 """
 
 from __future__ import annotations
@@ -23,6 +25,7 @@ REVIEW_REASONS = (
     "borderline_overlap",
     "section_mismatch",
     "omission_other_section",
+    "unmapped_omission",
 )
 # A token is a maximal run of letters and digits; a decimal point between digits stays inside.
 _TOKEN = re.compile(r"[^\W_]+(?:(?<=\d)\.(?=\d)[^\W_]+)*")
@@ -90,12 +93,24 @@ def map_category(category: str, type_ids: Iterable[str], category_map: Mapping[s
 @dataclass(frozen=True)
 class Outcome:
     """One finding's outcome. Before adjudication: hit, review, near_miss or false_alarm;
-    after resolution also duplicate and miss."""
+    after resolution also duplicate and miss.
+
+    `error_ids` is set only where one finding concerns several errors (EVAL-09 C): a review
+    for the omission errors of its report (one review item each), and after resolution a hit
+    on more than one of them. Otherwise the error is `error_id` alone."""
 
     outcome: str
     error_id: str | None = None
     reason: str | None = None  # the review reason
     overlap: float | None = None
+    error_ids: tuple[str, ...] = ()
+
+    @property
+    def ids(self) -> tuple[str, ...]:
+        """Every error this outcome concerns."""
+        if self.error_ids:
+            return self.error_ids
+        return () if self.error_id is None else (self.error_id,)
 
 
 _LEVEL = {"hit": 0, "review": 1, "near_miss": 2}
@@ -144,6 +159,9 @@ def classify(section: str, quote: str, mapped: str, errors: Sequence) -> Outcome
     is a false_alarm."""
     found = candidates(section, quote, mapped, errors)
     if not found:
+        omissions = tuple(e.error_id for e in errors if e.kind == "omission")
+        if mapped == UNMAPPED and omissions:  # EVAL-09 C: one review item per omission
+            return Outcome("review", omissions[0], "unmapped_omission", None, omissions)
         return Outcome("false_alarm")
     return min(found, key=lambda c: (_LEVEL[c.outcome], -c.overlap, _error_number(c.error_id)))
 
@@ -157,22 +175,46 @@ def resolve(base: Sequence[Outcome], decide: Callable[[int, Outcome], str | None
     `decide(index, outcome)` gives the verdict for a review finding (detected, miss, near_miss,
     false_alarm) or None to leave it in review. A detected verdict is a hit for the candidate
     error. Then, per error, the first hit in finding order stays a hit and later hits are
-    duplicates (neither hits nor false alarms)."""
+    duplicates (neither hits nor false alarms).
+
+    A finding in review for several omission errors (EVAL-09 C) gets one verdict per error,
+    each asked with that error as the outcome's error_id: it is a hit for every error judged
+    detected; otherwise a near-miss if any verdict is near_miss, a miss if any is miss, and a
+    false alarm only when every verdict is false_alarm. A hit on several errors is a duplicate
+    only where every one of them was hit earlier."""
     resolved: list[Outcome] = []
     for index, item in enumerate(base, start=1):
         if item.outcome == "review":
-            verdict = decide(index, item)
-            if verdict == "detected":
-                item = replace(item, outcome="hit")
-            elif verdict in ("miss", "near_miss", "false_alarm"):
-                error_id = None if verdict == "false_alarm" else item.error_id
-                item = replace(item, outcome=verdict, error_id=error_id)
+            item = _decided(item, index, decide)
         resolved.append(item)
     seen: set[str] = set()
     for i, item in enumerate(resolved):
         if item.outcome == "hit":
-            if item.error_id in seen:
+            new = tuple(e for e in item.ids if e not in seen)
+            if not new:
                 resolved[i] = replace(item, outcome="duplicate")
             else:
-                seen.add(item.error_id)
+                seen.update(new)
+                if new != item.ids:
+                    resolved[i] = replace(
+                        item, error_id=new[0], error_ids=new if len(new) > 1 else ()
+                    )
     return resolved
+
+
+def _decided(item: Outcome, index: int, decide: Callable[[int, Outcome], str | None]) -> Outcome:
+    """One review finding with its verdicts applied (resolve)."""
+    verdicts = [(eid, decide(index, replace(item, error_id=eid, error_ids=()))) for eid in item.ids]
+    hits = tuple(eid for eid, verdict in verdicts if verdict == "detected")
+    if hits:
+        several = hits if len(hits) > 1 else ()
+        return replace(item, outcome="hit", error_id=hits[0], error_ids=several)
+    if any(verdict is None for _, verdict in verdicts):
+        return item
+    for kind in ("near_miss", "miss"):
+        eid = next((e for e, verdict in verdicts if verdict == kind), None)
+        if eid is not None:
+            return replace(item, outcome=kind, error_id=eid, error_ids=())
+    if all(verdict == "false_alarm" for _, verdict in verdicts):
+        return replace(item, outcome="false_alarm", error_id=None, error_ids=())
+    return item  # a verdict outside the four: left in review

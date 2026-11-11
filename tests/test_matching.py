@@ -174,7 +174,8 @@ def test_a_point_between_a_letter_and_a_digit_splits_tokens():
          ("review", "omission_other_section")),
         ("unmapped", "Synoptic summary", "LVI absent; PNI absent.",
          ("review", "unmapped_category")),
-        ("unmapped", "Synoptic summary", "Something unrelated", ("false_alarm", None)),
+        ("unmapped", "Synoptic summary", "Something unrelated",
+         ("review", "unmapped_omission")),  # EVAL-09 C; a false alarm before
         ("H4", "Synoptic summary", "LVI absent; PNI absent.", ("false_alarm", None)),
     ],
 )  # fmt: skip
@@ -255,3 +256,71 @@ def test_verdicts_resolve_review_findings():
         ("duplicate", "H-001-E1"),  # a second detected verdict on E1 in the same unit
     ]
     assert resolve(base, lambda i, o: None) == base  # undecided findings stay in review
+
+
+# EVAL-09 C (owner decision, 2026-11-11): in a report with an omission error, an unmapped
+# finding that is not already a hit or a review item becomes a review item for each omission.
+
+OMISSION_E2 = _error(2, "H5", "Diagnosis", "Invasive tumour, grade 2.", kind="omission")
+OMISSION_E3 = _error(3, "H5", "Synoptic summary", "pT1c pN0.", kind="omission")
+STATEMENT_E1 = _error(1, "H1", "Microscopic description", "Tumour measures 25 mm.")
+
+
+def test_an_unmapped_finding_beside_an_omission_is_reviewed_for_it():
+    errors = [STATEMENT_E1, OMISSION_E2]
+    outcome = classify("Gross description", "Fatty tissue.", "unmapped", errors)
+    assert outcome == Outcome("review", "H-001-E2", "unmapped_omission", None, ("H-001-E2",))
+
+
+def test_an_unmapped_finding_beside_two_omissions_is_reviewed_for_each():
+    errors = [STATEMENT_E1, OMISSION_E2, OMISSION_E3]
+    outcome = classify("Gross description", "Fatty tissue.", "unmapped", errors)
+    assert (outcome.outcome, outcome.reason) == ("review", "unmapped_omission")
+    assert outcome.error_ids == ("H-001-E2", "H-001-E3")
+
+
+def test_an_unmapped_finding_already_in_review_for_another_error_keeps_that_item():
+    errors = [STATEMENT_E1, OMISSION_E2]
+    outcome = classify("Microscopic description", "Tumour measures 25 mm.", "unmapped", errors)
+    assert (outcome.outcome, outcome.error_id, outcome.reason) == (
+        "review", "H-001-E1", "unmapped_category"
+    )  # fmt: skip
+
+
+@pytest.mark.parametrize("mapped", ["H2", "other"])
+def test_a_mapped_finding_beside_an_omission_stays_a_false_alarm(mapped):
+    errors = [STATEMENT_E1, OMISSION_E2]
+    assert classify("Gross description", "Fatty tissue.", mapped, errors) == Outcome("false_alarm")
+
+
+def test_an_unmapped_finding_without_an_omission_stays_a_false_alarm():
+    assert classify("Gross description", "Fatty tissue.", "unmapped", [STATEMENT_E1]) == Outcome(
+        "false_alarm"
+    )
+
+
+@pytest.mark.parametrize(
+    ("verdicts", "expected"),
+    [
+        ({"H-001-E2": "detected", "H-001-E3": "false_alarm"}, ("hit", ("H-001-E2",))),
+        ({"H-001-E2": "detected", "H-001-E3": "detected"}, ("hit", ("H-001-E2", "H-001-E3"))),
+        ({"H-001-E2": "false_alarm", "H-001-E3": "false_alarm"}, ("false_alarm", ())),
+        ({"H-001-E2": "miss", "H-001-E3": "near_miss"}, ("near_miss", ("H-001-E3",))),
+        ({"H-001-E2": "miss", "H-001-E3": "false_alarm"}, ("miss", ("H-001-E2",))),
+    ],
+)
+def test_one_verdict_per_omission_resolves_the_finding(verdicts, expected):
+    review = Outcome("review", "H-001-E2", "unmapped_omission", None, ("H-001-E2", "H-001-E3"))
+    (resolved,) = resolve([review], lambda i, o: verdicts[o.error_id])
+    assert (resolved.outcome, resolved.ids) == expected
+
+
+def test_a_finding_hitting_two_omissions_is_a_duplicate_only_where_both_were_hit():
+    review = Outcome("review", "H-001-E2", "unmapped_omission", None, ("H-001-E2", "H-001-E3"))
+    base = [Outcome("hit", "H-001-E2", None, 1.0), review, review]
+    resolved = resolve(base, lambda i, o: "detected")
+    assert [(o.outcome, o.ids) for o in resolved] == [
+        ("hit", ("H-001-E2",)),
+        ("hit", ("H-001-E3",)),  # E2 was already hit: only E3 is new
+        ("duplicate", ("H-001-E2", "H-001-E3")),
+    ]

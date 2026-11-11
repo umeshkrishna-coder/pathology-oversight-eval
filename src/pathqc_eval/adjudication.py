@@ -2,9 +2,12 @@
 
 `prepare` collects every review finding of the two runs and merges identical ones into items.
 The owner sees only adjudication_sheet.md (and adjudication.json): report, section, quoted
-sentence, category, rationale and the candidate planted error, never a condition, repeat,
-model or run. adjudication_hidden.json maps each item to its findings; only the scorer reads
-it, and only once every verdict is filled; it then writes adjudication_log.json.
+sentence, category, rationale, the planted error it may match and the reason it needs review,
+never a condition, repeat, model or run (decision 9 as reworded on 2026-11-11). A finding in
+review for several omission errors gives one item per omission (EVAL-09 C).
+adjudication_hidden.json maps each item to its findings; only the scorer reads it, and only
+once every verdict is filled; it then writes adjudication_log.json. It is gitignored, with
+results/*/provisional/, until the reveal (EVAL-09 A).
 
 A provisional score shows ranges by condition, so every one made before the last verdict is
 recorded in results/<dataset>/provisional/provisional_log.json and copied into
@@ -55,6 +58,9 @@ REASON_WORDS = {
     "section_mismatch": "type and quoted sentence are right, but the finding names another section",
     "omission_other_section": "the type matches this omission, but the finding is in another "
     "section than the anchor",
+    "unmapped_omission": "its category is not in the category map, and this report has an "
+    "omission error; the finding may be reporting what is missing (the finding has one item "
+    "for each omission error of the report)",
 }
 
 
@@ -334,14 +340,20 @@ def prepare(
     (folder / SHEET_FILE).write_bytes(sheet_text(dataset, prepared.items, reports).encode("utf-8"))
     return Outcome(
         [
-            f"adjudication ({dataset}): {len(prepared.items)} item(s) from {len(found)} review "
-            f"finding(s); fill in {(folder / SHEET_FILE).as_posix()}"
+            f"adjudication ({dataset}): {len(prepared.items)} item(s) from "
+            f"{_finding_count(found)} review finding(s); fill in {(folder / SHEET_FILE).as_posix()}"
         ],
         True,
     )
 
 
-FindingKey = tuple[str, str, int, int]  # run id, report id, repeat, finding index
+# run id, report id, repeat, finding index, candidate error id (a finding in review for
+# several omission errors has one item, and one verdict, per error: EVAL-09 C)
+FindingKey = tuple[str, str, int, int, str]
+
+
+def _finding_count(found: list) -> int:
+    return len({(r.unit.run_id, r.unit.report_id, r.unit.repeat, r.index) for r in found})
 
 
 def stale_message(folder: Path) -> str:
@@ -364,7 +376,7 @@ def join(
     """The reveal: once every verdict is filled, read adjudication_hidden.json, check that it
     covers exactly the current review findings, and write adjudication_log.json (once), with
     the provisional scores logged before completion. Returns the verdict of each review
-    finding by (run id, report id, repeat, finding index)."""
+    finding by (run id, report id, repeat, finding index, candidate error id)."""
     folder = adjudication_dir(root, dataset)
     data, problem = load_items(folder)
     if data is None:
@@ -379,7 +391,10 @@ def join(
         }
     except (OSError, ValueError, RecursionError, AttributeError, TypeError) as exc:
         return None, [f"{HIDDEN_FILE} cannot be read ({str(exc)[:200]})"]
-    expected = {(r.unit.run_id, r.unit.report_id, r.unit.repeat, r.index): r for r in found}
+    expected = {
+        (r.unit.run_id, r.unit.report_id, r.unit.repeat, r.index, r.outcome.error_id): r
+        for r in found
+    }
     by_ref: dict[FindingKey, AdjudicationItem] = {}
     items = {item.item_id: item for item in data.items}
     stale = set(hidden) != set(items)
@@ -389,7 +404,8 @@ def join(
             continue
         for ref in refs:
             key = (ref.run_id, item.report_id, ref.repeat, ref.finding_index)
-            stale = stale or key in by_ref  # one finding in two items
+            key += (item.candidate_error_id,)
+            stale = stale or key in by_ref  # one finding and error in two items
             by_ref[key] = item
     stale = stale or set(by_ref) != set(expected)
     for key, review in expected.items():

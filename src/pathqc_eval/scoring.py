@@ -11,7 +11,7 @@ import json
 import math
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import combinations
 from pathlib import Path
 from typing import Literal
@@ -222,6 +222,32 @@ def _load_reports(root: Path, dataset: str) -> tuple[dict[str, Report], list[str
     return reports, problems
 
 
+def _remap_problems(root: Path, category_map: CategoryMap) -> list[str]:
+    """Owner decision (EVAL-09 H6; decision 10, nothing is remapped after scoring): once the
+    scored split has been scored, the category map must keep the sha256 that
+    results/scored/score.json records."""
+    where = f"{RESULTS_DIR}/scored/score.json"
+    path = root / RESULTS_DIR / "scored" / "score.json"
+    if not path.exists():
+        return []
+    try:
+        recorded = read_report_json(path)["inputs"]["category_map"]["sha256"]
+        if not isinstance(recorded, str):
+            raise TypeError(f"the recorded sha256 is {type(recorded).__name__}, not text")
+    except (OSError, ValueError, RecursionError, KeyError, TypeError) as exc:
+        return [
+            f"{where} cannot be read, so the category map recorded at the first scoring "
+            f"cannot be checked ({_short(exc)})"
+        ]
+    if recorded == category_map.sha256:
+        return []
+    return [
+        f"{CATEGORY_MAP_FILE} has changed since the scored split was scored: {where} records "
+        f"sha256 {recorded}, the map now has {category_map.sha256}; nothing is remapped after "
+        "scoring (decision 10)"
+    ]
+
+
 def load_inputs(root: Path, dataset: str, run_ids: Sequence[str]) -> tuple[Inputs | None, list]:
     """Everything adjudication and scoring read, or every reason to refuse (6.8 checks)."""
     problems: list[str] = []
@@ -300,12 +326,13 @@ def load_inputs(root: Path, dataset: str, run_ids: Sequence[str]) -> tuple[Input
                 f"{CATEGORY_MAP_FILE} must have status approved to score the scored split "
                 f"(it is {category_map.status})"
             )
+        if category_map is not None:
+            problems += _remap_problems(root, category_map)
         if not cfg.OWNER_CONFIRMED:
             problems.append(
-                "scoring_config.OWNER_CONFIRMED is False: these scorer defaults await the "
-                "owner's confirmation:"
+                "scoring_config.OWNER_CONFIRMED is False: the scorer defaults are not confirmed "
+                "by the owner"
             )
-            problems += [f"({chr(97 + i)}) {d}" for i, d in enumerate(cfg.PENDING_DEFAULTS)]
     if problems or category_map is None:
         return None, problems
     inputs = Inputs(
@@ -361,10 +388,13 @@ def classify_runs(inputs: Inputs) -> Views:
 
 @dataclass(frozen=True)
 class ReviewFinding:
+    """One review finding and one candidate error: a finding in review for several omission
+    errors (EVAL-09 C) gives one ReviewFinding, and so one review item, per omission."""
+
     unit: UnitView
     index: int  # 1-based position of the finding in its unit
     finding: ParsedFinding
-    outcome: Outcome
+    outcome: Outcome  # the review outcome for this one candidate error
 
 
 def review_findings(views: Views) -> list[ReviewFinding]:
@@ -376,8 +406,15 @@ def review_findings(views: Views) -> list[ReviewFinding]:
                 zip(unit.findings, unit.base, strict=True), start=1
             ):
                 if outcome.outcome == "review":
-                    found.append(ReviewFinding(unit, index, finding, outcome))
+                    for eid in outcome.ids:
+                        one = replace(outcome, error_id=eid, error_ids=())
+                        found.append(ReviewFinding(unit, index, finding, one))
     return found
+
+
+def finding_count(found: Sequence[ReviewFinding]) -> int:
+    """How many findings are in review (a finding with several candidate errors counts once)."""
+    return len({(r.unit.run_id, r.unit.report_id, r.unit.repeat, r.index) for r in found})
 
 
 Decide = Callable[[UnitView, int, Outcome], str | None]
@@ -422,7 +459,7 @@ def _consistency(flag_lists: list[list[bool]]) -> dict:
 
 
 def _hits(outcomes: Sequence[Outcome]) -> set[str]:
-    return {o.error_id for o in outcomes if o.outcome == "hit"}
+    return {eid for o in outcomes if o.outcome == "hit" for eid in o.ids}
 
 
 def _false_alarms(outcomes: Sequence[Outcome]) -> int:
@@ -475,6 +512,14 @@ def condition_metrics(inputs: Inputs, views: dict, facts: ConditionFacts) -> dic
             sum(facts.detected[e.error_id] for e in of_type), len(of_type), True
         )
     overall = _proportion(sum(facts.detected[e.error_id] for _, e in errors), len(errors), True)
+    by_severity = {
+        severity: _proportion(
+            sum(facts.detected[e.error_id] for _, e in errors if e.severity == severity),
+            sum(e.severity == severity for _, e in errors),
+            True,
+        )
+        for severity in cfg.SEVERITIES
+    }  # EVAL-09 G: plain recall for each severity, beside the weighted figure
     weights = cfg.SEVERITY_WEIGHTS
     planted_weight = sum(weights[e.severity] for _, e in errors)
     detected_weight = sum(weights[e.severity] for _, e in errors if facts.detected[e.error_id])
@@ -530,6 +575,7 @@ def condition_metrics(inputs: Inputs, views: dict, facts: ConditionFacts) -> dic
             "planted_errors": _consistency(error_flags),
             "clean_controls_any_false_alarm": _consistency(clean_flags),
         },
+        "recall_by_severity": by_severity,
         "severity_weighted_recall": {
             "detected_weight": detected_weight,
             "planted_weight": planted_weight,
@@ -632,7 +678,7 @@ def error_table(inputs: Inputs, views: Views, resolved: Resolved, facts: Mapping
                         rep
                         for rep in range(1, REPEATS + 1)
                         for o in resolved[cond][(rid, rep)]
-                        if o.outcome == "review" and o.error_id == err.error_id
+                        if o.outcome == "review" and err.error_id in o.ids
                     ),
                 }
             rows.append(row)
@@ -660,12 +706,23 @@ def finding_table(views: Views, resolved: Resolved, verdict_of: Callable) -> lis
                         "mapped": mapped,
                         "outcome": final.outcome,
                         "error_id": final.error_id,
+                        "error_ids": list(final.ids),
                         "review_reason": base.reason,
-                        "verdict": verdict_of(unit, index) if base.outcome == "review" else None,
+                        "verdict": _verdicts(verdict_of, unit, index, base),
                         "overlap": _r(base.overlap),
                     }
                 )
     return rows
+
+
+def _verdicts(verdict_of: Callable, unit: UnitView, index: int, base: Outcome):
+    """A review finding's verdict; for one in review for several omission errors (EVAL-09 C),
+    the verdict on each, by error id."""
+    if base.outcome != "review":
+        return None
+    if len(base.ids) > 1:
+        return {eid: verdict_of(unit, index, eid) for eid in base.ids}
+    return verdict_of(unit, index, base.error_id)
 
 
 def planted_by_type(inputs: Inputs) -> dict[str, int]:

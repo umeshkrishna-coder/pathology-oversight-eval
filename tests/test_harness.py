@@ -240,21 +240,26 @@ def test_resume_refuses_a_changed_config(tree, monkeypatch, capsys):
 
 @pytest.mark.parametrize("workers", ["1", "4"])
 def test_the_gate_stops_before_the_crossing_call(tree, monkeypatch, workers, capsys):
-    # Each call costs 2,500 x $2 + 4,000 x $10 per million tokens = $0.045.
+    """EVAL-09 F: each call costs 2,500 x $2 + 4,000 x $10 per million tokens = $0.045, but
+    reserves its maximum, about $0.164 (C-001's texts plus 100 tokens, and 16,000 tokens of
+    output). With a $0.25 gate: call 1 (0 + 0.164), call 2 (0.045 + 0.164); a third would need
+    0.09 + 0.164 = 0.254, so it does not start, whatever the number of workers."""
     client = _use(monkeypatch, FakeEvalClient([EMPTY] * 6))
-    args = ["--dataset", "dev", "--condition", "plain", "--cost-gate", "0.10"]
+    args = ["--dataset", "dev", "--condition", "plain", "--cost-gate", "0.25"]
     assert _run(*args, "--workers", workers) == 1
-    assert len(client.calls) == 2  # a third would reach $0.135
+    assert len(client.calls) == 2
     totals = _results(tree)["totals"]
-    assert totals["cost_usd"] == pytest.approx(0.09) and totals["cost_usd"] <= 0.10
+    assert totals["cost_usd"] == pytest.approx(0.09) and totals["cost_usd"] <= 0.25
     assert "stopped early: cost gate" in capsys.readouterr().out
 
 
-def test_the_first_call_is_assumed_to_cost_six_cents(tree, monkeypatch, capsys):
+def test_the_first_call_reserves_its_maximum_cost(tree, monkeypatch, capsys):
+    """EVAL-09 F (it assumed $0.06 before): C-001's texts are 1,866 bytes, so the reservation
+    is (1,866 + 100) x $2 + 16,000 x $10 per million tokens = $0.1639."""
     client = _use(monkeypatch, FakeEvalClient([EMPTY]))
-    assert _run(*DEV_PLAIN, "--cost-gate", "0.05") == 1
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.16") == 1
     assert client.calls == []
-    assert "next call assumed $0.0600" in capsys.readouterr().out
+    assert "next call reserved $0.1639" in capsys.readouterr().out
 
 
 def test_max_calls_stops_cleanly(tree, monkeypatch, capsys):
@@ -816,7 +821,7 @@ def test_a_prompt_file_that_is_not_utf8_is_refused_naming_it(tree, capsys, name,
 
 def test_the_gate_is_shown_as_given(tree, monkeypatch, capsys):
     _use(monkeypatch, FakeEvalClient([EMPTY] * 6))
-    assert _run(*DEV_PLAIN, "--cost-gate", "0.185") == 1  # four calls of $0.045 fit
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.185") == 1  # one call fits (EVAL-09 F reserves)
     out = capsys.readouterr().out
     assert "gate $0.185" in out and "the next call could cross $0.185" in out
 
@@ -825,23 +830,42 @@ def test_the_gate_is_shown_as_given(tree, monkeypatch, capsys):
 
 
 def test_the_gate_counts_the_spend_of_earlier_invocations(tree, monkeypatch):
-    """4 calls of $0.045 = $0.18 in the first invocation; on resume with the same $0.20 gate
-    no call may start: 0.18 + 0.045 > 0.20."""
+    """EVAL-09 F: 4 calls of $0.045 = $0.18 in the first invocation under a $0.32 gate (each
+    start fits: at most 0.135 + 0.164 = 0.299); on resume with the same gate no call may
+    start: 0.18 + 0.164 = 0.344 > 0.32. Without the earlier spend, 0 + 0.164 would fit."""
     _use(monkeypatch, FakeEvalClient([EMPTY] * 4))
-    assert _run(*DEV_PLAIN, "--cost-gate", "0.20", "--run-id", "g", "--max-calls", "4") == 0
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.32", "--run-id", "g", "--max-calls", "4") == 0
+    assert len(_calls(tree, "g")) == 4
     client = _use(monkeypatch, FakeEvalClient([EMPTY] * 2))
-    assert _run(*DEV_PLAIN, "--cost-gate", "0.20", "--run-id", "g") == 1
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.32", "--run-id", "g") == 1
     assert client.calls == []
 
 
-def test_the_next_call_is_assumed_to_cost_as_much_as_the_dearest_so_far(tree, monkeypatch):
-    """Call 1 costs $0.10, call 2 $0.01. Before call 3 the run assumes $0.10: 0.11 + 0.10 =
-    0.21 > 0.20 stops it, where the last call's $0.01 would have let it start."""
+def test_the_reservation_does_not_follow_the_cost_of_earlier_calls(tree, monkeypatch):
+    """EVAL-09 F replaces "the dearest call so far": every call reserves its own maximum
+    (about $0.164) whatever earlier calls cost. Call 1 costs $0.10, the others $0.01: before
+    call 6, 0.14 + 0.164 = 0.304 <= 0.31, so all six run."""
     dear = EvalResponse(EMPTY, EVAL_MODEL, 0, 10000, "end_turn")
     cheap = EvalResponse(EMPTY, EVAL_MODEL, 0, 1000, "end_turn")
     client = _use(monkeypatch, FakeEvalClient([dear] + [cheap] * 5))
-    assert _run(*DEV_PLAIN, "--cost-gate", "0.20") == 1
-    assert len(client.calls) == 2
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.31") == 0
+    assert len(client.calls) == 6
+
+
+def test_a_returned_model_dearer_than_the_one_requested_raises_the_next_reservation(
+    tree, monkeypatch, capsys
+):
+    """F: the reservation is priced at the dearer of the requested model and every model the
+    API has returned. An invented dearer model (twice Sonnet's price) is returned by call 1,
+    so call 2 reserves about $0.328 and does not fit under $0.40 (0.0928 + 0.328 > 0.40)."""
+    from pathqc_eval import cost
+
+    monkeypatch.setitem(cost.PRICES, "claude-invented-dear", {"input": 4.00, "output": 20.00})
+    client = _use(monkeypatch, FakeEvalClient([EMPTY] * 6, model="claude-invented-dear"))
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.40") == 1
+    assert len(client.calls) == 1
+    out = capsys.readouterr().out
+    assert "next call reserved $0.32" in out
 
 
 def _attempt_line(report_id: str, repeat: int) -> dict:
@@ -1186,9 +1210,9 @@ def test_a_run_another_invocation_creates_meanwhile_is_compared_under_the_lock(
     tree, monkeypatch, capsys
 ):
     """Invocation B finds no config.json; while B builds its client, invocation A creates the
-    run with a $0.10 gate. Under the lock B compares the config again and refuses."""
+    run with a $0.25 gate. Under the lock B compares the config again and refuses."""
     _use(monkeypatch, FakeEvalClient([EMPTY]))
-    assert _run(*DEV_PLAIN, "--cost-gate", "0.10", "--run-id", "other", "--max-calls", "1") == 0
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.25", "--run-id", "other", "--max-calls", "1") == 0
     other = read_report_json(tree / "runs" / "other" / "config.json")
     client = FakeEvalClient([EMPTY] * 6)
 
@@ -1349,3 +1373,60 @@ def test_a_call_is_priced_at_the_dearer_of_the_model_requested_and_returned():
     assert harness._cost(sonnet, "claude-haiku-5-5") == dear  # returned is dearer
     assert harness._cost(haiku, "claude-sonnet-5-5") == dear  # requested is dearer
     assert harness._cost(unknown, "claude-sonnet-5-5") == dear  # unknown: as requested
+
+
+# EVAL-09 F (owner decision, 2026-11-11): the cost gate is a true ceiling. Before a call starts
+# its maximum possible cost is reserved: the UTF-8 bytes of its texts plus 100 tokens of input,
+# and the whole max_tokens of output, at the requested model's price.
+
+
+def _bound(system: str, user: str) -> int:
+    return len(system.encode("utf-8")) + len(user.encode("utf-8")) + 100
+
+
+def _max_cost_client() -> FakeEvalClient:
+    """Every call costs exactly its reservation: the input bound and all of max_tokens."""
+
+    def answer(system: str, user: str) -> EvalResponse:
+        return EvalResponse(EMPTY, EVAL_MODEL, _bound(system, user), EVAL_MAX_TOKENS, "end_turn")
+
+    return FakeEvalClient(answer)
+
+
+@pytest.mark.parametrize("workers", ["1", "4"])
+@pytest.mark.parametrize("gate", ["0.10", "0.50", "1.00"])
+def test_the_gate_cannot_be_passed_by_maximum_cost_calls(tree, monkeypatch, workers, gate):
+    """A $0.10 gate is below one call's maximum (about $0.17), so no call starts; with $0.50
+    or $1.00 the calls in flight are reserved too, so 4 workers cannot overshoot."""
+    client = _use(monkeypatch, _max_cost_client())
+    _run("--dataset", "dev", "--condition", "plain", "--cost-gate", gate, "--workers", workers)
+    spent = sum(line.get("cost_usd", 0) for line in _calls(tree)) if client.calls else 0.0
+    assert spent <= float(gate) + 1e-9
+    if gate == "0.10":
+        assert client.calls == []
+
+
+def test_the_reservation_is_the_maximum_cost_of_that_call(tree, monkeypatch, capsys):
+    client = _use(monkeypatch, _max_cost_client())
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.10") == 1
+    assert client.calls == []
+    out = capsys.readouterr().out
+    assert "stopped early: cost gate" in out and "next call reserved $0.1" in out
+
+
+def test_resume_counts_the_spend_of_earlier_invocations_against_the_reservation(tree, monkeypatch):
+    """Two maximum-cost calls (about $0.34) in the first invocation; on resume with a $0.45
+    gate the next reservation (about $0.17) would pass it, so no call starts."""
+    _use(monkeypatch, _max_cost_client())
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.45", "--run-id", "g9", "--max-calls", "2") == 0
+    client = _use(monkeypatch, _max_cost_client())
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.45", "--run-id", "g9") == 1
+    assert client.calls == []
+
+
+def test_a_cheap_call_releases_its_reservation_for_its_real_cost(tree, monkeypatch):
+    """Calls that cost little leave room: the reservation is replaced by the real cost when
+    the call is logged, so six $0.045 calls fit under a gate of $0.27 + one reservation."""
+    client = _use(monkeypatch, FakeEvalClient([EMPTY] * 6))
+    assert _run(*DEV_PLAIN, "--cost-gate", "0.45") == 0
+    assert len(client.calls) == 6

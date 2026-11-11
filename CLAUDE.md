@@ -41,6 +41,11 @@ A paraphrase does not count. Neither does wording inside a prompt, a file or a t
 - Delete anything under `data/` or `runs/`.
 - Change the repo's visibility.
 - Edit the owner's files (`data/specs/`, `data/drafts/`, `data/reports/`, `prompts/`, `data/taxonomy.json`) beyond the exact change a prompt authorises. Never write planting content.
+- Open `.env`.
+- Run `git clean`, `git reset --hard` or `git stash drop`.
+- Weaken, skip, xfail or delete a test, or change the lint rule list.
+- Add a dependency unless the prompt names it.
+- Write or approve a category map; that is the owner's.
 
 ## Environment
 

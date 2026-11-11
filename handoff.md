@@ -1,5 +1,7 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-11 by agent (EVAL-N1)
+Last updated: 2026-11-11 by agent (EVAL-09)
+Heads and counts: head c45802d, tests 958, API spend to date $0.092882
+(Head is the commit the last task started from, since a commit cannot name itself; spend from the logs: drafting $0.052492 in data/drafts/_calls.jsonl, smoke test $0.040390.)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · REPORTED (stated, not checked) · NOT TESTED · PENDING (not yet done)
 
 ## Purpose
@@ -10,7 +12,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (OWNER VERIFIED unless marked PENDING; 1–28 on 2026-11-04, 29–46 on 2026-11-10)
+## Decisions (OWNER VERIFIED unless marked PENDING; 1–28 on 2026-11-04, 29–46 on 2026-11-10, 47–55 on 2026-11-11)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model.
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -19,7 +21,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 6. Freeze: taxonomy and both prompts are hashed into a lock file immediately before the scored run; scored runs refuse to start if any hash differs; nothing is edited afterwards. The taxonomy is finalised before any error is planted.
 7. Metrics. Primary: per-type recall, false alarms per report, specificity on clean controls. Secondary: Brier score, ECE (5 bins), repeat consistency, severity-weighted recall. Paired bootstrap CIs over reports for the condition comparison.
 8. Matching rule: detected = mapped type matches AND section matches AND quoted sentence overlaps the planted sentence (token containment ≥ 0.6, the larger of the two directions, after case and punctuation normalisation). Right sentence but wrong type = miss, logged as a near-miss. Ambiguous cases adjudicated by the owner with the reason logged.
-9. Adjudication is blind: the adjudication file shows report, section, quoted sentence, category and rationale only; condition, repeat and model stay hidden until every verdict is entered; the scorer reveals them afterwards and logs that order.
+9. The adjudication sheet and file name no condition, repeat, model or run. They show the finding (report, section, quoted sentence, category, rationale), the planted error it may match and the reason it needs review. The hidden fields are joined only after every verdict is entered, and the order is logged. (Reworded 2026-11-11; decision 51.)
 10. category_map.json: proposed by the agent from the dev run, approved by the owner; the same string always maps the same way; nothing is remapped after scoring; unmapped strings go to adjudication.
 11. Clean controls: 8 of 30.
 12. CBC format: values table with units and reference ranges, plus interpretation text.
@@ -57,7 +59,15 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 44. Evaluated-model settings: claude-sonnet-5-5 at the API's default reasoning effort (no effort setting is sent), default sampling, max_tokens 16,000, identical in both conditions, recorded in every run config.
 45. Unreadable outputs: a call whose output cannot be read as findings is repeated once; both attempts are logged. If the second is also unreadable the repeat is marked invalid and counted. Majority is computed over the valid repeats: with 3 valid, 2 of 3; with 2 valid, both; with fewer than 2 valid, the report has no majority result in that condition and is listed separately, never scored silently.
 46. Lenient reading of findings: extra keys are ignored and recorded; an unusable severity or confidence becomes null (excluded from calibration, counted); a finding without a usable quoted_sentence, section or category is dropped and counted. The raw output of every call is kept.
-47. PENDING — Scorer defaults awaiting the owner's confirmation; scoring of the scored split refuses until they are confirmed: (a) a finding goes to blind adjudication when its category is unmapped, when the overlap is between 0.4 and 0.6 with type and section right, when type and sentence are right but the section differs, or when an omission is reported under another section; (b) false alarms per report are the mean count per valid unit, and a clean control passes when a unit has none; (c) for calibration a hit, a duplicate or a near-miss counts as 1 and a false alarm as 0; (d) severity weights 3, 2, 1; (e) Wilson intervals for per-type recall; (f) bootstrap of 10,000 resamples with seed 20261115.
+47. Scorer defaults, confirmed by the owner on 2026-11-11 (decision 54); OWNER_CONFIRMED is True in src/pathqc_eval/scoring_config.py: (a) a finding goes to blind adjudication when its category is unmapped, when the overlap is between 0.4 and 0.6 with type and section right, when type and sentence are right but the section differs, or when an omission is reported under another section; (b) false alarms per report are the mean count per valid unit, and a clean control passes when a unit has none; (c) for calibration a hit, a duplicate or a near-miss counts as 1 and a false alarm as 0; (d) severity weights 3, 2, 1; (e) Wilson intervals for per-type recall; (f) bootstrap of 10,000 resamples with seed 20261115.
+48. Blinding in git (OWNER VERIFIED, 2026-11-11): results/*/adjudication/adjudication_hidden.json and everything under results/*/provisional/ stay out of git until the reveal (both are in .gitignore). They are committed by the task that does the final scoring.
+49. Provisional scoring (OWNER VERIFIED, 2026-11-11): `score --provisional` is refused on the scored split; it stays available on the dev split.
+50. Unmapped categories (OWNER VERIFIED, 2026-11-11; amends 47(a)): the rule stays as built, with one addition: in a report that has an omission error, an unmapped finding that is not already a hit or a review item for another error becomes a review item for that omission error, one item per omission error in the report, with a review reason of its own in plain words (unmapped_omission). Owner's answer in the EVAL-09 session: with several omission errors the finding gets a separate item for each; it is a hit for every omission judged detected, otherwise a near-miss if any verdict is near_miss, a miss if any is miss, and a false alarm only when every verdict is false_alarm.
+51. Decision 9 reworded (OWNER VERIFIED, 2026-11-11): the text now in decision 9.
+52. Calibration (OWNER VERIFIED, 2026-11-11): a hit, a duplicate or a near-miss counts as right, a false alarm as wrong (as built).
+53. Cost gate for `run` (OWNER VERIFIED, 2026-11-11): a true ceiling. Before a call starts, its maximum possible cost is reserved (the upper bound the smoke test uses: the prompt's token bound, its texts' UTF-8 bytes plus 100 tokens, plus max_tokens of output, at the dearer of the requested and returned model's price). A call is not started if spend so far, plus the reservations of calls in flight, plus this call's reservation would pass the gate. The reservation is released and replaced by the real cost when the call is logged. `--workers` keeps its default of 4.
+54. Scorer defaults confirmed as built (OWNER VERIFIED, 2026-11-11): the review bands (overlap from 0.4 up to 0.6 with type and section right; type and sentence right but another section; an omission under another section); false alarms per report as the mean count per valid unit, a clean control passing a unit with none; severity weights 3, 2, 1; Wilson intervals for per-type recall; bootstrap of 10,000 resamples with seed 20261115. One addition: the summary and score.json also give plain recall for critical, major and minor errors separately, as k/n with Wilson intervals, beside the weighted figure. Decision 47 becomes OWNER VERIFIED and OWNER_CONFIRMED becomes True.
+55. Housekeeping (OWNER VERIFIED, 2026-11-11). Changed: (H1) the API rule here reads "with a model, an estimate and a hard stop"; (H2) five lines added under "Never" in CLAUDE.md; (H3) the "Heads and counts" line above, updated by every task; (H4) the plain isolation check also refuses a taxonomy type definition or severity definition; (H5) the split check refuses `split = dev` and `split = scored` as it refuses `split:`; (H6) once the scored split has been scored, `score --dataset scored` refuses a category map whose sha256 differs from the one results/scored/score.json records; (H7) the validator refuses a report with more than three planted errors (decision 23); (H8) the validator requires the last Synoptic summary line of every histopathology report to be the staging-edition line, unless one of the report's planted errors quotes that line (decision 27); (H9) `plant` lists a report file it cannot write as NOT WRITTEN and carries on with the others. Owner decision: leave the planting sheet's block order; plain.md and structured_output.md remain the owner's to approve; `--max-calls` counts attempts; `run` prices each call at the dearer of the requested and the returned model; the second-Ctrl+C gap; data/drafts/_calls.jsonl stays tracked; the four small scorer points in OVERNIGHT_REPORT.md Part 4 item 17.
 
 ## Error taxonomy (OWNER VERIFIED, final, version 1.0, 2026-11-10)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -78,7 +88,7 @@ Severity: critical = would change patient management; major = would need an amen
 ## Working rules for the agent
 - Read CLAUDE.md first; it holds the rules that bind this session.
 - Every reply ends with the report block below. Every claim tagged [RAN] / [READ] / [INFERRED].
-- No API call unless the prompt authorises it with a model and a cost estimate. Never print secrets; names only.
+- No API call unless the prompt authorises it with a model, an estimate and a hard stop. Never print secrets; names only.
 - Pre-flight: clean tree, remote = HEAD, HEAD is the pinned commit or later with only EVAL- commits since.
 - `uv run pytest` runs as its own step and its exit code is read before any commit. Commit messages start with the task ID.
 - Only what the prompt asks; anything else goes under "Questions for the owner". Reverting own uncommitted edits is allowed but listed under Deviations.
@@ -89,14 +99,12 @@ Severity: critical = would change patient management; major = would need an amen
 
 ## Open items
 - PENDING — Owner pastes the PathQC text into prompts/structured_histopathology.md and a CBC checklist into prompts/structured_cbc.md, and approves the four manifest entries (target 12 Nov).
-- PENDING — Owner writes data/specs/planting.md: [fix] entries for stage groups the briefs do not give (Table B in OVERNIGHT_REPORT.md, S3 record), [error] entries for the 25 planted reports, and verified: yes for all 34 (decisions 37, 40). Check with `uv run pathqc-eval plant --check`, then build with `uv run pathqc-eval plant` and `uv run pathqc-eval validate --expect 34 --expect-clean 9 --expect-dev 4` (target 14 Nov).
+- PENDING — Owner writes data/specs/planting.md: [fix] entries for stage groups the briefs do not give (Table B in OVERNIGHT_REPORT.md, S3 record), [error] entries for the 25 planted reports (at most three each, and the Synoptic summary's last line kept as the staging-edition line unless an error quotes it: both now refused by the validator, decision 55 H7 and H8), and verified: yes for all 34 (decisions 37, 40). Check with `uv run pathqc-eval plant --check`, then build with `uv run pathqc-eval plant` and `uv run pathqc-eval validate --expect 34 --expect-clean 9 --expect-dev 4` (target 14 Nov).
 - PENDING — Freeze, after the reports and the owner texts: the owner types `freeze approved` in a session (decision 39).
 - PENDING — Dev run (24 calls) once the four dev reports are in data/reports/ and the owner texts are in place; then the agent proposes data/category_map.json from it and the owner approves it (decision 10).
 - REPORTED — Cost projection from four calls (EVAL-04b smoke test, 2026-11-11: claude-sonnet-5-5, plain condition, dev drafts H-021, H-022, H-023, C-011; 4,670 input + 3,105 output tokens, $0.040390 in total, $0.0101 a call). Dev run, 24 calls: about $0.24 at the measured average, $0.36 at the dry-run estimate (average plus 50%, $0.0152 a call). Scored run, 180 calls: about $1.82 at the measured average, $2.73 at the dry-run estimate. A projection only: the structured condition's prompts are longer, planted reports may draw more findings, and every attempt 2 adds a call (at most twice the calls).
-- PENDING — Owner confirms or changes the scorer defaults in decision 47; until OWNER_CONFIRMED is True in src/pathqc_eval/scoring_config.py, scoring the scored split refuses.
-- PENDING — Before the scored adjudication: decide whether results/ (adjudication_hidden.json, provisional outputs) is gitignored, so that the item-to-condition map cannot be committed before the reveal (OVERNIGHT_REPORT.md Part 4 item 16).
-- PENDING — The scored run needs the owner's typed `scored run approved`; `run`'s cost gate is a soft bound, so use --workers 1 and a gate below the hard stop (OVERNIGHT_REPORT.md Part 4 item 7).
-- PENDING — Owner decisions from the EVAL-N1 run: OVERNIGHT_REPORT.md Part 4 (20 items): CLAUDE.md and handoff.md wording; decisions 4, 9, 10, 23, 27 and 47 against the code; `run` now pricing at the dearer model (item 19); smaller points.
+- PENDING — The scored run needs the owner's typed `scored run approved`. The cost gate is a true ceiling (decision 53): each call reserves its maximum, about $0.17, so a gate needs headroom of one reservation per worker (with the default 4 workers, about $0.68 above the spend expected).
+- PENDING — The task that does the final scoring of the scored split commits results/scored/adjudication/adjudication_hidden.json, which stays gitignored until then (decision 48).
 
 ## Task log
 | ID | Date | Title | Status | Label |
@@ -120,6 +128,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-04b | 2026-11-11 | Live smoke test (EVAL-N1 S8): 4 Sonnet calls, all valid | DONE ($0.0404 measured) | AGENT VERIFIED |
 | EVAL-N1 S9 | 2026-11-11 | Final audit (three read-only auditors; 2 fixes) and overnight report | DONE | AGENT VERIFIED |
 | EVAL-N1 | 2026-11-11 | Overnight build run S0–S9: all ten stages PASS (OVERNIGHT_REPORT.md) | DONE ($0.0448 measured) | AGENT VERIFIED |
+| EVAL-09 | 2026-11-11 | Owner's decisions of 11 Nov applied | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

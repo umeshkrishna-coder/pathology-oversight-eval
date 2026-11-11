@@ -35,7 +35,7 @@ from pathqc_eval.schema import (
 )
 from pathqc_eval.spec import Sex, SpecRow
 from pathqc_eval.taxonomy import REPO_ROOT, load_taxonomy
-from pathqc_eval.validate import check_report
+from pathqc_eval.validate import STAGING_EDITION_LINE, check_report
 
 DRAFT_MODEL = "claude-haiku-5-5"
 DRAFT_MAX_TOKENS = 16000
@@ -46,7 +46,6 @@ PROMPTS_DIR = REPO_ROOT / "prompts" / "drafting"
 DEFAULT_DRAFTS_DIR = REPO_ROOT / "data" / "drafts"
 EST_INPUT_TOKENS = 1200
 EST_OUTPUT_TOKENS = 8000  # including thinking at high effort
-STAGING_EDITION_LINE = "Staging edition: AJCC 8th edition"
 _EPS = 1e-12
 
 

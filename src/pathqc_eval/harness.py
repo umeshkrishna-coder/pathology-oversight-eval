@@ -49,7 +49,10 @@ EVAL_MAX_TOKENS = 16000
 REPEATS = 3
 MAX_ATTEMPTS = 2  # attempt 2 only after an unreadable output or an abnormal stop
 NORMAL_STOP_REASON = "end_turn"
-FIRST_CALL_ASSUMED_USD = 0.06  # assumed cost of a call before any call has been made
+# Owner decision (EVAL-09 F): before a call starts, its maximum possible cost is reserved:
+# input no larger than the texts' UTF-8 bytes (a token covers at least one byte) plus this
+# room for the message wrapping, and the whole max_tokens of output.
+WRAPPING_TOKENS = 100
 TRANSPORT_RETRIES = 3
 BACKOFF_SECONDS = (2.0, 8.0, 30.0)  # waits before transport retries 1, 2 and 3
 # Dry-run estimate per call (S8, EVAL-04b): the four plain calls of the smoke test averaged
@@ -590,6 +593,24 @@ def _cost(response: EvalResponse, requested: str) -> float:
         return as_requested
 
 
+def max_input_tokens(system: str, user: str) -> int:
+    """No call's input can exceed this many tokens: the texts' UTF-8 bytes plus the wrapping."""
+    return len(system.encode("utf-8")) + len(user.encode("utf-8")) + WRAPPING_TOKENS
+
+
+def reservation_usd(models: set[str], system: str, user: str, max_tokens: int) -> float:
+    """The most a call can cost: its input bound and all of max_tokens, at the dearest price
+    among `models` (the model requested and every model the API has returned in this run; a
+    returned model without a known price is priced as the one requested, as in _cost)."""
+    prices = []
+    for model in models:
+        try:
+            prices.append(cost_usd(model, max_input_tokens(system, user), max_tokens))
+        except ValueError:
+            continue
+    return max(prices)
+
+
 @dataclass
 class RunOutcome:
     complete: bool  # every unit is valid or invalid
@@ -707,13 +728,19 @@ def run_units(
     calls already in flight are waited for and logged (they are billed; a second Ctrl+C
     abandons them), results.json is rebuilt from calls.jsonl, and the error is raised again.
 
+    The cost gate is a true ceiling (owner decision, EVAL-09 F): before a call starts, its
+    maximum possible cost is reserved (reservation_usd), and the call is not started if the
+    spend so far (earlier invocations included), plus the reservations of the calls in flight,
+    plus its own reservation would pass the gate. A call's reservation is released and replaced
+    by its real cost when it is logged.
+
     For the smoke test (EVAL-04b): `transport_retries` 0 makes every call a single request,
-    and `min_assumed_usd` makes each call count at least its ceiling before it starts."""
+    and `min_assumed_usd` makes each call reserve at least that amount."""
     calls_path = run_dir / "calls.jsonl"
     attempts = read_attempts(calls_path, run_id, condition)
     done = [a for lines in attempts.values() for a in lines]
     spent = sum(a["cost_usd"] for a in done)
-    dearest = max((a["cost_usd"] for a in done), default=None)
+    priced_as = {model} | {a["model_returned"] for a in done}
     queue: deque[tuple[tuple[str, int], int]] = deque()
     for report_id in sorted(messages):
         for repeat in range(1, repeats + 1):
@@ -724,7 +751,8 @@ def run_units(
     def base(unit: tuple[str, int]) -> dict:
         return {"run_id": run_id, "report_id": unit[0], "condition": condition, "repeat": unit[1]}
 
-    in_flight: dict[Future, tuple[tuple[str, int], int, str]] = {}
+    # Each call in flight: unit, attempt, start time and its reservation (maximum cost).
+    in_flight: dict[Future, tuple[tuple[str, int], int, str, float]] = {}
     written: dict[Future, int] = {}  # lines of a finished call already appended to calls.jsonl
     started_calls = 0
     stopped: str | None = None
@@ -734,8 +762,8 @@ def run_units(
         """Log one finished call (its transport lines, then its attempt or failure line) and
         update the run. A call stays in flight until its lines are written, and lines already
         written are not written again, so an interrupted record can be repeated."""
-        nonlocal spent, dearest, failure
-        unit, attempt, started_at = in_flight[future]
+        nonlocal spent, failure
+        unit, attempt, started_at, _ = in_flight[future]
         result: _CallResult = future.result()
         lines = [
             base(unit) | {"error_class": error_class, "error_message": writable_text(text)[0]}
@@ -779,7 +807,7 @@ def run_units(
         for line in lines[written.get(future, 0) :]:
             _append_line(calls_path, line)
             written[future] = written.get(future, 0) + 1
-        del in_flight[future]
+        del in_flight[future]  # its reservation is released; the real cost is added below
         if result.fatal is not None:
             error_class, text = result.fatal
             out(f"FAIL {unit[0]} repeat {unit[1]}: {error_class}: {writable_text(text)[0]}")
@@ -794,7 +822,7 @@ def run_units(
             return
         attempts.setdefault(unit, []).append(attempt_line)
         spent += attempt_line["cost_usd"]
-        dearest = max(dearest or 0.0, attempt_line["cost_usd"])
+        priced_as.add(attempt_line["model_returned"])
         status = unit_status(attempts[unit])
         if status == "pending":
             queue.appendleft((unit, attempt + 1))
@@ -819,22 +847,24 @@ def run_units(
                 if max_calls is not None and started_calls >= max_calls:
                     stopped = f"--max-calls {max_calls} reached"
                     break
-                assumed = FIRST_CALL_ASSUMED_USD if dearest is None else dearest
-                assumed = max(assumed, min_assumed_usd)  # the smoke test: each call's ceiling
-                if spent + assumed * (len(in_flight) + 1) > cost_gate + _EPS:
+                unit, attempt = queue[0]
+                system, user = messages[unit[0]]
+                reservation = max(
+                    reservation_usd(priced_as, system, user, max_tokens), min_assumed_usd
+                )
+                held = sum(entry[3] for entry in in_flight.values())
+                if spent + held + reservation > cost_gate + _EPS:
                     if not in_flight:
                         stopped = (
                             f"cost gate: the next call could cross {usd(cost_gate)} "
-                            f"(spent ${spent:.4f}, next call assumed ${assumed:.4f})"
+                            f"(spent ${spent:.4f}, next call reserved ${reservation:.4f})"
                         )
                     break
-                unit, attempt = queue[0]
-                system, user = messages[unit[0]]
                 started_at = _stamp(clock())  # before the call starts, so nothing can come
                 queue.popleft()  # between starting it and noting it as in flight
                 call = (_call, client, system, user, max_tokens, sleep, transport_retries)
                 in_flight[pool.submit(*call)] = (
-                    unit, attempt, started_at,
+                    unit, attempt, started_at, reservation,
                 )  # fmt: skip
                 started_calls += 1
             if not in_flight:

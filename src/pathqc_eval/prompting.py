@@ -22,16 +22,17 @@ STRUCTURED_OWNER_PROMPTS: dict[str, str] = {
 }
 OWNER_TEXT_PLACEHOLDER = "<<OWNER TEXT REQUIRED>>"
 TAXONOMY_HEADING = "## Error taxonomy"
-# Owner decision (EVAL-04): only label forms of the split are refused: `split:` followed by dev
-# or scored, or the quoted key "split". The bare words occur in ordinary report text ("HER2
-# scored 2+", a core received 'split'). Any case; spaces, quotes (straight or typographic) and
-# markdown emphasis may stand around the colon ("**Split:** scored", {'split': 'dev'}); a
-# prefix joined to the label ("data_split: dev") is still a label. The key is "split" in
-# double quotes, or 'split' in any quotes followed by a colon.
+# Owner decision (EVAL-04): only label forms of the split are refused: `split:` or (EVAL-09 H5)
+# `split =` followed by dev or scored, or the quoted key "split". The bare words occur in
+# ordinary report text ("HER2 scored 2+", a core received 'split'). Any case; spaces, quotes
+# (straight or typographic) and markdown emphasis may stand around the colon or the equals sign
+# ("**Split:** scored", {'split': 'dev'}, "split = dev"); a prefix joined to the label
+# ("data_split: dev") is still a label. The key is "split" in double quotes, or 'split' in any
+# quotes followed by a colon.
 _QUOTES = "\"'“”‘’"
 _AROUND = rf"[\s*_`{_QUOTES}]*"
 # After the value no letter or digit may follow; "_" may (underscore emphasis: "_dev_").
-_SPLIT_LABEL = re.compile(rf"split{_AROUND}:{_AROUND}(dev|scored)(?![^\W_])", re.IGNORECASE)
+_SPLIT_LABEL = re.compile(rf"split{_AROUND}[:=]{_AROUND}(dev|scored)(?![^\W_])", re.IGNORECASE)
 _SPLIT_KEY = re.compile(rf'"split"|[{_QUOTES}]split[{_QUOTES}]\s*:', re.IGNORECASE)
 
 
@@ -124,6 +125,9 @@ def check_eval_isolation(
                 problems.append(f"plain system message contains the type id {t.id}")
             if t.name.lower() in lowered:
                 problems.append(f"plain system message contains the type name '{t.name}'")
+            definition = t.definition.strip().rstrip(".").strip().lower()
+            if definition and definition in lowered:  # EVAL-09 H4
+                problems.append(f"plain system message contains the type definition of {t.id}")
         for level in taxonomy.severity_levels:
             if level.definition.lower() in lowered:
                 problems.append(f"plain system message contains the {level.id} severity definition")

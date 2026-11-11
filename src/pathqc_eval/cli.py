@@ -34,6 +34,7 @@ from pathqc_eval.harness import (
     EVAL_MAX_TOKENS,
     EVAL_MODEL,
     RUNS_DIR,
+    WRAPPING_TOKENS,
     AnthropicEvalClient,
     CallsFileError,
     RunInUse,
@@ -378,7 +379,8 @@ def _plant(args: argparse.Namespace) -> int:
             f"{len(run.problems)} sheet problem(s); nothing written"
         )
         return 0 if run.ok else 1
-    for line in write_outputs(run, root):
+    lines, not_written = write_outputs(run, root)
+    for line in lines:
         print(line)
     result = validate_reports(root / REPORTS_DIR, taxonomy)
     print(result.summary)
@@ -394,7 +396,9 @@ def _plant(args: argparse.Namespace) -> int:
         print(f"  {notice}")
     verified = sum(r.provenance.verified for r in result.reports)
     print(f"verified: {verified} of {len(result.reports)} reports in {REPORTS_DIR.as_posix()}")
-    return 0 if run.ok else 1
+    if not_written:
+        print(f"NOT WRITTEN: {', '.join(not_written)} (see above)")
+    return 0 if run.ok and not not_written else 1
 
 
 def _refuse(problems: list[str], what: str = "run") -> int:
@@ -569,7 +573,7 @@ def _run(args: argparse.Namespace) -> int:
 
 SMOKE_MAX_CALLS = 8  # section B, for the whole stage
 SMOKE_HARD_STOP_USD = 1.00  # section B, for the whole stage
-SMOKE_WRAPPING_TOKENS = 100  # room for the message wrapping around the texts
+SMOKE_WRAPPING_TOKENS = WRAPPING_TOKENS  # room for the message wrapping (100 tokens)
 SMOKE_STAGE_DIR = "_smoke_stage"  # runs/_smoke_stage/.run.lock: one smoke run at a time
 
 
