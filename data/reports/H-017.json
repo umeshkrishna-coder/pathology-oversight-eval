@@ -1,0 +1,25 @@
+{
+  "id": "H-017",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Urinary bladder, transurethral resection of bladder tumour",
+  "sections": {
+    "Clinical details": "Man aged 71 years with painless haematuria. Transurethral resection of a papillary tumour of the urinary bladder.",
+    "Specimen": "Urinary bladder, transurethral resection of bladder tumour.",
+    "Gross description": "Received in formalin are multiple fragments of tan-pink, friable soft tissue. All tissue is submitted in blocks A to D. Detrusor muscle is identified in block D.",
+    "Microscopic description": "Sections show fragments of papillary urothelial neoplasm with fused and branching papillae. The neoplastic urothelium is cytologically high grade, with marked nuclear pleomorphism, hyperchromasia, prominent nucleoli and frequent mitoses, including atypical forms. Invasive tumour nests and single cells infiltrate the lamina propria. The muscularis propria is present in the specimen and is free of tumour. No lymphovascular invasion is identified. No perineural invasion is identified.",
+    "Diagnosis": "Urinary bladder, transurethral resection: invasive high-grade papillary urothelial carcinoma invading the lamina propria (pT1). The muscularis propria is present and free of tumour. No lymphovascular invasion is identified.",
+    "Synoptic summary": "Tumour size: Not assessable (transurethral specimen)\nHistologic grade: High grade\nMargins: Not assessable (transurethral specimen)\nLymphovascular invasion: Not identified\nPerineural invasion: Not identified\nLymph nodes (positive/total): Not applicable\npT: pT1\npN: Not applicable\nStaging edition: AJCC 8th edition",
+    "Comment": "The presence of muscularis propria free of tumour supports the pT1 assignment, as it confirms that the invasive component has not reached the muscularis propria. Because the specimen is a transurethral resection, tumour size and margin status cannot be assessed. Given high-grade pT1 disease, correlation with the treating urologist is advised regarding further resection and intravesical therapy."
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

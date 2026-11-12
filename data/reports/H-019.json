@@ -1,0 +1,25 @@
+{
+  "id": "H-019",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Gallbladder, extended cholecystectomy with hepatic wedge",
+  "sections": {
+    "Clinical details": "56-year-old woman with long-standing gallstone disease. Ultrasonography and computed tomography showed gallbladder wall thickening with a fundal mass-like area. Extended cholecystectomy with hepatic wedge resection was performed.",
+    "Specimen": "Gallbladder with attached hepatic wedge and cystic duct margin, received fresh in formalin.",
+    "Gross description": "The gallbladder measures 85 x 40 x 30 mm. It contains multiple faceted grey-brown gallstones, the largest 18 mm. The fundal wall is thickened and firm, with a greyish-white, ill-defined tumour measuring 22 mm in greatest dimension. The mucosa is focally haemorrhagic. The cystic duct margin is inked and sectioned. The hepatic wedge measures 40 x 30 x 20 mm and is inked on its external surface. Four lymph nodes are identified in the cystic duct region, each up to 6 mm.",
+    "Microscopic description": "Sections of the fundal tumour show infiltrating glands and cords of moderately differentiated adenocarcinoma with abundant desmoplastic stroma and focal intraluminal mucin. The tumour invades the muscularis propria and extends into the perimuscular connective tissue on the peritoneal side. It reaches but does not breach the serosa. Adjacent mucosa shows chronic cholecystitis with Rokitansky-Aschoff sinuses. No lymphovascular invasion is identified. No perineural invasion is seen. The cystic duct margin and the hepatic bed are free of tumour. The hepatic wedge shows no malignancy. All four lymph nodes are free of metastatic carcinoma.",
+    "Diagnosis": "Gallbladder, extended cholecystectomy with hepatic wedge:\nModerately differentiated adenocarcinoma of the fundus, 22 mm, invading perimuscular connective tissue on the peritoneal side without serosal involvement (pT2a).\nNo lymph node metastasis (0 of 4) (pN0).\nCystic duct and hepatic bed margins clear.\nLymphovascular invasion absent.\nAJCC 8th edition stage IIA (pT2a pN0 M not assessed in this specimen).",
+    "Synoptic summary": "Tumour size: 22 mm\nHistologic grade: G2, moderately differentiated\nMargins: Cystic duct and hepatic bed margins clear\nLymphovascular invasion: Absent\nPerineural invasion: Not identified\nLymph nodes (positive/total): 0/4\npT: pT2a\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "The tumour is confined to the perimuscular connective tissue on the peritoneal side. Clinical correlation with imaging for metastatic disease is advised, as M stage cannot be assessed from this specimen. Multidisciplinary review is recommended to consider further management."
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

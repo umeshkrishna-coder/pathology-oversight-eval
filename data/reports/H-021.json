@@ -1,0 +1,43 @@
+{
+  "id": "H-021",
+  "modality": "histopathology",
+  "split": "dev",
+  "specimen_type": "Testis, right radical inguinal orchidectomy",
+  "sections": {
+    "Clinical details": "A 31-year-old man presented with a painless swelling of the right testis. Serum lactate dehydrogenase was raised and serum alpha-fetoprotein was within normal limits. Right radical inguinal orchidectomy was performed.",
+    "Specimen": "Right radical inguinal orchidectomy: right testis with attached epididymis and spermatic cord.",
+    "Gross description": "The testis is received with the attached epididymis and a sectioned spermatic cord. The cut surface shows a well-circumscribed, lobulated, creamy-tan tumour measuring 38 mm in greatest dimension, occupying the testicular parenchyma. The tumour is confined within the testis. Representative sections are taken from the tumour, the tumour-parenchyma interface, the rete testis region, the epididymis and the spermatic cord margin.",
+    "Microscopic description": "The tumour is composed of sheets and nests of uniform large polygonal cells with clear to finely granular cytoplasm, prominent central nucleoli and fibrous septa containing a lymphoplasmacytic infiltrate with scattered non-caseating granulomas. The features are those of classic seminoma. The tumour is confined to the testis. No lymphovascular invasion is identified. There is no rete testis invasion. The spermatic cord margin is free of tumour.",
+    "Immunohistochemistry": "Tumour cells are positive for OCT3/4, SALL4 and CD117. CD30 and alpha-fetoprotein are negative within the tumour cells.",
+    "Diagnosis": "Right testis, right radical inguinal orchidectomy:\n- Classic seminoma, 38 mm, confined to the testis (pT2).\n- No lymphovascular invasion; no rete testis invasion.\n- Spermatic cord margin clear of tumour.\n- No lymph nodes submitted (pNX).",
+    "Synoptic summary": "Tumour size: 38 mm\nHistologic grade: Not applicable\nMargins: Spermatic cord margin clear\nLymphovascular invasion: Absent\nPerineural invasion: Not applicable\nLymph nodes (positive/total): Not applicable (no lymph nodes submitted)\npT: pT2\npN: pNX\nStaging edition: AJCC 8th edition"
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-021-E1",
+      "type": "H3",
+      "section": "Synoptic summary",
+      "quoted_sentence": "pT: pT2",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "the higher stage has been wrongly given.",
+      "rationale": "it changes the treatment modality of the patient.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "- Classic seminoma, 38 mm, confined to the testis (pT2)."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-11",
+    "edited_by": "owner",
+    "verified": true,
+    "verified_at": "2026-11-11"
+  },
+  "schema_version": "1.0"
+}

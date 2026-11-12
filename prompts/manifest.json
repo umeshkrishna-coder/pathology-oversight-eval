@@ -1,6 +1,6 @@
 {
-  "plain": {"file": "prompts/plain.md", "status": "proposed"},
-  "structured_output": {"file": "prompts/structured_output.md", "status": "proposed"},
-  "structured_histopathology": {"file": "prompts/structured_histopathology.md", "status": "proposed"},
-  "structured_cbc": {"file": "prompts/structured_cbc.md", "status": "proposed"}
+  "plain": {"file": "prompts/plain.md", "status": "approved"},
+  "structured_output": {"file": "prompts/structured_output.md", "status": "approved"},
+  "structured_histopathology": {"file": "prompts/structured_histopathology.md", "status": "approved"},
+  "structured_cbc": {"file": "prompts/structured_cbc.md", "status": "approved"}
 }

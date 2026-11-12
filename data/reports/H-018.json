@@ -1,0 +1,26 @@
+{
+  "id": "H-018",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Ovary, hysterectomy with bilateral salpingo-oophorectomy, omentectomy and pelvic lymphadenectomy",
+  "sections": {
+    "Clinical details": "58-year-old woman who presented with a right adnexal mass. Total abdominal hysterectomy, bilateral salpingo-oophorectomy, omentectomy and pelvic lymphadenectomy were performed.",
+    "Specimen": "1. Uterus with cervix, right and left fallopian tubes and ovaries, in continuity.\n2. Omentum.\n3. Pelvic lymph nodes, ten in number.\n4. Peritoneal washings, received fresh.",
+    "Gross description": "The uterus measures 85 x 50 x 35 mm and weighs 150 g. The endometrium is thin and atrophic. The myometrium is unremarkable. The cervix is unremarkable.\n\nThe right ovary is replaced by a predominantly solid and cystic mass measuring 75 mm in greatest dimension. The capsule is intact, and the ovarian surface is smooth and uninvolved. The cut surface shows haemorrhage and necrosis. The left ovary measures 30 x 20 x 15 mm and is unremarkable. The fallopian tubes are unremarkable.\n\nThe omentum weighs 180 g and shows no nodules. Ten pelvic lymph nodes, ranging from 5 to 15 mm, are identified and submitted entirely.",
+    "Microscopic description": "The right ovarian tumour shows high-grade serous carcinoma with papillary, solid and slit-like growth patterns. Nuclear pleomorphism is marked and mitotic activity is brisk. Psammoma bodies are focally present. The capsule is intact and the ovarian surface is uninvolved. No lymphovascular invasion is identified.\n\nThe left ovary shows no malignancy. The omentum contains no tumour. The peritoneal washings contain no malignant cells. All ten pelvic lymph nodes are free of metastatic carcinoma. The endometrium is atrophic and the cervix shows no malignancy.",
+    "Immunohistochemistry": "The tumour cells are positive for WT1 and PAX8. p53 shows an aberrant, diffuse strong staining pattern in the tumour cells.",
+    "Diagnosis": "Right ovary and fallopian tube, bilateral salpingo-oophorectomy: high-grade serous carcinoma, 75 mm, confined to the right ovary (capsule intact, ovarian surface uninvolved). pT1a.\nLeft ovary and fallopian tubes: no malignancy.\nOmentum: no malignancy.\nPelvic lymph nodes, 0 of 10: no metastatic carcinoma (pN0).\nPeritoneal washings: no malignant cells.\nUterus and cervix: no malignancy.\nPathological stage (AJCC 8th edition): IA (pT1a pN0).",
+    "Synoptic summary": "Tumour size: 75 mm (greatest dimension)\nHistologic grade: High grade (high-grade serous carcinoma)\nMargins: Not applicable\nLymphovascular invasion: Not identified\nPerineural invasion: Not identified\nLymph nodes (positive/total): 0/10\npT: pT1a\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "The tumour is confined to one ovary with an intact capsule, an uninvolved ovarian surface and negative peritoneal washings, which corresponds to stage IA. Given the histological type, germline and somatic BRCA1 and BRCA2 testing and homologous recombination deficiency assessment are recommended to guide further management."
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

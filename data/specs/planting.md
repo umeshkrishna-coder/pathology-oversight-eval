@@ -241,33 +241,52 @@ verified: no
 
 == H-021 ==
 # dev | planted | planned types: H3, H6
-verified: no
-# Example (delete the leading '# ' on each line to use it):
-# [error]
-# type: H3
-# severity: <critical, major or minor>
-# section: <section name>
-# find: <text copied exactly from data/drafts/_readable/H-021.md>
-# replace: <the text as it should read with the error>
-# description: <what is wrong>
-# rationale: <why it is an error>
+verified: yes
+verified_on: 2026-11-11
+[error]
+type: H3
+severity: critical
+section: Synoptic summary
+find: pT: pT1b
+replace: pT: pT2
+also_section: Diagnosis
+also_find: (pT1b)
+also_replace: (pT2)
+description: the higher stage has been wrongly given.
+rationale: it changes the treatment modality of the patient.
 
 == H-022 ==
 # dev | planted | planned types: H4, H5
-verified: no
-# Example (delete the leading '# ' on each line to use it):
-# [error]
-# type: H4
-# severity: <critical, major or minor>
-# section: <section name>
-# find: <text copied exactly from data/drafts/_readable/H-022.md>
-# replace: <the text as it should read with the error>
-# description: <what is wrong>
-# rationale: <why it is an error>
+verified: yes
+verified_on: 2026-11-11
+[error]
+type: H4
+severity: major
+section: Microscopic description
+find: Metastatic carcinoma is identified in 3 of 17 regional lymph nodes.
+replace: Metastatic carcinoma is identified in 8 of 17 regional lymph nodes.
+also_section: Synoptic summary
+also_quote: Lymph nodes (positive/total): 3/17
+also_section: Diagnosis
+also_quote: - Metastatic carcinoma in 3 of 17 regional lymph nodes (pN1).
+description: the number of positive lymph nodes does not match.
+rationale: lymph node status is vital in determining the treatment modalities.
+
+[error]
+type: H2
+severity: critical
+section: Synoptic summary
+find: Histologic grade: G2, moderately differentiated
+replace: Histologic grade: G2, poorly differentiated
+also_section: Diagnosis
+also_quote: - Moderately differentiated ductal adenocarcinoma of the pancreatic head, 26 mm (pT2).
+description: the histologic grade does not match.
+rationale: histologic grading is vital in determining the treatment modalities.
 
 == H-023 ==
 # dev | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-11
 
 == C-001 ==
 # scored | planted | planned types: C1, C2, C3
@@ -374,13 +393,13 @@ verified: no
 
 == C-011 ==
 # dev | planted | planned types: C1
-verified: no
-# Example (delete the leading '# ' on each line to use it):
-# [error]
-# type: C1
-# severity: <critical, major or minor>
-# section: <section name>
-# find: <text copied exactly from data/drafts/_readable/C-011.md>
-# replace: <the text as it should read with the error>
-# description: <what is wrong>
-# rationale: <why it is an error>
+verified: yes
+verified_on: 2026-11-11
+[error]
+type: C2
+severity: major
+set: Hct = 20.0
+also_section: Interpretation
+also_quote: The haematocrit of 48% sits at the upper end of the adult male reference range, with haemoglobin of 16.0 g/dL, which is consistent with haemoconcentration from plasma leakage rather than true polycythaemia.
+description: hct value is wrong as 20.
+rationale: it doesn't add up with other parameters.

@@ -1,0 +1,161 @@
+{
+  "id": "C-011",
+  "modality": "cbc",
+  "split": "dev",
+  "scenario": "Leukopenia and thrombocytopenia in dengue fever",
+  "sections": {
+    "Values": "Hb: 16.0 g/dL (ref 13.0–17.0)\nRBC: 5.45 x10^12/L (ref 4.50–5.50)\nHct: 20.0 % (ref 40.0–50.0)\nMCV: 88.1 fL (ref 83.0–101.0)\nMCH: 29.4 pg (ref 27.0–32.0)\nMCHC: 33.3 g/dL (ref 31.5–34.5)\nRDW: 13.2 % (ref 11.6–14.0)\nWBC: 2.80 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 45.0 % (ref 40.0–80.0)\nNeutrophils absolute: 1.26 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 44.0 % (ref 20.0–40.0)\nLymphocytes absolute: 1.23 x10^9/L (ref 1.00–3.00)\nMonocytes %: 8.0 % (ref 2.0–10.0)\nMonocytes absolute: 0.22 x10^9/L (ref 0.20–1.00)\nEosinophils %: 2.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.06 x10^9/L (ref 0.02–0.50)\nBasophils %: 1.0 % (ref 0.0–2.0)\nBasophils absolute: 0.03 x10^9/L (ref 0.02–0.10)\nPlatelets: 38 x10^9/L (ref 150–410)\nMPV: 10.6 fL (ref 7.5–11.5)",
+    "Interpretation": "Peripheral blood findings in an adult man on illness day five with NS1-antigen-positive dengue show leukopenia, with a white cell count of 2.8 x10^9/L, and marked thrombocytopenia, with a platelet count of 38 x10^9/L. The haematocrit of 48% sits at the upper end of the adult male reference range, with haemoglobin of 16.0 g/dL, which is consistent with haemoconcentration from plasma leakage rather than true polycythaemia. The red cell indices are normocytic and normochromic, and the differential shows relative lymphocyte predominance with an absolute neutrophil count of about 1.3 x10^9/L. Trends in platelet count and haematocrit are the most useful markers of disease progression and bleeding risk over the next few days.",
+    "Comment/recommendation": "No critical value is present. Daily platelet count and haematocrit monitoring is recommended to track thrombocytopenia and haemoconcentration through the febrile and defervescence phases, with prompt clinical review if the haematocrit rises further or falls abruptly, or if the platelet count continues to fall."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 16.0,
+      "unit": "g/dL",
+      "ref_low": 13.0,
+      "ref_high": 17.0
+    },
+    "RBC": {
+      "value": 5.45,
+      "unit": "x10^12/L",
+      "ref_low": 4.5,
+      "ref_high": 5.5
+    },
+    "Hct": {
+      "value": 20.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 50.0
+    },
+    "MCV": {
+      "value": 88.1,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 29.4,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 33.3,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 13.2,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 2.8,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 45.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 1.26,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 44.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 1.23,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 8.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 0.22,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 2.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.06,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.03,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 38.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 10.6,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "C-011-E1",
+      "type": "C2",
+      "section": "Values",
+      "quoted_sentence": "Hct: 20.0 % (ref 40.0–50.0)",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "hct value is wrong as 20.",
+      "rationale": "it doesn't add up with other parameters.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Interpretation",
+          "quoted_sentence": "The haematocrit of 48% sits at the upper end of the adult male reference range, with haemoglobin of 16.0 g/dL, which is consistent with haemoconcentration from plasma leakage rather than true polycythaemia."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": true,
+    "verified_at": "2026-11-11"
+  },
+  "schema_version": "1.0"
+}

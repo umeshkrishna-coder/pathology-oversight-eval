@@ -1,0 +1,142 @@
+{
+  "id": "C-009",
+  "modality": "cbc",
+  "split": "scored",
+  "scenario": "Near-normal count with mild eosinophilia",
+  "sections": {
+    "Values": "Hb: 14.8 g/dL (ref 13.0–17.0)\nRBC: 4.95 x10^12/L (ref 4.50–5.50)\nHct: 44.0 % (ref 40.0–50.0)\nMCV: 88.9 fL (ref 83.0–101.0)\nMCH: 29.9 pg (ref 27.0–32.0)\nMCHC: 33.6 g/dL (ref 31.5–34.5)\nRDW: 12.8 % (ref 11.6–14.0)\nWBC: 7.20 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 59.0 % (ref 40.0–80.0)\nNeutrophils absolute: 4.25 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 25.0 % (ref 20.0–40.0)\nLymphocytes absolute: 1.80 x10^9/L (ref 1.00–3.00)\nMonocytes %: 6.0 % (ref 2.0–10.0)\nMonocytes absolute: 0.43 x10^9/L (ref 0.20–1.00)\nEosinophils %: 9.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.65 x10^9/L (ref 0.02–0.50)\nBasophils %: 1.0 % (ref 0.0–2.0)\nBasophils absolute: 0.07 x10^9/L (ref 0.02–0.10)\nPlatelets: 265 x10^9/L (ref 150–410)\nMPV: 9.4 fL (ref 7.5–11.5)",
+    "Interpretation": "Haemoglobin, red-cell indices, total white cell count and platelet count are within their reference ranges, with normocytic normochromic red cells and no evidence of anaemia. The eosinophil percentage is raised at 9.0 percent, giving an absolute eosinophil count of about 0.65 x10^9/L, which indicates mild eosinophilia. The other leucocyte populations are within range. Mild eosinophilia in this setting is most consistent with the patient's seasonal allergic rhinitis, but it should be correlated with the allergy history and medication history. A stool examination for parasites is advised to exclude helminthic infection as a cause. Repeat CBC with differential may be considered to confirm the persistence of eosinophilia."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 14.8,
+      "unit": "g/dL",
+      "ref_low": 13.0,
+      "ref_high": 17.0
+    },
+    "RBC": {
+      "value": 4.95,
+      "unit": "x10^12/L",
+      "ref_low": 4.5,
+      "ref_high": 5.5
+    },
+    "Hct": {
+      "value": 44.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 50.0
+    },
+    "MCV": {
+      "value": 88.9,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 29.9,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 33.6,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 12.8,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 7.2,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 59.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 4.25,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 25.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 1.8,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 6.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 0.43,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 9.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.65,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.07,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 265.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 9.4,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": true,
+  "errors": [],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-11",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}
