@@ -128,6 +128,48 @@ Decision 34 sets the anchor rules: for CBC, the Values line carrying the number 
 
 The validator also refuses a report with more than three planted errors (decision 23), and requires the last line of every histopathology Synoptic summary to be `Staging edition: AJCC 8th edition` unless one of the report's planted errors quotes that last line (decision 27). Both rules hold for drafts too (EVAL-09).
 
+**Other places** (decision 56): a contradiction has two sides, and the model may quote either, so an `[error]` may name up to three other places in the report. Each is a group of lines after the entry's other keys, in this order: `also_section: <section name>` followed by exactly one of `also_quote` (text left as it is, which must occur exactly once in that section of the built report) or `also_find` with `also_replace` (a second place changed as part of the same error, applied after the entry's main change; `also_find` must occur exactly once at that point, and the place's quote is the whole line holding the replacement). For CBC a group may instead be the single line `also_analyte: <analyte>`: the other place is that analyte's rendered Values line. An incomplete group, a fourth group, a group that repeats the main place, or a section the report does not have is reported in plain words with the block and entry. The built report lists the places under the error's `other_places`; `data/reports/_review/<id>.md` shows them under the error, and the validator checks that each is quoted verbatim in its section and is not the main place (an omission's other places may be in any section). Invented examples:
+
+```text
+== H-004 ==
+verified: no
+[error]
+type: H1
+severity: major
+section: Microscopic description
+find: The tumour measures 22 mm.
+replace: The tumour measures 32 mm.
+quote: The tumour measures 32 mm.
+description: Microscopic size contradicts the 22 mm gross size.
+rationale: Gross, microscopic and synoptic sizes must agree.
+also_section: Gross description
+also_quote: a firm lesion 22 mm across
+
+== H-005 ==
+verified: no
+[error]
+type: H3
+severity: critical
+section: Synoptic summary
+find: pT: pT1c
+replace: pT: pT3
+description: pT3 does not fit an 18 mm tumour.
+rationale: pT follows the size for this site.
+also_section: Diagnosis
+also_find: grade 2, 18 mm.
+also_replace: grade 2, 18 mm, pT3.
+
+== C-005 ==
+verified: no
+[error]
+type: C2
+severity: minor
+set: MCHC = 41.0
+description: MCHC does not follow from Hb and Hct.
+rationale: MCHC = Hb / Hct x 100 would give about 30 g/dL.
+also_analyte: Hb
+```
+
 ## Evaluation prompts and the two conditions
 
 The user message is the same in both conditions: the report's sections in stored order, each as `## {section name}` followed by its text, separated by one blank line. Nothing else from the report file is sent (no id, split, modality, errors, provenance or flags).
@@ -207,6 +249,8 @@ Owner steps:
 6. Once the scored split has been scored, scoring it again refuses a category map whose sha256 differs from the one `results/scored/score.json` records: nothing is remapped after scoring (decision 10). The dev split may be scored again with another map.
 
 How a finding is classified against each planted error of its report (decisions 8 and 34): a statement error is a **hit** when the mapped category is the error's type, the sections match and the quoted sentences overlap by at least 0.6 (token containment, the larger of the two directions); a **near-miss** when section and sentence match but the category maps to another type or to `other`. An omission is a hit when the type matches and the finding names the anchor's section. A finding goes to **adjudication** when its category is unmapped (with section and sentence matching), when type and section are right but the overlap is from 0.4 up to 0.6, when type and sentence are right but the section differs, or when an omission is reported under another section. In a report with an omission error, an unmapped finding that is not already a hit or a review item for another error becomes a review item for that omission (owner decision, 2026-11-11), one item for each omission error in the report, with the reason in its own words; it is a hit for every omission judged detected, otherwise a near-miss if any verdict is near_miss, a miss if any is miss, and a false alarm only when every verdict is false_alarm. A hit beats a review, which beats a near-miss; within a level the highest overlap wins, then the lowest error id. Anything else, and every finding in a clean report, is a **false alarm**. A second hit on the same error in a unit is a duplicate, neither a hit nor a false alarm.
+
+**Other places** (decision 56, amending decisions 8 and 34): a finding that quotes any of an error's places, its main sentence or one of its other places, is treated exactly as a finding that quotes its main sentence: the same rules for hit, near-miss and review apply, using the best-matching place (the place giving the best outcome, hit before review before near-miss, then the highest overlap, then the main place first). For an omission, a finding with the right type in the anchor's section or in the section of any other place is a hit. Nothing else in the classification changes. The adjudication sheet shows the candidate error's other places after its quoted sentence.
 
 A unit is one report in one repeat of one condition. An error is detected by majority when it is detected in at least two valid units: 2 of 3, or both of 2. A report with fewer than two valid units has no majority result in that condition; it is listed, and left out of the majority figures and of the paired comparison. The metrics are per-type and overall recall (Wilson intervals), false alarms per report, specificity on clean controls (by majority and per unit), Brier score and ECE, repeat consistency, recall by severity (critical, major and minor separately, as k/n with Wilson intervals), severity-weighted recall (weights 3, 2, 1), and structured minus plain for recall, false alarms and specificity with a paired bootstrap over reports (10,000 resamples, seed 20261115).
 

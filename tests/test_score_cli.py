@@ -1241,3 +1241,46 @@ def test_the_verdicts_on_each_omission_decide_the_finding(
     errors = {e["error_id"]: e["plain"]["detected_by_repeat"] for e in score["errors"]}
     for eid in ("H-003-E1", "H-003-E2"):
         assert errors[eid][0] is (eid in error_ids and outcome == "hit")
+
+
+# EVAL-10 K (owner decision, 2026-11-11): a finding on an error's other place
+
+GROSS = "Gross description"
+OTHER = "a firm lesion 18 mm across"
+
+
+def _other_place_tree(root, histo, cbc):
+    """H-001-E1 (H1, Microscopic description) names the Gross description's size as its
+    other place."""
+    reports = standard_reports(histo, cbc)
+    reports[0]["errors"][0]["other_places"] = [{"section": GROSS, "quoted_sentence": OTHER}]
+    write_tree(root, reports)
+
+
+def test_a_finding_on_the_other_place_is_a_hit(tree, histo, cbc):
+    _other_place_tree(tree, histo, cbc)
+    plain = all_units(IDS)
+    for rep in (1, 2, 3):
+        plain[("H-001", rep)] = [finding("H1", GROSS, OTHER)]
+    write_run(tree, PLAIN, "plain", plain)
+    write_run(tree, STRUCTURED, "structured", all_units(IDS))
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    score = read_report_json(tree / "results" / "dev" / "score.json")
+    assert score["metrics"]["plain"]["per_type_recall"]["H1"]["k"] == 1
+    assert score["counts"]["by_condition"]["plain"]["false_alarms"] == 0
+    assert {f["outcome"] for f in score["findings"] if f["condition"] == "plain"} == {"hit"}
+
+
+def test_the_sheet_shows_the_candidate_errors_other_places_after_its_sentence(tree, histo, cbc):
+    _other_place_tree(tree, histo, cbc)
+    plain = all_units(IDS)
+    plain[("H-001", 1)] = [finding("odd wording", GROSS, OTHER)]  # unmapped: review
+    write_run(tree, PLAIN, "plain", plain)
+    write_run(tree, STRUCTURED, "structured", all_units(IDS))
+    assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
+    sheet = (tree / ADJ / "adjudication_sheet.md").read_text(encoding="utf-8")
+    assert (
+        "#   its quoted sentence: Tumour measures 25 mm.\n"
+        f"#   its other place 1: {GROSS}: {OTHER}\n"
+        "#   its description:"
+    ) in sheet

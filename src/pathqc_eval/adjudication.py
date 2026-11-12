@@ -256,6 +256,8 @@ def sheet_text(dataset: str, items: list[AdjudicationItem], reports: dict) -> st
             f"{error.error_id} ({error.type}, {error.kind}) in {error.section}",
         )
         out += _comment("  its quoted sentence", error.quoted_sentence)
+        for n, place in enumerate(error.other_places, start=1):  # decision 56 (EVAL-10)
+            out += _comment(f"  its other place {n}", f"{place.section}: {place.quoted_sentence}")
         out += _comment("  its description", error.description)
         out += _comment("why it needs you", reason_words(item.review_reason))
         out += ["verdict:", "reason:"]

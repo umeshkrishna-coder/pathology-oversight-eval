@@ -116,6 +116,23 @@ def check_omission_anchor(report: Report, taxonomy: Taxonomy) -> list[str]:
     ]
 
 
+def check_other_places(report: Report, taxonomy: Taxonomy) -> list[str]:
+    """Decision 56 (EVAL-10): each other place of a planted error is quoted verbatim in its
+    section and is not the error's main place. The schema allows at most three. An omission's
+    other places are not bound by the anchor sections of decision 43."""
+    reasons = []
+    for err in report.errors:
+        for n, place in enumerate(err.other_places, start=1):
+            where = f"{err.error_id}: other place {n}"
+            if place.section not in report.sections:
+                reasons.append(f"{where}: section '{place.section}' is not in the report")
+            elif (place.section, place.quoted_sentence) == (err.section, err.quoted_sentence):
+                reasons.append(f"{where} is the error's main place (the same section and sentence)")
+            elif place.quoted_sentence not in report.sections[place.section]:
+                reasons.append(f"{where} does not occur verbatim in '{place.section}'")
+    return reasons
+
+
 def check_section_order(report: Report, taxonomy: Taxonomy) -> list[str]:
     convention = SECTION_CONVENTIONS[report.modality]
     order = {name: i for i, (name, _) in enumerate(convention)}
@@ -251,6 +268,7 @@ RULES: tuple[Callable[[Report, Taxonomy], list[str]], ...] = (
     check_error_types,
     check_quoted_sentences,
     check_omission_anchor,
+    check_other_places,
     check_section_order,
     check_cbc_indices,
     check_cbc_units,

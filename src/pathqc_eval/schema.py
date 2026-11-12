@@ -98,6 +98,17 @@ class CBCValues(StrictModel):
     MPV: Analyte
 
 
+MAX_OTHER_PLACES = 3
+
+
+class OtherPlace(StrictModel):
+    """Another place in the report where a planted error shows (decision 56, EVAL-10): the
+    other side of a contradiction, or a second place changed with the same error."""
+
+    section: str
+    quoted_sentence: str = Field(min_length=1)
+
+
 class PlantedError(StrictModel):
     error_id: str = Field(pattern=r"^(H|C)-\d{3}-E\d+$")
     type: str = Field(pattern=r"^[HC]\d+$")
@@ -109,6 +120,8 @@ class PlantedError(StrictModel):
     rationale: str
     # Decision 34: an omission quotes an anchor line that exists in the report.
     kind: Literal["statement", "omission"] = "statement"
+    # Decision 56 (EVAL-10): up to three other places; reports without the field stay valid.
+    other_places: list[OtherPlace] = Field(default_factory=list, max_length=MAX_OTHER_PLACES)
 
 
 class Provenance(StrictModel):

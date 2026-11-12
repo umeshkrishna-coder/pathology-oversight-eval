@@ -613,3 +613,63 @@ def test_a_planted_error_elsewhere_does_not_excuse_the_staging_line(histo, taxon
 
 def test_cbc_reports_have_no_staging_line(cbc, taxonomy):
     assert check_report(_report(cbc), taxonomy) == []
+
+
+# EVAL-10 K (owner decision, 2026-11-11): other places of a planted error
+
+GROSS_PLACE = {
+    "section": "Gross description",
+    "quoted_sentence": "a firm lesion 18 mm across",
+}
+
+
+def _other(histo: dict, *places: dict) -> dict:
+    histo["errors"][0]["other_places"] = list(places)
+    return histo
+
+
+def test_an_other_place_quoted_verbatim_passes(histo, taxonomy):
+    assert check_report(_report(_other(histo, GROSS_PLACE)), taxonomy) == []
+
+
+def test_a_report_without_other_places_stays_valid_at_schema_version_1_0(histo, taxonomy):
+    assert "other_places" not in histo["errors"][0]
+    report = _report(histo)
+    assert report.errors[0].other_places == [] and report.schema_version == "1.0"
+    assert check_report(report, taxonomy) == []
+
+
+def test_an_other_place_not_verbatim_fails(histo, taxonomy):
+    place = GROSS_PLACE | {"quoted_sentence": "a firm lesion 25 mm across"}
+    assert check_report(_report(_other(histo, place)), taxonomy) == [
+        "H-001-E1: other place 1 does not occur verbatim in 'Gross description'"
+    ]
+
+
+def test_an_other_place_in_a_missing_section_fails(histo, taxonomy):
+    place = {"section": "Comment", "quoted_sentence": "Invented."}
+    assert check_report(_report(_other(histo, GROSS_PLACE, place)), taxonomy) == [
+        "H-001-E1: other place 2: section 'Comment' is not in the report"
+    ]
+
+
+def test_an_other_place_that_is_the_main_place_fails(histo, taxonomy):
+    place = {"section": "Microscopic description", "quoted_sentence": "Tumour measures 25 mm."}
+    assert check_report(_report(_other(histo, place)), taxonomy) == [
+        "H-001-E1: other place 1 is the error's main place (the same section and sentence)"
+    ]
+
+
+def test_four_other_places_do_not_parse(tmp_path, histo, taxonomy):
+    _write(tmp_path, "H-001.json", _other(histo, *[GROSS_PLACE] * 4))
+    result = validate_reports(tmp_path, taxonomy)
+    assert not result.ok
+    assert result.failures[0].startswith("H-001.json: does not parse: errors.0.other_places:")
+    assert "at most 3 items" in result.failures[0]
+
+
+def test_an_omissions_other_place_is_not_bound_by_the_anchor_sections(histo, taxonomy):
+    """Decision 43 binds the anchor (Synoptic summary or Diagnosis), not the other places."""
+    _omission(histo)
+    place = {"section": "Microscopic description", "quoted_sentence": "Tumour measures 25 mm."}
+    assert check_report(_report(_other(histo, place)), taxonomy) == []

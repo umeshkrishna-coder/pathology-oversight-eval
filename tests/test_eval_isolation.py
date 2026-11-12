@@ -4,7 +4,12 @@ owner texts; never the owner's own texts."""
 
 import pytest
 
-from pathqc_eval.prompting import build_eval_messages, check_eval_isolation, taxonomy_block
+from pathqc_eval.prompting import (
+    build_eval_messages,
+    check_eval_isolation,
+    render_report_text,
+    taxonomy_block,
+)
 from pathqc_eval.schema import Report
 
 
@@ -323,3 +328,26 @@ def test_words_after_split_equals_must_be_the_split_itself(
     report = Report.model_validate(histo)
     system, user = _messages(report, "plain", fixed_taxonomy, real_prompts)
     assert check_eval_isolation(report, "plain", f"{system}\n{words}", user, fixed_taxonomy) == []
+
+
+# EVAL-10 K: the model sees the report text only; an error's other places reach neither message
+# except as part of that text.
+
+
+@pytest.mark.parametrize("condition", ["plain", "structured"])
+def test_other_places_reach_no_message_except_as_report_text(
+    histo, fixed_taxonomy, real_prompts, condition
+):
+    gross = "a firm lesion 18 mm across"
+    histo["errors"][0]["other_places"] = [
+        {"section": "Gross description", "quoted_sentence": gross}
+    ]
+    report = Report.model_validate(histo)
+    system, user = _messages(report, condition, fixed_taxonomy, real_prompts)
+    assert check_eval_isolation(report, condition, system, user, fixed_taxonomy) == []
+    for text in (system, user):
+        for word in ("other_places", "other place", "also_section", "also_quote"):
+            assert word not in text
+    assert gross not in system
+    assert user == render_report_text(report)  # the other place is there only as report text
+    assert user.count(gross) == histo["sections"]["Gross description"].count(gross) == 1

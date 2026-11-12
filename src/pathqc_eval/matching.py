@@ -120,36 +120,60 @@ def _error_number(error_id: str) -> int:
     return int(error_id.rsplit("-E", 1)[1])
 
 
+def _places(err) -> list[tuple[str, str]]:
+    """The error's main place, then its other places (decision 56, EVAL-10)."""
+    others = getattr(err, "other_places", None) or []
+    return [(err.section, err.quoted_sentence)] + [(p.section, p.quoted_sentence) for p in others]
+
+
+def _at_place(kind: str, type_ok: bool, mapped: str, section_ok: bool, ov: float):
+    """The 6.4 rules for one place of one error: (outcome, review reason) or (None, None)."""
+    close = ov >= cfg.OVERLAP_THRESHOLD
+    if kind == "omission":
+        if type_ok and section_ok:
+            return "hit", None
+        if type_ok:
+            return "review", "omission_other_section"
+        if mapped == UNMAPPED and section_ok and close:
+            return "review", "unmapped_category"
+        return None, None
+    if type_ok and section_ok and close:
+        return "hit", None
+    if section_ok and close and mapped == UNMAPPED:
+        return "review", "unmapped_category"
+    if section_ok and close:
+        return "near_miss", None  # mapped to another taxonomy id or to other
+    if type_ok and section_ok and ov >= cfg.BORDERLINE_LOW:
+        return "review", "borderline_overlap"
+    if type_ok and not section_ok and close:
+        return "review", "section_mismatch"
+    return None, None
+
+
 def candidates(section: str, quote: str, mapped: str, errors: Sequence) -> list[Outcome]:
-    """Every outcome the finding qualifies for, one per error at most (6.4)."""
+    """Every outcome the finding qualifies for, one per error at most (6.4).
+
+    Decision 56 (EVAL-10): a finding quoting any of an error's places (its main sentence or one
+    of its other places) is treated as one quoting the main sentence, using the best-matching
+    place: the place giving the best outcome (hit before review before near-miss), then the
+    highest overlap, then the main place before the others in order. For an omission, the
+    right type in the anchor's section or in the section of any other place is a hit."""
     found: list[Outcome] = []
     f_section = normalise_section(section)
     for err in errors:
         type_ok = mapped == err.type
-        section_ok = f_section == normalise_section(err.section)
-        ov = overlap(quote, err.quoted_sentence)
-        close = ov >= cfg.OVERLAP_THRESHOLD
-        outcome: str | None = None
-        reason: str | None = None
-        if err.kind == "omission":
-            if type_ok and section_ok:
-                outcome = "hit"
-            elif type_ok:
-                outcome, reason = "review", "omission_other_section"
-            elif mapped == UNMAPPED and section_ok and close:
-                outcome, reason = "review", "unmapped_category"
-        elif type_ok and section_ok and close:
-            outcome = "hit"
-        elif section_ok and close and mapped == UNMAPPED:
-            outcome, reason = "review", "unmapped_category"
-        elif section_ok and close:
-            outcome = "near_miss"  # mapped to another taxonomy id or to other
-        elif type_ok and section_ok and ov >= cfg.BORDERLINE_LOW:
-            outcome, reason = "review", "borderline_overlap"
-        elif type_ok and not section_ok and close:
-            outcome, reason = "review", "section_mismatch"
-        if outcome is not None:
-            found.append(Outcome(outcome, err.error_id, reason, ov))
+        best: tuple | None = None
+        for n, (place_section, place_quote) in enumerate(_places(err)):
+            section_ok = f_section == normalise_section(place_section)
+            ov = overlap(quote, place_quote)
+            outcome, reason = _at_place(err.kind, type_ok, mapped, section_ok, ov)
+            if outcome is None:
+                continue
+            key = (_LEVEL[outcome], -ov, n)
+            if best is None or key < best[0]:
+                best = (key, Outcome(outcome, err.error_id, reason, ov))
+        if best is not None:
+            found.append(best[1])
     return found
 
 

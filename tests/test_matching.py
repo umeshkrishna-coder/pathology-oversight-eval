@@ -324,3 +324,91 @@ def test_a_finding_hitting_two_omissions_is_a_duplicate_only_where_both_were_hit
         ("hit", ("H-001-E3",)),  # E2 was already hit: only E3 is new
         ("duplicate", ("H-001-E2", "H-001-E3")),
     ]
+
+
+# EVAL-10 K (owner decision, 2026-11-11): an error may name up to three other places. A finding
+# quoting any of the error's places is treated as one quoting its main sentence, using the
+# best-matching place; for an omission, the right type in the section of any place is a hit.
+
+SYN_PT = "pT: pT3"
+DIAG_PT = "Invasive tumour, pT3, grade 2."
+GROSS = "Fatty tissue 40 x 30 x 20 mm with a firm lesion."
+
+
+def _with_places(err: PlantedError, *places: tuple[str, str]) -> PlantedError:
+    data = err.model_dump() | {
+        "other_places": [{"section": s, "quoted_sentence": q} for s, q in places]
+    }
+    return PlantedError.model_validate(data)
+
+
+def _stage() -> PlantedError:
+    return _with_places(_error(1, "H3", "Synoptic summary", SYN_PT), ("Diagnosis", DIAG_PT))
+
+
+@pytest.mark.parametrize(
+    ("mapped", "section", "quote", "expected"),
+    [
+        ("H3", "Diagnosis", DIAG_PT, ("hit", None, 1.0)),
+        ("H1", "Diagnosis", DIAG_PT, ("near_miss", None, 1.0)),
+        ("unmapped", "Diagnosis", DIAG_PT, ("review", "unmapped_category", 1.0)),
+        ("H3", "Diagnosis", "Invasive tumour with deep margin unusual today here.",
+         ("review", "borderline_overlap", 0.4)),
+        ("H3", "Microscopic description", DIAG_PT, ("review", "section_mismatch", 1.0)),
+        ("H3", "Synoptic summary", SYN_PT, ("hit", None, 1.0)),  # the main place still counts
+    ],
+)  # fmt: skip
+def test_a_finding_quoting_an_other_place_follows_the_same_rules(mapped, section, quote, expected):
+    result = classify(section, quote, mapped, [_stage()])
+    assert (result.outcome, result.reason, round(result.overlap, 3)) == expected
+    assert result.error_id == "H-001-E1"
+
+
+def test_the_best_matching_place_wins_over_a_closer_sentence_elsewhere():
+    """Main place: the same section, the right type, the finding contained in it (a hit); the other
+    place: the exact sentence in another section (a section mismatch). The hit wins."""
+    err = _with_places(
+        _error(1, "H3", "Diagnosis", "Invasive tumour, pT3, grade 2 of 3 here."),
+        ("Synoptic summary", "Invasive tumour, pT3, grade 2."),
+    )
+    result = classify("Diagnosis", "Invasive tumour, pT3, grade 2.", "H3", [err])
+    assert (result.outcome, result.reason) == ("hit", None)
+
+
+def test_without_other_places_the_other_sentence_is_a_false_alarm():
+    plain = _error(1, "H3", "Synoptic summary", SYN_PT)
+    assert classify("Diagnosis", DIAG_PT, "H3", [plain]) == Outcome("false_alarm")
+
+
+def test_an_omission_is_hit_through_the_section_of_an_other_place():
+    omission = _with_places(
+        _error(2, "H5", "Synoptic summary", "LVI absent", kind="omission"),
+        ("Microscopic description", "Margins are clear."),
+    )
+    hit = classify("Microscopic description", "No PNI is mentioned.", "H5", [omission])
+    assert (hit.outcome, hit.error_id) == ("hit", "H-001-E2")
+    elsewhere = classify("Diagnosis", "No PNI is mentioned.", "H5", [omission])
+    assert (elsewhere.outcome, elsewhere.reason) == ("review", "omission_other_section")
+
+
+def test_an_unmapped_finding_on_an_omissions_other_place_is_reviewed_as_unmapped_category():
+    omission = _with_places(
+        _error(2, "H5", "Synoptic summary", "LVI absent", kind="omission"),
+        ("Microscopic description", "Margins are clear."),
+    )
+    result = classify("Microscopic description", "Margins are clear.", "unmapped", [omission])
+    assert (result.outcome, result.reason, result.error_id) == (
+        "review", "unmapped_category", "H-001-E2"
+    )  # fmt: skip
+
+
+def test_a_finding_on_two_errors_places_gets_one_outcome_by_the_existing_precedence():
+    """E1 (H1) names the Diagnosis sentence as an other place; E3 (H3) has it as its main
+    sentence. An H3 finding there is a hit for E3 (a near-miss for E1); an H1 finding is a
+    hit for E1 through its other place (a near-miss for E3)."""
+    e1 = _with_places(_error(1, "H1", "Gross description", GROSS), ("Diagnosis", DIAG_PT))
+    e3 = _error(3, "H3", "Diagnosis", DIAG_PT)
+    as_h3 = classify("Diagnosis", DIAG_PT, "H3", [e1, e3])
+    as_h1 = classify("Diagnosis", DIAG_PT, "H1", [e1, e3])
+    assert (as_h3.outcome, as_h3.error_id) == ("hit", "H-001-E3")
+    assert (as_h1.outcome, as_h1.error_id) == ("hit", "H-001-E1")

@@ -1429,3 +1429,230 @@ def test_a_report_file_that_cannot_be_written_is_listed_and_the_others_are_writt
     assert "H-002 built | 1 planted error(s)" in out
     assert other.is_file()
     assert locked.read_bytes() == before
+
+
+# EVAL-10 K (owner decision, 2026-11-11): an [error] may name up to three other places, each a
+# group: also_section with also_quote (unchanged) or with also_find and also_replace (changed
+# too), or, for CBC, also_analyte alone. Lines: 1 block, 2 verified, 3 [error], 4-7 the
+# required keys, 8 onwards the body.
+
+SIZE_ERROR = "section: Synoptic summary\nfind: size: 18 mm\nreplace: size: 25 mm\n"
+GROSS_LINE = "Fatty tissue 40 x 30 x 20 mm with a firm lesion 18 mm across."
+DIAG_LINE = "Invasive tumour of no special type, grade 2, 25 mm."
+
+
+def _places(result) -> list[tuple[str, str]]:
+    assert result.ok, result.problems
+    return [
+        (p["section"], p["quoted_sentence"]) for p in result.report["errors"][0]["other_places"]
+    ]
+
+
+def test_an_unchanged_and_a_changed_other_place_are_read_in_order(histo_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "H1",
+        "major",
+        SIZE_ERROR
+        + f"also_section: Gross description\nalso_quote: {GROSS_LINE}\n"
+        + "also_section: Diagnosis\nalso_find: grade 2, 18 mm.\nalso_replace: grade 2, 25 mm.\n",
+    )
+    before = copy.deepcopy(histo_draft)
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert _places(result) == [("Gross description", GROSS_LINE), ("Diagnosis", DIAG_LINE)]
+    assert result.report["sections"]["Diagnosis"] == DIAG_LINE
+    assert result.report["sections"]["Gross description"] == GROSS_LINE  # unchanged
+    assert result.report["errors"][0]["quoted_sentence"] == "Tumour size: 25 mm"
+    assert histo_draft == before  # the draft itself is never changed
+
+
+def test_the_changed_places_quote_is_the_whole_line_with_the_replacement(
+    histo_draft, fixed_taxonomy
+):
+    body = "verified: no\n" + _error(
+        "H3",
+        "critical",
+        "section: Diagnosis\nfind: grade 2, 18 mm.\nreplace: grade 2, 18 mm, pT3.\n"
+        "quote: Invasive tumour of no special type, grade 2, 18 mm, pT3.\n"
+        "also_section: Synoptic summary\nalso_find: pT: pT1c\nalso_replace: pT: pT3\n",
+    )
+    result = _apply(_row("H-001", planned=["H3"]), histo_draft, body, fixed_taxonomy)
+    assert _places(result) == [("Synoptic summary", "pT: pT3")]
+
+
+def test_a_cbc_other_place_is_an_analytes_rendered_line(cbc_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error("C2", "minor", "set: MCHC = 41.0\nalso_analyte: Hb\n")
+    result = _apply(_row("C-001", planned=["C2"]), cbc_draft, body, fixed_taxonomy)
+    hb_line = result.report["sections"]["Values"].split("\n")[0]
+    assert hb_line.startswith("Hb")
+    assert _places(result) == [("Values", hb_line)]
+
+
+def test_three_other_places_are_allowed(histo_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "H1",
+        "major",
+        SIZE_ERROR
+        + f"also_section: Gross description\nalso_quote: {GROSS_LINE}\n"
+        + "also_section: Microscopic description\nalso_quote: Tumour measures 18 mm.\n"
+        + "also_section: Diagnosis\nalso_quote: grade 2, 18 mm.\n",
+    )
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert [s for s, _ in _places(result)] == [
+        "Gross description",
+        "Microscopic description",
+        "Diagnosis",
+    ]
+
+
+def test_an_omission_may_name_an_other_place_in_any_section(histo_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "H5",
+        "minor",
+        "kind: omission\nremove_from: Synoptic summary\nremove: Perineural invasion: Absent\n"
+        "anchor: Lymphovascular invasion: Absent\n"
+        "also_section: Microscopic description\nalso_quote: Margins are clear.\n",
+    )
+    result = _apply(_row("H-001", planned=["H5"]), histo_draft, body, fixed_taxonomy)
+    assert _places(result) == [("Microscopic description", "Margins are clear.")]
+
+
+def test_an_error_without_other_places_is_built_as_before(histo_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error("H1", "major", SIZE_ERROR)
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert result.ok and "other_places" not in result.report["errors"][0]
+
+
+P = "[error] 1 (line 3): other place"
+
+
+@pytest.mark.parametrize(
+    ("extra", "problem"),
+    [
+        (
+            "also_quote: Margins are clear.\n",
+            "line 11: also_quote in [error] 1 (line 3) comes before any also_section line; an "
+            "other place starts with also_section (or, for CBC, also_analyte)",
+        ),
+        (
+            "also_section: Gross description\n",
+            f"{P} 1 (line 11) needs also_quote, or also_find with also_replace, after also_section",
+        ),
+        (
+            "also_section: Diagnosis\nalso_find: grade 2\n",
+            f"{P} 1 (line 11) needs also_quote, or also_find with also_replace, after also_section",
+        ),
+        (
+            "also_section: Diagnosis\nalso_quote: grade 2\nalso_find: grade 2\n"
+            "also_replace: grade 3\n",
+            f"{P} 1 (line 11) gives also_quote and also_find; give one of them (also_quote, or "
+            "also_find with also_replace)",
+        ),
+        (
+            "also_section: Diagnosis\nalso_quote: grade 2\nalso_quote: 18 mm\n",
+            "line 13: 'also_quote' is given twice in other place 1 of [error] 1 (line 3)",
+        ),
+        ("also_analyte: Hb\n", f"{P} 1 (line 11): also_analyte applies only to CBC reports"),
+        (
+            "also_section: Comment section\nalso_quote: Invented comment.\n",
+            f"{P} 1 (line 11): also_section 'Comment section' is not a section of this report "
+            "(sections: Clinical details, Specimen, Gross description, Microscopic "
+            "description, Immunohistochemistry, Diagnosis, Synoptic summary, Comment)",
+        ),
+        (
+            "also_section: Synoptic summary\nalso_quote: Tumour size: 25 mm\n",
+            f"{P} 1 (line 11) repeats the error's main place (the same section and sentence)",
+        ),
+        (
+            "also_section: Gross description\nalso_quote: no such words\n",
+            f"{P} 1 (line 11): the also_quote text occurs 0 times in 'Gross description' of the "
+            "built report (it must occur exactly once); copy it exactly from the readable draft",
+        ),
+        (
+            "also_section: Microscopic description\nalso_quote: umour\n",
+            f"{P} 1 (line 11): the also_quote text occurs 2 times in 'Microscopic description' "
+            "of the built report (it must occur exactly once); add surrounding words from the "
+            "readable draft so that it is unique",
+        ),
+        (
+            "also_section: Diagnosis\nalso_find: no such words\nalso_replace: other words\n",
+            f"{P} 1 (line 11): the also_find text occurs 0 times in 'Diagnosis' (it must occur "
+            "exactly once); copy it exactly from the readable draft",
+        ),
+        (
+            "also_section: Microscopic description\nalso_find: umour\nalso_replace: esion\n",
+            f"{P} 1 (line 11): the also_find text occurs 2 times in 'Microscopic description' "
+            "(it must occur exactly once); add surrounding words from the readable draft so "
+            "that it is unique",
+        ),
+    ],
+)
+def test_other_place_problems_are_said_in_plain_words(histo_draft, fixed_taxonomy, extra, problem):
+    """The main change takes lines 8 to 10, so the group starts at line 11."""
+    body = "verified: no\n" + _error("H1", "major", SIZE_ERROR + extra)
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert not result.ok
+    assert result.problems == [problem]
+
+
+def test_a_fourth_other_place_is_refused(histo_draft, fixed_taxonomy):
+    groups = "".join(
+        f"also_section: Gross description\nalso_quote: {words}\n"
+        for words in ("Fatty tissue", "40 x 30", "firm lesion", "18 mm across")
+    )
+    body = "verified: no\n" + _error("H1", "major", SIZE_ERROR + groups)
+    result = _apply(_row("H-001"), histo_draft, body, fixed_taxonomy)
+    assert result.problems == [f"{P} 4 (line 17): an error names at most three other places"]
+
+
+def test_an_unknown_analyte_and_an_analyte_with_other_keys_are_refused(cbc_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "C2",
+        "minor",
+        "set: MCHC = 41.0\nalso_analyte: Haemoglobin\nalso_analyte: Hb\nalso_quote: Hb\n",
+    )
+    result = _apply(_row("C-001", planned=["C2"]), cbc_draft, body, fixed_taxonomy)
+    assert result.problems[0].startswith(
+        f"{P} 1 (line 9): also_analyte 'Haemoglobin' is not an analyte; use the names in "
+        "cbc_values ("
+    )
+    assert result.problems[1:] == [
+        f"{P} 2 (line 10): also_analyte stands alone; also_quote does not belong with it"
+    ]
+
+
+def test_an_also_find_in_values_is_refused(cbc_draft, fixed_taxonomy):
+    body = "verified: no\n" + _error(
+        "C2", "minor", "set: MCHC = 41.0\nalso_section: Values\nalso_find: Hb\nalso_replace: Hgb\n"
+    )
+    result = _apply(_row("C-001", planned=["C2"]), cbc_draft, body, fixed_taxonomy)
+    assert result.problems == [
+        f"{P} 1 (line 9): the Values text is generated from cbc_values and cannot be edited; "
+        "change a number with set lines in an [error] entry"
+    ]
+
+
+def test_other_places_build_deterministically_and_leave_the_drafts_alone(tree, capsys):
+    sheet = GOOD_SHEET.replace(
+        "replace: The tumour measures 25 mm across.\n",
+        "replace: The tumour measures 25 mm across.\n"
+        "also_section: Gross description\nalso_quote: firm lesion 18 mm across\n"
+        "also_section: Diagnosis\nalso_find: grade 2, 18 mm.\nalso_replace: grade 2, 25 mm.\n",
+    )
+    assert sheet != GOOD_SHEET
+    (tree / SHEET_FILE).write_text(sheet, encoding="utf-8")
+    drafts = _snapshot(tree / "data" / "drafts")
+    cli.main(["plant"])
+    first = _snapshot(tree / "data" / "reports")
+    cli.main(["plant"])
+    assert _snapshot(tree / "data" / "reports") == first
+    assert _snapshot(tree / "data" / "drafts") == drafts
+    report = read_report_json(tree / "data" / "reports" / "H-001.json")
+    assert report["errors"][0]["other_places"] == [
+        {"section": "Gross description", "quoted_sentence": "firm lesion 18 mm across"},
+        {"section": "Diagnosis", "quoted_sentence": DIAG_LINE},
+    ]
+    review = (tree / "data" / "reports" / "_review" / "H-001.md").read_text(encoding="utf-8")
+    assert (
+        "   other place 1: Gross description | firm lesion 18 mm across\n"
+        f"   other place 2: Diagnosis | {DIAG_LINE}\n"
+    ) in review

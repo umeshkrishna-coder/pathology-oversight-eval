@@ -20,7 +20,7 @@ from pydantic import ValidationError
 from pathqc_eval.io import read_report_json, write_report_json
 from pathqc_eval.readable import READABLE_DIR
 from pathqc_eval.render import render_cbc_values
-from pathqc_eval.schema import SECTION_CONVENTIONS, CBCValues, Report
+from pathqc_eval.schema import MAX_OTHER_PLACES, SECTION_CONVENTIONS, CBCValues, Report
 from pathqc_eval.spec import SpecRow
 from pathqc_eval.taxonomy import Taxonomy
 from pathqc_eval.validate import FILE_PLACEHOLDER, check_report
@@ -53,6 +53,11 @@ OMISSION_KEYS = (
 ERROR_KEYS = tuple(
     dict.fromkeys(ERROR_REQUIRED + ERROR_OPTIONAL + TEXT_KEYS + NUMBER_KEYS + OMISSION_KEYS)
 )
+# Decision 56 (EVAL-10): an [error] may name up to three other places, each a group of lines
+# that starts with also_section (followed by also_quote, or by also_find and also_replace) or,
+# for CBC, is the single line also_analyte.
+ALSO_KEYS = ("also_section", "also_quote", "also_find", "also_replace", "also_analyte")
+ALSO_STARTS = ("also_section", "also_analyte")
 VARIANT_KEYS = {"text": TEXT_KEYS, "number": NUMBER_KEYS, "omission": OMISSION_KEYS}
 VARIANT_NAMES = {
     "text": "a text change",
@@ -68,12 +73,21 @@ _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 @dataclass
+class RawGroup:
+    """One other place of an [error] entry, as written: its first line and its keys."""
+
+    line: int
+    fields: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
 class RawEntry:
     tag: str  # "fix" or "error"
     number: int  # 1-based among the block's entries with the same tag
     line: int
     fields: dict[str, str] = field(default_factory=dict)
     sets: list[tuple[str, int]] = field(default_factory=list)  # raw `set:` values, line numbers
+    also: list[RawGroup] = field(default_factory=list)  # other places, in sheet order
 
     @property
     def label(self) -> str:
@@ -134,10 +148,16 @@ def parse_sheet(text: str) -> ParsedSheet:
                 f"line {n}: expected 'key: value', '[fix]', '[error]' or '== <id> ==', got '{line}'"
             )
             continue
-        allowed = REPORT_KEYS if entry is None else FIX_KEYS if entry.tag == "fix" else ERROR_KEYS
+        allowed = (
+            REPORT_KEYS
+            if entry is None
+            else FIX_KEYS
+            if entry.tag == "fix"
+            else ERROR_KEYS + ALSO_KEYS
+        )
         if key not in allowed:
             hint = f"allowed keys: {', '.join(allowed)}"
-            if entry is None and key in ERROR_KEYS + FIX_KEYS:
+            if entry is None and key in ERROR_KEYS + FIX_KEYS + ALSO_KEYS:
                 hint += "; entry keys go after an [error] or [fix] line"
             elif entry is not None and key in REPORT_KEYS:
                 hint = "report-level lines go before the first [fix] or [error] line"
@@ -148,6 +168,22 @@ def parse_sheet(text: str) -> ParsedSheet:
             continue
         if entry is not None and key == "set":
             entry.sets.append((value, n))
+            continue
+        if entry is not None and key in ALSO_KEYS:
+            if key in ALSO_STARTS:
+                entry.also.append(RawGroup(n, {key: value}))
+            elif not entry.also:
+                current.problems.append(
+                    f"line {n}: {key} in {entry.label} comes before any also_section line; an "
+                    "other place starts with also_section (or, for CBC, also_analyte)"
+                )
+            elif key in entry.also[-1].fields:
+                current.problems.append(
+                    f"line {n}: '{key}' is given twice in other place {len(entry.also)} of "
+                    f"{entry.label}"
+                )
+            else:
+                entry.also[-1].fields[key] = value
             continue
         target = entry.fields if entry is not None else current.fields
         if key in target:
@@ -167,6 +203,20 @@ class Fix:
     find: str
     replace: str
     note: str
+
+
+@dataclass
+class OtherPlaceEntry:
+    """One other place of an error (decision 56): `form` is "quote" (unchanged text), "change"
+    (also_find replaced by also_replace) or "analyte" (a CBC Values line)."""
+
+    label: str  # "[error] 1 (line 3): other place 1 (line 11)"
+    form: str
+    section: str | None = None
+    quote: str | None = None
+    find: str | None = None
+    replace: str | None = None
+    analyte: str | None = None
 
 
 @dataclass
@@ -191,6 +241,63 @@ class ErrorEntry:
     anchor_section: str | None = None
     anchor: str | None = None
     anchor_analyte: str | None = None
+    others: list[OtherPlaceEntry] = field(default_factory=list)
+
+
+def interpret_other_places(
+    entry: RawEntry, modality: str
+) -> tuple[list[OtherPlaceEntry], list[str]]:
+    """The other-place groups of one [error] entry (decision 56), or their problems."""
+    places: list[OtherPlaceEntry] = []
+    problems: list[str] = []
+    for k, group in enumerate(entry.also, start=1):
+        where = f"{entry.label}: other place {k} (line {group.line})"
+        if k > MAX_OTHER_PLACES:
+            problems.append(f"{where}: an error names at most three other places")
+            continue
+        g = group.fields
+        if "also_analyte" in g:
+            extra = [key for key in ALSO_KEYS if key in g and key != "also_analyte"]
+            if extra:
+                problems.append(
+                    f"{where}: also_analyte stands alone; {', '.join(extra)} does not belong "
+                    "with it"
+                )
+            elif modality != "cbc":
+                problems.append(f"{where}: also_analyte applies only to CBC reports")
+            elif g["also_analyte"] not in ANALYTES:
+                problems.append(
+                    f"{where}: also_analyte '{g['also_analyte']}' is not an analyte; use the "
+                    f"names in cbc_values ({', '.join(ANALYTES)})"
+                )
+            else:
+                places.append(OtherPlaceEntry(where, "analyte", analyte=g["also_analyte"]))
+            continue
+        changed = [key for key in ("also_find", "also_replace") if key in g]
+        if "also_quote" in g and changed:
+            problems.append(
+                f"{where} gives also_quote and {changed[0]}; give one of them (also_quote, or "
+                "also_find with also_replace)"
+            )
+        elif "also_quote" in g:
+            places.append(
+                OtherPlaceEntry(where, "quote", section=g["also_section"], quote=g["also_quote"])
+            )
+        elif len(changed) == 2:
+            places.append(
+                OtherPlaceEntry(
+                    where,
+                    "change",
+                    section=g["also_section"],
+                    find=g["also_find"],
+                    replace=g["also_replace"],
+                )
+            )
+        else:
+            problems.append(
+                f"{where} needs also_quote, or also_find with also_replace, after also_section"
+            )
+    return places, problems
 
 
 def _missing(entry: RawEntry, keys: tuple[str, ...]) -> list[str]:
@@ -300,6 +407,8 @@ def interpret_error(
         ]
     sets, set_problems = _parse_sets(entry) if variant == "number" else ([], [])
     problems += set_problems
+    others, other_problems = interpret_other_places(entry, modality)
+    problems += other_problems
     if problems or variant is None:
         return None, problems
     return (
@@ -324,6 +433,7 @@ def interpret_error(
             anchor_section=f.get("anchor_section"),
             anchor=f.get("anchor"),
             anchor_analyte=f.get("anchor_analyte"),
+            others=others,
         ),
         [],
     )
@@ -418,6 +528,8 @@ class _Planter:
         self.cbc: dict | None = copy.deepcopy(draft.get("cbc_values"))
         self.problems: list[str] = []
         self.required = {name for name, req in SECTION_CONVENTIONS[row.modality] if req}
+        # Unchanged other places, checked against the built report once every entry is applied.
+        self.kept_quotes: list[tuple[str, str, str]] = []  # (label, section, quote)
 
     def _text_section(self, label: str, key: str, name: str) -> str | None:
         if name not in self.sections:
@@ -434,7 +546,9 @@ class _Planter:
             return None
         return self.sections[name]
 
-    def _locate(self, label: str, key: str, name: str, text: str, needle: str) -> int | None:
+    def _locate(
+        self, label: str, key: str, name: str, text: str, needle: str, where: str = ""
+    ) -> int | None:
         count = occurrences(text, needle)
         if count == 1:
             return text.find(needle)
@@ -444,20 +558,23 @@ class _Planter:
             else f"copy it exactly from {self.readable}"
         )
         self.problems.append(
-            f"{label}: the {key} text occurs {count} times in '{name}' (it must occur exactly "
-            f"once); {advice}"
+            f"{label}: the {key} text occurs {count} times in '{name}'{where} (it must occur "
+            f"exactly once); {advice}"
         )
         return None
 
-    def replace(self, label: str, name: str, find: str, replace: str) -> tuple[str, int] | None:
-        """Replace the single occurrence; return the new section text and the start index."""
-        text = self._text_section(label, "section", name)
+    def replace(
+        self, label: str, name: str, find: str, replace: str, prefix: str = ""
+    ) -> tuple[str, int] | None:
+        """Replace the single occurrence; return the new section text and the start index.
+        `prefix` "also_" names the keys of an other place (decision 56) in its problems."""
+        text = self._text_section(label, f"{prefix}section", name)
         if text is None:
             return None
         if replace == find:
-            self.problems.append(f"{label}: replace is the same as find")
+            self.problems.append(f"{label}: {prefix}replace is the same as {prefix}find")
             return None
-        start = self._locate(label, "find", name, text, find)
+        start = self._locate(label, f"{prefix}find", name, text, find)
         if start is None:
             return None
         new = text[:start] + replace + text[start + len(find) :]
@@ -496,6 +613,53 @@ class _Planter:
 
     def rendered_values(self) -> str:
         return render_cbc_values(CBCValues.model_validate(self.cbc))
+
+    def apply_other_places(self, err: ErrorEntry, main: tuple[str, str]) -> list[dict]:
+        """The error's other places (decision 56), after its main change: a changed place is
+        changed now and quoted as the whole line holding the replacement; an unchanged place
+        is checked against the built report (check_kept_quotes); a CBC analyte place is that
+        analyte's rendered Values line."""
+        places: list[dict] = []
+        for other in err.others:
+            if other.form == "change":
+                assert other.section and other.find and other.replace
+                done = self.replace(other.label, other.section, other.find, other.replace, "also_")
+                if done is None:
+                    continue
+                new, start = done
+                line_start = new.rfind("\n", 0, start) + 1
+                line_end = new.find("\n", start + len(other.replace))
+                place = (other.section, new[line_start : None if line_end == -1 else line_end])
+            elif other.form == "quote":
+                assert other.section and other.quote
+                if other.section not in self.sections:
+                    self.problems.append(
+                        f"{other.label}: also_section '{other.section}' is not a section of this "
+                        f"report (sections: {', '.join(self.sections)})"
+                    )
+                    continue
+                place = (other.section, other.quote)
+            else:
+                assert other.analyte and self.cbc is not None
+                place = ("Values", values_line(self.rendered_values(), other.analyte))
+            if place == main:
+                self.problems.append(
+                    f"{other.label} repeats the error's main place (the same section and sentence)"
+                )
+                continue
+            if other.form == "quote":
+                self.kept_quotes.append((other.label, place[0], place[1]))
+            places.append({"section": place[0], "quoted_sentence": place[1]})
+        return places
+
+    def check_kept_quotes(self) -> None:
+        """Each unchanged other place occurs exactly once in its section of the built report."""
+        for label, name, quote in self.kept_quotes:
+            if name not in self.sections:
+                self.problems.append(f"{label}: also_section '{name}' is not in the built report")
+                continue
+            where = " of the built report"
+            self._locate(label, "also_quote", name, self.sections[name], quote, where)
 
     def apply_fix(self, fix: Fix) -> None:
         self.replace(fix.label, fix.section, fix.find, fix.replace)
@@ -546,7 +710,10 @@ class _Planter:
                 quote = err.anchor or ""
         if len(self.problems) > before:
             return None
-        return {
+        others = self.apply_other_places(err, (section, quote))
+        if len(self.problems) > before:
+            return None
+        planted = {
             "error_id": f"{self.row.id}-E{number}",
             "type": err.type,
             "section": section,
@@ -557,6 +724,9 @@ class _Planter:
             "rationale": err.rationale,
             "kind": err.kind,
         }
+        if others:  # written only when there are some, so earlier reports build unchanged
+            planted["other_places"] = others
+        return planted
 
 
 def _report_level(block: RawBlock) -> tuple[bool, str | None, list[str]]:
@@ -650,6 +820,7 @@ def apply_block(
     for fix in fixes:
         planter.apply_fix(fix)
     planted = [planter.apply_error(err, i) for i, err in enumerate(errors, start=1)]
+    planter.check_kept_quotes()
     problems = planting + planter.problems
     if problems:
         result.problems = problems
@@ -836,6 +1007,12 @@ def review_markdown(result: BlockResult) -> str:
             f"{err['error_id']} | {err['type']} | {err['severity']} | {err['kind']} | "
             f"{err['section']}",
             f"   quote: {err['quoted_sentence']}",
+        ]
+        lines += [
+            f"   other place {n}: {place['section']} | {place['quoted_sentence']}"
+            for n, place in enumerate(err.get("other_places", []), start=1)
+        ]
+        lines += [
             f"   description: {err['description']}",
             f"   rationale: {err['rationale']}",
         ]

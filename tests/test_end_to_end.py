@@ -136,13 +136,27 @@ ENTRIES = {
     "C3-omission": ("critical", "kind: omission\nremove_from: Comment/recommendation\n"
                                 "remove: No action needed.\nanchor_analyte: Platelets\n"),
 }  # fmt: skip
+# EVAL-10 (decision 56): an error with an unchanged other place (the gross size, the other
+# side of the contradiction) and one with a changed other place (the Diagnosis gains the pT).
+GROSS_SIZE = "a firm lesion 18 mm across"
+DIAG_PT3 = "Invasive tumour of no special type, grade 2, 18 mm, pT3."
+ENTRIES["H1-also-quote"] = (
+    "major",
+    ENTRIES["H1"][1] + f"also_section: Gross description\nalso_quote: {GROSS_SIZE}\n",
+)
+ENTRIES["H3-also-change"] = (
+    "critical",
+    ENTRIES["H3"][1]
+    + "also_section: Diagnosis\nalso_find: grade 2, 18 mm.\nalso_replace: grade 2, 18 mm, pT3.\n",
+)
 # Report id -> (taxonomy type, entry). H-008 carries a severity override with its reason.
 PLAN = {
     "H-001": ("H1", "H1"), "H-002": ("H2", "H2"), "H-003": ("H3", "H3"), "H-004": ("H4", "H4"),
     "H-005": ("H5", "H5"), "H-006": ("H6", "H6"), "H-007": ("H5", "H5-omission"),
-    "H-008": ("H1", "H1"), "H-009": ("H2", "H2"), "H-010": ("H3", "H3"), "H-011": ("H4", "H4"),
+    "H-008": ("H1", "H1"), "H-009": ("H2", "H2"), "H-010": ("H3", "H3-also-change"),
+    "H-011": ("H4", "H4"),
     "H-012": ("H5", "H5"), "H-013": ("H6", "H6"), "H-014": ("H5", "H5-omission"),
-    "H-015": ("H1", "H1"), "H-021": ("H1", "H1"), "H-022": ("H3", "H3"),
+    "H-015": ("H1", "H1-also-quote"), "H-021": ("H1", "H1"), "H-022": ("H3", "H3"),
     "C-001": ("C1", "C1"), "C-002": ("C2", "C2"), "C-003": ("C3", "C3-omission"),
     "C-004": ("C1", "C1"), "C-005": ("C2", "C2"), "C-006": ("C3", "C3-omission"),
     "C-007": ("C1", "C1"), "C-011": ("C2", "C2"),
@@ -270,6 +284,13 @@ def _script_scored(model: Model) -> None:
     m.plans["structured", "H-007"] = [_out(elsewhere)] + [_out(m.hit("H-007", "structured"))] * 2
     m.plans["structured", "C-002"] = ["garbage"] + [_out(m.hit("C-002", "structured"))] * 3
     m.plans["structured", "H-013"] = [EMPTY] * 3  # a miss
+    # EVAL-10: in each condition one finding quotes each error's other place
+    for cond in CONDITIONS:
+        gross = m.hit("H-015", cond, section="Gross description", quoted_sentence=GROSS_SIZE)
+        m.plans[cond, "H-015"] = [_out(gross)] + [_out(m.hit("H-015", cond))] * 2
+        diag = m.hit("H-010", cond, section="Diagnosis", quoted_sentence=DIAG_PT3)
+        main = _out(m.hit("H-010", cond))
+        m.plans[cond, "H-010"] = [main, _out(diag), main]
     assert R["H-016"]["sections"]["Specimen"] == "Wide local excision, left breast."
 
 
@@ -511,7 +532,18 @@ def test_scored_split(world, capsys, monkeypatch):
     C-006) gets an unmapped finding here; the one unmapped category is in H-004 (a statement
     error), which was already a review item.
     The bootstrap intervals are not worked by hand; they are pinned as the seeded scorer gives
-    them, so that a change to the resampling shows."""
+    them, so that a change to the resampling shows.
+
+    Other places (EVAL-10, decision 56): H-015's H1 error names the unchanged gross size
+    ("a firm lesion 18 mm across", Gross description) as its other place, and H-010's H3 error
+    changes the Diagnosis too ("Invasive tumour of no special type, grade 2, 18 mm, pT3."). In
+    both conditions H-015's repeat 1 and H-010's repeat 2 quote the other place instead of the
+    main sentence, with the right category: each is a hit through that place (overlap 1.0).
+    So no number above changes: these four findings count exactly as the main sentence would.
+    Without decision 56 each would be a false alarm and both errors would be found in 2 of 3
+    units: still detected by majority, but plain false alarms per planted report would rise
+    from 3/44 to (1 + 1/2 + 1/3 + 1/3)/22 = 13/132, structured from 0 to (2/3)/22 = 1/33,
+    calibration would gain four outcomes of 0, and repeat consistency would fall."""
     root = world
     reports, drafts_before = _build(root, capsys)
     assert _main("freeze") == 0 and _main("freeze", "--check") == 0
@@ -552,6 +584,20 @@ def test_scored_split(world, capsys, monkeypatch):
                     m["severity_weighted_recall"]["planted_weight"])
                 for c, m in (("plain", p), ("structured", s))}  # fmt: skip
     assert weighted == {"plain": (41, 47), "structured": (44, 47)}
+    rows = {(f["condition"], f["report_id"], f["repeat"], f["finding_index"]): f
+            for f in score["findings"]}  # fmt: skip
+    for cond in CONDITIONS:  # EVAL-10: the findings on other places are hits
+        for key, section in ((("H-015", 1), "Gross description"), (("H-010", 2), "Diagnosis")):
+            row = rows[(cond, *key, 1)]
+            assert (row["outcome"], row["error_id"], row["section"], row["overlap"]) == (
+                "hit", f"{key[0]}-E1", section, 1.0,
+            )  # fmt: skip
+    built = {rid: read_report_json(root / "data" / "reports" / f"{rid}.json")["errors"][0]
+             for rid in ("H-010", "H-015")}  # fmt: skip
+    assert built["H-015"]["other_places"] == [
+        {"section": "Gross description", "quoted_sentence": GROSS_SIZE}
+    ]
+    assert built["H-010"]["other_places"] == [{"section": "Diagnosis", "quoted_sentence": DIAG_PT3}]
     by_severity = {c: {k: (v["k"], v["n"], [round(x, 4) for x in v["interval"]])
                        for k, v in m["recall_by_severity"].items()}
                    for c, m in (("plain", p), ("structured", s))}  # fmt: skip
