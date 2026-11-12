@@ -1,0 +1,1490 @@
+{
+  "title": "Scores: dev split",
+  "provisional": false,
+  "dataset": "dev",
+  "inputs": {
+    "runs": {
+      "plain": "20261112-133401-dev-plain",
+      "structured": "20261112-133439-dev-structured"
+    },
+    "scorer_commit": "0150f1bc2da7a880eb1f67b4f5bed8ef6aa887ab",
+    "lock_created_at": null,
+    "dataset_hash": "5f19d874299be7e2e031cadca617b2a4680e30cc5296252887f0fb17982ecc5f",
+    "taxonomy_hash": "616f5eb4e0d359d9c49f5d4692033b9d3eb6bf7ddc5e727d356b53643c408335",
+    "scoring_config": {
+      "OVERLAP_THRESHOLD": 0.6,
+      "BORDERLINE_LOW": 0.4,
+      "SEVERITY_WEIGHTS": {
+        "critical": 3,
+        "major": 2,
+        "minor": 1
+      },
+      "ECE_BINS": 5,
+      "BOOTSTRAP_RESAMPLES": 10000,
+      "BOOTSTRAP_SEED": 20261115,
+      "CONFIDENCE_LEVEL": 0.95,
+      "OWNER_CONFIRMED": true
+    },
+    "models_returned": [
+      "claude-sonnet-5-5"
+    ],
+    "drafted_by": [
+      "claude-haiku-5-5"
+    ],
+    "warnings": []
+  },
+  "counts": {
+    "reports": 4,
+    "planted_errors_by_type": {
+      "H1": 0,
+      "H2": 1,
+      "H3": 1,
+      "H4": 1,
+      "H5": 0,
+      "H6": 0,
+      "C1": 0,
+      "C2": 1,
+      "C3": 0
+    },
+    "review_findings": 0,
+    "review_items": null,
+    "provisional_scores_before_completion": 0,
+    "by_condition": {
+      "plain": {
+        "reports": 4,
+        "reports_with_no_majority_result": [],
+        "invalid_units": 0,
+        "findings": 29,
+        "false_alarms": 11,
+        "near_misses": 0,
+        "duplicates": 6,
+        "review_findings": 0,
+        "verdict_miss": 0,
+        "still_in_review": 0,
+        "null_confidence": 0,
+        "null_severity": 0,
+        "dropped_findings": 0
+      },
+      "structured": {
+        "reports": 4,
+        "reports_with_no_majority_result": [],
+        "invalid_units": 0,
+        "findings": 26,
+        "false_alarms": 7,
+        "near_misses": 0,
+        "duplicates": 7,
+        "review_findings": 0,
+        "verdict_miss": 0,
+        "still_in_review": 0,
+        "null_confidence": 0,
+        "null_severity": 0,
+        "dropped_findings": 0
+      }
+    }
+  },
+  "metrics": {
+    "plain": {
+      "per_type_recall": {
+        "H1": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "H2": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "H3": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "H4": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "H5": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "H6": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "C1": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "C2": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "C3": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        }
+      },
+      "overall_recall": {
+        "k": 4,
+        "n": 4,
+        "value": 1.0,
+        "interval": [
+          0.510109,
+          1.0
+        ]
+      },
+      "false_alarms_per_report": {
+        "planted": {
+          "reports": 3,
+          "mean": 1.222222
+        },
+        "clean": {
+          "reports": 1,
+          "mean": 0.0
+        },
+        "all": {
+          "reports": 4,
+          "mean": 0.916667
+        }
+      },
+      "specificity": {
+        "by_majority": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0
+        },
+        "per_unit": {
+          "k": 3,
+          "n": 3,
+          "value": 1.0
+        }
+      },
+      "calibration": {
+        "brier": 0.079828,
+        "ece": 0.17931,
+        "findings": 29,
+        "left_out_miss_or_in_review": 0,
+        "left_out_no_confidence": 0
+      },
+      "repeat_consistency": {
+        "planted_errors": {
+          "n": 4,
+          "mean_pairwise_agreement": 1.0,
+          "share_same_in_every_unit": 1.0
+        },
+        "clean_controls_any_false_alarm": {
+          "n": 1,
+          "mean_pairwise_agreement": 1.0,
+          "share_same_in_every_unit": 1.0
+        }
+      },
+      "recall_by_severity": {
+        "critical": {
+          "k": 2,
+          "n": 2,
+          "value": 1.0,
+          "interval": [
+            0.34238,
+            1.0
+          ]
+        },
+        "major": {
+          "k": 2,
+          "n": 2,
+          "value": 1.0,
+          "interval": [
+            0.34238,
+            1.0
+          ]
+        },
+        "minor": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        }
+      },
+      "type_agreement": {
+        "labels_scored": false,
+        "distinct_labels": 19
+      },
+      "severity_weighted_recall": {
+        "detected_weight": 10,
+        "planted_weight": 10,
+        "value": 1.0
+      }
+    },
+    "structured": {
+      "per_type_recall": {
+        "H1": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "H2": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "H3": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "H4": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "H5": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "H6": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "C1": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        },
+        "C2": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0,
+          "interval": [
+            0.206549,
+            1.0
+          ]
+        },
+        "C3": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        }
+      },
+      "overall_recall": {
+        "k": 4,
+        "n": 4,
+        "value": 1.0,
+        "interval": [
+          0.510109,
+          1.0
+        ]
+      },
+      "false_alarms_per_report": {
+        "planted": {
+          "reports": 3,
+          "mean": 0.777778
+        },
+        "clean": {
+          "reports": 1,
+          "mean": 0.0
+        },
+        "all": {
+          "reports": 4,
+          "mean": 0.583333
+        }
+      },
+      "specificity": {
+        "by_majority": {
+          "k": 1,
+          "n": 1,
+          "value": 1.0
+        },
+        "per_unit": {
+          "k": 3,
+          "n": 3,
+          "value": 1.0
+        }
+      },
+      "calibration": {
+        "brier": 0.049292,
+        "ece": 0.126154,
+        "findings": 26,
+        "left_out_miss_or_in_review": 0,
+        "left_out_no_confidence": 0
+      },
+      "repeat_consistency": {
+        "planted_errors": {
+          "n": 4,
+          "mean_pairwise_agreement": 1.0,
+          "share_same_in_every_unit": 1.0
+        },
+        "clean_controls_any_false_alarm": {
+          "n": 1,
+          "mean_pairwise_agreement": 1.0,
+          "share_same_in_every_unit": 1.0
+        }
+      },
+      "recall_by_severity": {
+        "critical": {
+          "k": 2,
+          "n": 2,
+          "value": 1.0,
+          "interval": [
+            0.34238,
+            1.0
+          ]
+        },
+        "major": {
+          "k": 2,
+          "n": 2,
+          "value": 1.0,
+          "interval": [
+            0.34238,
+            1.0
+          ]
+        },
+        "minor": {
+          "k": 0,
+          "n": 0,
+          "value": null,
+          "interval": null
+        }
+      },
+      "type_agreement": {
+        "labels_scored": true,
+        "overall": {
+          "k": 15,
+          "n": 19,
+          "value": 0.789474
+        },
+        "per_type": {
+          "H1": {
+            "k": 0,
+            "n": 0,
+            "value": null
+          },
+          "H2": {
+            "k": 3,
+            "n": 3,
+            "value": 1.0
+          },
+          "H3": {
+            "k": 6,
+            "n": 6,
+            "value": 1.0
+          },
+          "H4": {
+            "k": 3,
+            "n": 4,
+            "value": 0.75
+          },
+          "H5": {
+            "k": 0,
+            "n": 0,
+            "value": null
+          },
+          "H6": {
+            "k": 0,
+            "n": 0,
+            "value": null
+          },
+          "C1": {
+            "k": 0,
+            "n": 0,
+            "value": null
+          },
+          "C2": {
+            "k": 3,
+            "n": 6,
+            "value": 0.5
+          },
+          "C3": {
+            "k": 0,
+            "n": 0,
+            "value": null
+          }
+        }
+      },
+      "severity_weighted_recall": {
+        "detected_weight": 10,
+        "planted_weight": 10,
+        "value": 1.0
+      }
+    }
+  },
+  "comparison": {
+    "reports": 4,
+    "left_out": [],
+    "overall_recall": {
+      "difference": 0.0,
+      "interval": [
+        0.0,
+        0.0
+      ],
+      "resamples": 10000,
+      "undefined_resamples": 32
+    },
+    "false_alarms_per_report": {
+      "difference": -0.333333,
+      "interval": [
+        -1.0,
+        0.0
+      ],
+      "resamples": 10000,
+      "undefined_resamples": 0
+    },
+    "specificity": {
+      "difference": 0.0,
+      "interval": [
+        0.0,
+        0.0
+      ],
+      "resamples": 10000,
+      "undefined_resamples": 3097
+    }
+  },
+  "errors": [
+    {
+      "report_id": "C-011",
+      "error_id": "C-011-E1",
+      "type": "C2",
+      "severity": "major",
+      "kind": "statement",
+      "plain": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      },
+      "structured": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      }
+    },
+    {
+      "report_id": "H-021",
+      "error_id": "H-021-E1",
+      "type": "H3",
+      "severity": "critical",
+      "kind": "statement",
+      "plain": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      },
+      "structured": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      }
+    },
+    {
+      "report_id": "H-022",
+      "error_id": "H-022-E1",
+      "type": "H4",
+      "severity": "major",
+      "kind": "statement",
+      "plain": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      },
+      "structured": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      }
+    },
+    {
+      "report_id": "H-022",
+      "error_id": "H-022-E2",
+      "type": "H2",
+      "severity": "critical",
+      "kind": "statement",
+      "plain": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      },
+      "structured": {
+        "detected_by_repeat": [
+          true,
+          true,
+          true
+        ],
+        "detected_by_majority": true,
+        "review_pending_in_repeats": []
+      }
+    }
+  ],
+  "findings": [
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 1,
+      "finding_index": 1,
+      "section": "Values",
+      "category": "Value inconsistent with indices / transcription error",
+      "outcome": "hit",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 1,
+      "finding_index": 2,
+      "section": "Interpretation",
+      "category": "Discrepancy between values and interpretation",
+      "outcome": "duplicate",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 1,
+      "finding_index": 3,
+      "section": "Comment/recommendation",
+      "category": "Missed critical value",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 1,
+      "finding_index": 4,
+      "section": "Interpretation",
+      "category": "Omitted finding / inaccurate characterisation",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 1,
+      "section": "Values",
+      "category": "Value inconsistent with other data / transcription error",
+      "outcome": "hit",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 2,
+      "section": "Interpretation",
+      "category": "Discrepancy between values and interpretation",
+      "outcome": "duplicate",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 3,
+      "section": "Comment/recommendation",
+      "category": "Incorrect critical value assessment",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 4,
+      "section": "Values",
+      "category": "Flag/reference range",
+      "outcome": "duplicate",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 0.6
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 3,
+      "finding_index": 1,
+      "section": "Values",
+      "category": "Transcription/internal inconsistency",
+      "outcome": "hit",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "C-011",
+      "repeat": 3,
+      "finding_index": 2,
+      "section": "Interpretation",
+      "category": "Unsupported interpretation",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 1,
+      "finding_index": 1,
+      "section": "Diagnosis",
+      "category": "staging error",
+      "outcome": "hit",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 1,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "staging error",
+      "outcome": "duplicate",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 1,
+      "finding_index": 3,
+      "section": "Clinical details",
+      "category": "omission of required data",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 1,
+      "finding_index": 4,
+      "section": "Microscopic description",
+      "category": "internal inconsistency",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 1,
+      "section": "Diagnosis",
+      "category": "staging error",
+      "outcome": "hit",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "staging error",
+      "outcome": "duplicate",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 3,
+      "section": "Clinical details",
+      "category": "omission of relevant data",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 4,
+      "section": "Gross description",
+      "category": "omission",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 5,
+      "section": "Microscopic description",
+      "category": "incomplete description",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 3,
+      "finding_index": 1,
+      "section": "Diagnosis",
+      "category": "staging error",
+      "outcome": "hit",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 3,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "staging error",
+      "outcome": "duplicate",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 3,
+      "finding_index": 3,
+      "section": "Clinical details",
+      "category": "incomplete clinical information",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-021",
+      "repeat": 3,
+      "finding_index": 4,
+      "section": "Gross description",
+      "category": "omission",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-022",
+      "repeat": 1,
+      "finding_index": 1,
+      "section": "Microscopic description",
+      "category": "Internal inconsistency (lymph node count)",
+      "outcome": "hit",
+      "error_id": "H-022-E1",
+      "error_ids": [
+        "H-022-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-022",
+      "repeat": 1,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "Internal inconsistency (tumour grade)",
+      "outcome": "hit",
+      "error_id": "H-022-E2",
+      "error_ids": [
+        "H-022-E2"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-022",
+      "repeat": 2,
+      "finding_index": 1,
+      "section": "Microscopic description",
+      "category": "Internal inconsistency (lymph node count)",
+      "outcome": "hit",
+      "error_id": "H-022-E1",
+      "error_ids": [
+        "H-022-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-022",
+      "repeat": 2,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "Internal inconsistency (tumour grade)",
+      "outcome": "hit",
+      "error_id": "H-022-E2",
+      "error_ids": [
+        "H-022-E2"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-022",
+      "repeat": 3,
+      "finding_index": 1,
+      "section": "Microscopic description",
+      "category": "Internal inconsistency (lymph node count)",
+      "outcome": "hit",
+      "error_id": "H-022-E1",
+      "error_ids": [
+        "H-022-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "plain",
+      "run_id": "20261112-133401-dev-plain",
+      "report_id": "H-022",
+      "repeat": 3,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "Internal inconsistency (grade)",
+      "outcome": "hit",
+      "error_id": "H-022-E2",
+      "error_ids": [
+        "H-022-E2"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 1,
+      "finding_index": 1,
+      "section": "Values",
+      "category": "C2",
+      "outcome": "hit",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 1,
+      "finding_index": 2,
+      "section": "Interpretation",
+      "category": "C1",
+      "outcome": "duplicate",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 1,
+      "finding_index": 3,
+      "section": "Comment/recommendation",
+      "category": "C3",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 1,
+      "section": "Values",
+      "category": "C2",
+      "outcome": "hit",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 2,
+      "section": "Interpretation",
+      "category": "C1",
+      "outcome": "duplicate",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 3,
+      "section": "Comment/recommendation",
+      "category": "C3",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 2,
+      "finding_index": 4,
+      "section": "Interpretation",
+      "category": "C1",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 3,
+      "finding_index": 1,
+      "section": "Values",
+      "category": "C2",
+      "outcome": "hit",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 3,
+      "finding_index": 2,
+      "section": "Interpretation",
+      "category": "C1",
+      "outcome": "duplicate",
+      "error_id": "C-011-E1",
+      "error_ids": [
+        "C-011-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "C-011",
+      "repeat": 3,
+      "finding_index": 3,
+      "section": "Comment/recommendation",
+      "category": "C3",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 1,
+      "finding_index": 1,
+      "section": "Diagnosis",
+      "category": "H3",
+      "outcome": "hit",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 1,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "H3",
+      "outcome": "duplicate",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 1,
+      "finding_index": 3,
+      "section": "Gross description",
+      "category": "H5",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 1,
+      "section": "Diagnosis",
+      "category": "H3",
+      "outcome": "hit",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "H3",
+      "outcome": "duplicate",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 2,
+      "finding_index": 3,
+      "section": "Gross description",
+      "category": "H5",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 3,
+      "finding_index": 1,
+      "section": "Diagnosis",
+      "category": "H3",
+      "outcome": "hit",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 3,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "H3",
+      "outcome": "duplicate",
+      "error_id": "H-021-E1",
+      "error_ids": [
+        "H-021-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-021",
+      "repeat": 3,
+      "finding_index": 3,
+      "section": "Gross description",
+      "category": "H5",
+      "outcome": "false_alarm",
+      "error_id": null,
+      "error_ids": [],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": null
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-022",
+      "repeat": 1,
+      "finding_index": 1,
+      "section": "Microscopic description",
+      "category": "H4",
+      "outcome": "hit",
+      "error_id": "H-022-E1",
+      "error_ids": [
+        "H-022-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-022",
+      "repeat": 1,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "H2",
+      "outcome": "hit",
+      "error_id": "H-022-E2",
+      "error_ids": [
+        "H-022-E2"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-022",
+      "repeat": 2,
+      "finding_index": 1,
+      "section": "Microscopic description",
+      "category": "H4",
+      "outcome": "hit",
+      "error_id": "H-022-E1",
+      "error_ids": [
+        "H-022-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-022",
+      "repeat": 2,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "H2",
+      "outcome": "hit",
+      "error_id": "H-022-E2",
+      "error_ids": [
+        "H-022-E2"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-022",
+      "repeat": 2,
+      "finding_index": 3,
+      "section": "Diagnosis",
+      "category": "H3",
+      "outcome": "duplicate",
+      "error_id": "H-022-E1",
+      "error_ids": [
+        "H-022-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-022",
+      "repeat": 3,
+      "finding_index": 1,
+      "section": "Microscopic description",
+      "category": "H4",
+      "outcome": "hit",
+      "error_id": "H-022-E1",
+      "error_ids": [
+        "H-022-E1"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    },
+    {
+      "condition": "structured",
+      "run_id": "20261112-133439-dev-structured",
+      "report_id": "H-022",
+      "repeat": 3,
+      "finding_index": 2,
+      "section": "Synoptic summary",
+      "category": "H2",
+      "outcome": "hit",
+      "error_id": "H-022-E2",
+      "error_ids": [
+        "H-022-E2"
+      ],
+      "review_reason": null,
+      "verdict": null,
+      "overlap": 1.0
+    }
+  ]
+}
