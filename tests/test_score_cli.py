@@ -50,14 +50,18 @@ def _main(*args: str) -> int:
     return cli.main(list(args))
 
 
+BORDER = "Tumour measures about twenty."  # 2 of 4 tokens of TUMOUR: overlap 0.5
+
+
 def _review_runs(root):
-    """Three review findings in two items: an unmapped category on H-001's E1 in plain r1
-    and, identical, in structured r2 (one item); a section mismatch in structured r1."""
+    """Three review findings in two items (EVAL-12, by place): a borderline overlap on
+    H-001's E1 in plain r1 and, identical, in structured r2 (one item); a section mismatch in
+    structured r1. (Until EVAL-11 the first item was an unmapped category.)"""
     plain = all_units(IDS)
-    plain[("H-001", 1)] = [finding("size problem", MICRO, TUMOUR)]
+    plain[("H-001", 1)] = [finding("size problem", MICRO, BORDER)]
     structured = all_units(IDS)
     structured[("H-001", 1)] = [finding("H1", "Diagnosis", TUMOUR)]
-    structured[("H-001", 2)] = [finding("Size problem.", MICRO, TUMOUR)]
+    structured[("H-001", 2)] = [finding("size problem", MICRO, BORDER)]
     write_run(root, PLAIN, "plain", plain)
     write_run(root, STRUCTURED, "structured", structured)
 
@@ -103,25 +107,23 @@ def test_map_list_counts_categories_per_condition_and_never_writes_the_map(tree,
     before = (tree / "data" / "category_map.json").read_bytes()
     assert _main("map-list", "--runs", PLAIN, STRUCTURED) == 0
     out = read_report_json(tree / "results" / "dev" / "category_strings.json")
-    assert out["categories"] == [
-        {"category": "h1", "count": {"plain": 1, "structured": 0}, "mapped": True, "maps_to": "H1"},
-        {"category": "odd wording", "count": {"plain": 0, "structured": 1}, "mapped": False,
-         "maps_to": None},
-        {"category": "size mismatch", "count": {"plain": 1, "structured": 1}, "mapped": True,
-         "maps_to": "H1"},
+    assert out["categories"] == [  # EVAL-12: a listing only, with no mapping
+        {"category": "h1", "count": {"plain": 1, "structured": 0}},
+        {"category": "odd wording", "count": {"plain": 0, "structured": 1}},
+        {"category": "size mismatch", "count": {"plain": 1, "structured": 1}},
     ]  # fmt: skip
     assert (tree / "data" / "category_map.json").read_bytes() == before
-    assert "3 distinct categories, 1 unmapped" in capsys.readouterr().out
+    assert "3 distinct categories; wrote" in capsys.readouterr().out
 
 
-def test_map_list_without_a_map_lists_every_category_as_unmapped(tree):
+def test_map_list_without_a_map_lists_every_category(tree):
     plain = all_units(IDS)
     plain[("H-001", 1)] = [finding("Size mismatch", MICRO, TUMOUR)]
     write_run(tree, PLAIN, "plain", plain)
     assert _main("map-list", "--runs", PLAIN) == 0
     assert not (tree / "data" / "category_map.json").exists()
     (row,) = read_report_json(tree / "results" / "dev" / "category_strings.json")["categories"]
-    assert (row["category"], row["mapped"]) == ("size mismatch", False)
+    assert row == {"category": "size mismatch", "count": {"plain": 1, "structured": 0}}
 
 
 # Adjudication
@@ -131,10 +133,10 @@ def test_prepare_merges_identical_findings_into_one_item(tree):
     _review_runs(tree)
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
     items = _items(tree)
-    assert sorted(i["review_reason"] for i in items) == ["section_mismatch", "unmapped_category"]
+    assert sorted(i["review_reason"] for i in items) == ["borderline_overlap", "section_mismatch"]
     assert all(i["item_id"] in ("A001", "A002") and i["verdict"] is None for i in items)
     hidden = read_report_json(tree / ADJ / "adjudication_hidden.json")
-    merged = hidden[_item_for(tree, "unmapped_category")]
+    merged = hidden[_item_for(tree, "borderline_overlap")]
     assert [(r["run_id"], r["condition"], r["repeat"], r["finding_index"]) for r in merged] == [
         (PLAIN, "plain", 1, 1),
         (STRUCTURED, "structured", 2, 1),
@@ -219,7 +221,7 @@ def test_score_refuses_until_the_adjudication_is_complete(tree, capsys):
 def _complete(tree):
     _review_runs(tree)
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
-    unmapped = _item_for(tree, "unmapped_category")
+    unmapped = _item_for(tree, "borderline_overlap")
     mismatch = _item_for(tree, "section_mismatch")
     _fill(tree, {unmapped: ("detected", "right sentence"), mismatch: ("false_alarm", "no")})
     assert _main("adjudicate", "apply", "--dataset", "dev") == 0
@@ -304,9 +306,15 @@ def test_byte_identical_across_processes_with_different_hash_seeds(tree):
     """Set and dict order must not depend on Python's per-process string hashing."""
     plain = all_units(IDS)
     plain[("H-001", 1)] = [finding("H1", MICRO, TUMOUR), finding("Odd", "Diagnosis", DIAGNOSIS)]
-    plain[("H-002", 2)] = [finding("H5", "Diagnosis", DIAGNOSIS, confidence=None)]
+    # EVAL-12: findings in H-002 (which has an omission) would be review items, so H-002's
+    # finding is a hit on its statement error and the structured false alarm is in C-001.
+    plain[("H-002", 2)] = [finding("H5", "Synoptic summary", SYNOPTIC, confidence=None)]
     write_run(tree, PLAIN, "plain", plain)
-    write_run(tree, STRUCTURED, "structured", all_units(IDS, [finding("H1", MICRO, TUMOUR)]))
+    structured = all_units(IDS)
+    for rep in (1, 2, 3):
+        structured[("H-001", rep)] = [finding("H1", MICRO, TUMOUR)]
+    structured[("C-001", 1)] = [finding("Odd", "Interpretation", "All values within range.")]
+    write_run(tree, STRUCTURED, "structured", structured)
     outputs = []
     for seed in ("1", "2"):
         env = os.environ | {"PYTHONHASHSEED": seed, "ANTHROPIC_API_KEY": ""}
@@ -323,8 +331,17 @@ def test_byte_identical_across_processes_with_different_hash_seeds(tree):
     assert outputs[0] == outputs[1]
 
 
+def _h001_found(root) -> None:
+    """Plain finds H-001-E1 in every repeat and nothing else (EVAL-12: a finding in H-002,
+    which has an omission error, would go to the owner as a candidate)."""
+    plain = all_units(IDS)
+    for rep in (1, 2, 3):
+        plain[("H-001", rep)] = [finding("H1", MICRO, TUMOUR)]
+    write_run(root, PLAIN, "plain", plain)
+
+
 def test_summary_has_the_tables_and_the_disclosures(tree):
-    write_run(tree, PLAIN, "plain", all_units(IDS, [finding("H1", MICRO, TUMOUR)]))
+    _h001_found(tree)
     write_run(tree, STRUCTURED, "structured", all_units(IDS))
     assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
     summary = (tree / "results" / "dev" / "summary.md").read_text(encoding="utf-8")
@@ -336,6 +353,7 @@ def test_summary_has_the_tables_and_the_disclosures(tree):
         "Calibration",
         "Repeat consistency",
         "Severity-weighted recall",
+        "Type agreement (structured condition)",
         "Structured minus plain",
         "Counts",
         "Disclosures",
@@ -374,19 +392,12 @@ def _change_run(root, run_id: str, **changes) -> None:
          "one plain and one structured run"),
         (lambda root: write_run(root, STRUCTURED, "structured", all_units(IDS[:2])),
          f"run {STRUCTURED} covers other reports than the dev reports"),
-        (lambda root: write_map(root, {"Size mismatch": "H1"}),
-         "key 'Size mismatch' is not normalised; write it as 'size mismatch'"),
-        (lambda root: write_map(root, {"size": "H9"}), "'size' maps to 'H9'"),
         (lambda root: _change_run(root, STRUCTURED, dataset="scored"),
          f"run {STRUCTURED} is for the scored split, not dev"),
         (lambda root: _change_run(root, STRUCTURED, taxonomy_hash="c" * 64),
          "the two runs differ in taxonomy_hash"),
         (lambda root: _change_run(root, STRUCTURED, dataset_hash="c" * 64),
          "the two runs differ in dataset_hash"),
-        (lambda root: (root / "data" / "category_map.json").write_text(
-            '{"version": "1.0", "status": "proposed", '
-            '"map": {"size problem": "H1", "size problem": "H2"}}', encoding="utf-8"),
-         "key 'size problem' is given twice"),
     ],
 )  # fmt: skip
 def test_input_refusals(tree, capsys, change, message):
@@ -396,6 +407,25 @@ def test_input_refusals(tree, capsys, change, message):
     assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 1
     out = capsys.readouterr().out
     assert out.startswith("score refused:") and message in out
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        lambda root: write_map(root, {"Size mismatch": "H1"}),
+        lambda root: write_map(root, {"size": "H9"}),
+        lambda root: (root / "data" / "category_map.json").write_text(
+            '{"version": "1.0", "status": "proposed", '
+            '"map": {"size problem": "H1", "size problem": "H2"}}', encoding="utf-8"),
+    ],
+)  # fmt: skip
+def test_a_malformed_category_map_is_ignored(tree, change):
+    """Until EVAL-11 each of these maps refused scoring; since EVAL-12 (decision 61) no
+    category map is read at all."""
+    write_run(tree, PLAIN, "plain", all_units(IDS))
+    write_run(tree, STRUCTURED, "structured", all_units(IDS))
+    change(tree)
+    assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
 
 
 def test_dev_scoring_after_a_report_changed_goes_on_with_a_warning(tree, capsys):
@@ -464,7 +494,7 @@ def test_scored_scoring_works_when_every_condition_holds(scored):
     assert _main(*SCORED) == 0
     score = read_report_json(scored / "results" / "scored" / "score.json")
     assert score["inputs"]["lock_created_at"] == "2026-11-15T08:00:00Z"
-    assert score["inputs"]["category_map"]["version"] == "1.0"
+    assert "category_map" not in score["inputs"]  # EVAL-12: no category map is read
     assert score["counts"]["reports"] == 30
 
 
@@ -474,13 +504,10 @@ def test_scored_refuses_without_a_lock(scored, capsys):
     assert _refusal(capsys) == ["  - freeze --check: FAILED: data/prompts.lock.json does not exist"]
 
 
-def test_scored_refuses_a_map_that_is_not_approved(scored, capsys):
+def test_scored_scoring_ignores_a_map_that_is_not_approved(scored):
+    """EVAL-12 (decision 61): no category map is used, so its status refuses nothing."""
     write_map(scored, {"size mismatch": "H1"}, status="proposed")
-    assert _main(*SCORED) == 1
-    assert _refusal(capsys) == [
-        "  - data/category_map.json must have status approved to score the scored split "
-        "(it is proposed)"
-    ]
+    assert _main(*SCORED) == 0
 
 
 def test_scored_refuses_if_the_confirmation_is_ever_withdrawn(scored, capsys, monkeypatch):
@@ -515,7 +542,9 @@ def test_map_list_never_changes_an_approved_map(scored):
 
 def test_score_refuses_an_adjudication_prepared_from_other_findings(tree, capsys):
     _complete(tree)
-    write_map(tree, {"size problem": "H1"})  # two review findings become hits
+    plain = all_units(IDS)  # EVAL-12: the borderline finding now quotes the sentence: a hit
+    plain[("H-001", 1)] = [finding("size problem", MICRO, TUMOUR)]
+    write_run(tree, PLAIN, "plain", plain)
     assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 1
     assert "was prepared from other review findings than these runs give now" in (
         capsys.readouterr().out
@@ -541,8 +570,8 @@ def test_review_findings_in_different_reports_keep_their_own_verdicts(tree):
     """Two review findings at the same run, repeat and finding index, in two reports: each
     takes the verdict of its own item."""
     plain = all_units(IDS)
-    plain[("H-001", 1)] = [finding("size problem", MICRO, TUMOUR)]
-    plain[("H-002", 1)] = [finding("staging problem", "Synoptic summary", SYNOPTIC)]
+    plain[("H-001", 1)] = [finding("size problem", MICRO, BORDER)]  # borderline overlap
+    plain[("H-002", 1)] = [finding("staging problem", "Synoptic summary", "Unrelated words.")]
     write_run(tree, PLAIN, "plain", plain)
     write_run(tree, STRUCTURED, "structured", all_units(IDS))
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
@@ -645,11 +674,9 @@ def test_the_disclosure_states_what_the_sheet_hides_and_claims_no_more(tree):
     _complete(tree)
     assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
     summary = (tree / "results" / "dev" / "summary.md").read_text(encoding="utf-8")
-    assert (
-        "2 review item(s) were adjudicated by hand by the owner, from a sheet that names no "
-        "condition, repeat, model or run (decision 9). A finding's "
-        "category can still suggest its condition."
-    ) in summary
+    assert "2 review item(s) were adjudicated by hand by the owner." in summary
+    assert "The adjudication sheet showed no category, condition, repeat, model or run." in summary
+    assert "category can still suggest" not in summary  # EVAL-12: the sheet shows none
     assert "blind to the condition" not in summary
 
 
@@ -746,10 +773,12 @@ def test_the_sheet_states_the_borderline_band_from_the_settings(tree, monkeypatc
 
 def test_prepare_merges_findings_that_differ_only_in_case_and_spacing(tree):
     plain = all_units(IDS)
-    plain[("H-001", 1)] = [finding("size problem", MICRO, TUMOUR)]
+    same = {"rationale": "One rationale."}
+    plain[("H-001", 1)] = [finding("size problem", MICRO, BORDER) | same]
     structured = all_units(IDS)
     structured[("H-001", 2)] = [
-        finding("Size  Problem", "microscopic  DESCRIPTION", "tumour measures  25 mm.")
+        finding("Size  Problem", "microscopic  DESCRIPTION", "tumour measures  about twenty.")
+        | same
     ]
     write_run(tree, PLAIN, "plain", plain)
     write_run(tree, STRUCTURED, "structured", structured)
@@ -758,7 +787,7 @@ def test_prepare_merges_findings_that_differ_only_in_case_and_spacing(tree):
 
 
 def test_the_summary_shows_the_comparison_intervals_and_the_sampling_disclosure(tree):
-    write_run(tree, PLAIN, "plain", all_units(IDS, [finding("H1", MICRO, TUMOUR)]))
+    _h001_found(tree)
     write_run(tree, STRUCTURED, "structured", all_units(IDS))
     assert _main("score", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
     summary = (tree / "results" / "dev" / "summary.md").read_text(encoding="utf-8")
@@ -823,11 +852,11 @@ def test_completed_at_waits_for_the_last_verdict_and_the_reveal_is_stamped_once(
 def test_item_ids_follow_the_seeded_shuffle(tree):
     """6.7: ids in an order shuffled with the fixed seed, not in sorted order."""
     plain = all_units(IDS)
-    plain[("H-001", 1)] = [finding(f"cat {c}", MICRO, TUMOUR) for c in "abcdef"]
+    plain[("H-002", 1)] = [finding("any", MICRO, f"cat {c}") for c in "abcdef"]  # candidates
     write_run(tree, PLAIN, "plain", plain)
     write_run(tree, STRUCTURED, "structured", all_units(IDS))
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
-    by_id = [i["category"] for i in sorted(_items(tree), key=lambda i: i["item_id"])]
+    by_id = [i["quoted_sentence"] for i in sorted(_items(tree), key=lambda i: i["item_id"])]
     assert by_id != sorted(by_id)
     assert by_id == SHUFFLED
 
@@ -1057,24 +1086,16 @@ def test_provisional_scoring_of_the_dev_split_still_works(tree):
     assert (tree / "results" / "dev" / "provisional" / "score.json").is_file()
 
 
-# H6: once the scored split is scored, a category map with another sha256 is refused.
+# H6 (EVAL-09) is replaced by decision 61 (EVAL-12): no category map is read, so a changed
+# map neither refuses nor changes a rescoring.
 
 
-def test_scoring_the_scored_split_again_refuses_a_changed_category_map(scored, capsys):
+def test_scoring_the_scored_split_again_ignores_a_changed_category_map(scored):
     assert _main(*SCORED) == 0
-    first = read_report_json(scored / "results" / "scored" / "score.json")
-    recorded = first["inputs"]["category_map"]["sha256"]
-    capsys.readouterr()
+    first = (scored / "results" / "scored" / "score.json").read_bytes()
     write_map(scored, {"size mismatch": "H1", "odd wording": "H2"}, "approved", "1.1")
-    assert _main(*SCORED) == 1
-    lines = _refusal(capsys)
-    assert len(lines) == 1
-    assert lines[0].startswith(
-        "  - data/category_map.json has changed since the scored split was scored: "
-        f"results/scored/score.json records sha256 {recorded}, the map now has "
-    )
-    assert lines[0].endswith("; nothing is remapped after scoring (decision 10)")
-    assert read_report_json(scored / "results" / "scored" / "score.json") == first
+    assert _main(*SCORED) == 0
+    assert (scored / "results" / "scored" / "score.json").read_bytes() == first
 
 
 def test_scoring_the_scored_split_again_with_the_same_map_works(scored):
@@ -1084,16 +1105,15 @@ def test_scoring_the_scored_split_again_with_the_same_map_works(scored):
     assert (scored / "results" / "scored" / "score.json").read_bytes() == before
 
 
-def test_an_unreadable_scored_score_json_is_refused_in_plain_words(scored, capsys):
+def test_an_unreadable_earlier_scored_score_json_no_longer_blocks_scoring(scored):
+    """Until EVAL-11 the earlier score.json was read for the map's sha256 (H6); since EVAL-12
+    it is not read, and scoring writes it again."""
     assert _main(*SCORED) == 0
-    (scored / "results" / "scored" / "score.json").write_text("{not json", encoding="utf-8")
-    capsys.readouterr()
-    assert _main(*SCORED) == 1
-    lines = _refusal(capsys)
-    assert len(lines) == 1 and lines[0].startswith(
-        "  - results/scored/score.json cannot be read, so the category map recorded at the "
-        "first scoring cannot be checked ("
-    )
+    path = scored / "results" / "scored" / "score.json"
+    first = path.read_bytes()
+    path.write_text("{not json", encoding="utf-8")
+    assert _main(*SCORED) == 0
+    assert path.read_bytes() == first
 
 
 def test_the_dev_split_may_be_scored_again_with_another_map(tree):
@@ -1148,7 +1168,8 @@ def test_recall_by_severity_is_given_as_k_of_n_with_wilson_intervals(tree):
     assert summary.index("## Recall by severity") < summary.index("## Severity-weighted recall")
 
 
-# C: an unmapped finding in a report with an omission error becomes a review item for it.
+# Decision 62 (EVAL-12; replaces EVAL-09 C): every finding in a report with an omission error
+# that is not a hit for another error is a candidate for that omission, whatever its label.
 
 VAGUE = "Sections show an invasive tumour."
 
@@ -1161,12 +1182,12 @@ def test_an_unmapped_finding_in_a_report_with_an_omission_is_reviewed_for_the_om
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
     items = _items(tree)
     assert [(i["candidate_error_id"], i["review_reason"]) for i in items] == [
-        ("H-002-E2", "unmapped_omission")
+        ("H-002-E2", "omission_candidate")
     ]
     sheet = (tree / ADJ / "adjudication_sheet.md").read_text(encoding="utf-8")
     assert (
-        "# why it needs you: its category is not in the category map, and this report has "
-        "an omission error; the finding may be reporting what is missing"
+        "# why it needs you: this report has an omission error, and the finding is not a "
+        "detection of another error; it may be reporting what is missing"
     ) in sheet
     assert "H-002-E2 (H5, omission) in Diagnosis" in sheet
 
@@ -1206,7 +1227,7 @@ def test_with_two_omissions_one_finding_gives_one_item_per_omission(tree, histo)
     _two_omissions(tree, histo)
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0
     items = sorted((i["candidate_error_id"], i["review_reason"]) for i in _items(tree))
-    assert items == [("H-003-E1", "unmapped_omission"), ("H-003-E2", "unmapped_omission")]
+    assert items == [("H-003-E1", "omission_candidate"), ("H-003-E2", "omission_candidate")]
     hidden = read_report_json(tree / ADJ / "adjudication_hidden.json")
     refs = [(r["run_id"], r["repeat"], r["finding_index"]) for v in hidden.values() for r in v]
     assert refs == [(PLAIN, 1, 1), (PLAIN, 1, 1)]
@@ -1274,7 +1295,8 @@ def test_a_finding_on_the_other_place_is_a_hit(tree, histo, cbc):
 def test_the_sheet_shows_the_candidate_errors_other_places_after_its_sentence(tree, histo, cbc):
     _other_place_tree(tree, histo, cbc)
     plain = all_units(IDS)
-    plain[("H-001", 1)] = [finding("odd wording", GROSS, OTHER)]  # unmapped: review
+    near = "firm lesion seen here today"  # 2 of the place's 6 tokens: a borderline overlap
+    plain[("H-001", 1)] = [finding("odd wording", GROSS, near)]
     write_run(tree, PLAIN, "plain", plain)
     write_run(tree, STRUCTURED, "structured", all_units(IDS))
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", PLAIN, STRUCTURED) == 0

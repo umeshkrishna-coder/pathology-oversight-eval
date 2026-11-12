@@ -52,13 +52,23 @@ def _structured_units() -> dict:
     return units
 
 
-def _score(root, plain_units, structured_units):
+BORDER = "Tumour measures about twenty."  # 2 of 4 tokens of TUMOUR: a borderline overlap
+
+
+def _owner(unit, index, outcome):
+    """EVAL-12 (decision 62): an omission is detected only by the owner's verdict. In these
+    examples the owner judges every omission candidate detected (each is a finding on the
+    anchor, which until EVAL-11 was an automatic hit); other review items stay open."""
+    return "detected" if outcome.reason == "omission_candidate" else None
+
+
+def _score(root, plain_units, structured_units, decide=_owner):
     write_run(root, "p1", "plain", plain_units)
     write_run(root, "s1", "structured", structured_units)
     inputs, problems = load_inputs(root, "dev", ["p1", "s1"])
     assert problems == []
     views = classify_runs(inputs)
-    return score_body(inputs, views, lambda unit, i, o: None)
+    return score_body(inputs, views, decide)
 
 
 @pytest.fixture
@@ -69,8 +79,9 @@ def tree(tmp_path, histo, cbc):
 def test_metrics_of_the_worked_example(tree):
     """Plain run. H-001 (E1 H1 major): r1 hits E1; r2 finds nothing; r3 hits E1 and adds one
     false alarm. E1 is detected in 2 of 3 valid units: detected by majority. FA mean 1/3.
-    H-002 (E1 H3 critical; E2 H5 minor omission on the Diagnosis line): r1 hits E1, r2 hits E2
-    (type and the anchor's section match), r3 is invalid. Two valid units, so each error must
+    H-002 (E1 H3 critical; E2 H5 minor omission on the Diagnosis line): r1 hits E1, r2's
+    finding on the anchor is an omission candidate, adjudicated detected (EVAL-12: no automatic
+    hit for an omission), r3 is invalid. Two valid units, so each error must
     be detected in both: neither is. FA mean 0. C-001 (clean): one false alarm in r2; it passes
     in r1 and r3, so it passes by majority. FA mean 1/3.
 
@@ -86,7 +97,8 @@ def test_metrics_of_the_worked_example(tree):
     Consistency, planted errors: H-001 E1 (yes, no, yes) agrees in 1 of 3 pairs; H-002 E1
     (yes, no) and E2 (no, yes) in 0 of 1: mean (1/3 + 0 + 0) / 3 = 1/9; none is the same in
     every unit. Clean controls, any false alarm (no, yes, no): 1/3; share 0.
-    Structured: every error hit in every unit, no false alarm: recall 3/3, FA 0.
+    Structured: every error hit in every unit (E2 by the owner's verdict), no false alarm:
+    recall 3/3, FA 0.
     Structured minus plain over all 3 reports: recall 1 - 1/3 = +2/3; FA 0 - 2/9 = -2/9;
     specificity 1 - 1 = 0."""
     body = _score(tree, _plain_units(), _structured_units())
@@ -230,9 +242,10 @@ def test_a_clean_report_counts_every_finding_as_a_false_alarm(tree):
 
 
 def test_near_misses_count_for_calibration_and_not_as_false_alarms(tree):
+    """EVAL-12: there is no automatic near-miss; a near_miss comes only from a verdict."""
     units = all_units(IDS)
-    units[("H-001", 1)] = [finding("H2", MICRO, TUMOUR, confidence=0.4)]
-    body = _score(tree, units, all_units(IDS))
+    units[("H-001", 1)] = [finding("H2", MICRO, BORDER, confidence=0.4)]  # a review item
+    body = _score(tree, units, all_units(IDS), lambda unit, i, o: "near_miss")
     counts = body["counts"]["plain"]
     assert (counts["near_misses"], counts["false_alarms"]) == (1, 0)
     assert body["conditions"]["plain"]["calibration"]["brier"] == approx(0.36)
@@ -279,7 +292,7 @@ def test_identical_conditions_give_a_zero_difference_with_a_zero_interval(tree):
 
 def test_review_findings_count_as_in_review_until_resolved(tree):
     units = all_units(IDS)
-    units[("H-001", 1)] = [finding("odd wording", MICRO, TUMOUR)]  # unmapped: review
+    units[("H-001", 1)] = [finding("odd wording", MICRO, BORDER)]  # a borderline review
     body = _score(tree, units, all_units(IDS))
     counts = body["counts"]["plain"]
     assert (counts["review_findings"], counts["still_in_review"]) == (1, 1)

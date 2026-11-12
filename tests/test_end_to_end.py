@@ -490,18 +490,25 @@ def test_scored_split(world, capsys, monkeypatch):
     Severity weights (H-008 is overridden to minor): H1 2+1+2=5, H2 6, H3 6, H4 4, H5 2+1+2+1=6,
     H6 6, C1 6, C2 2, C3 6 = 47. All confidences are 0.8.
 
+    Detection by place (EVAL-12, decisions 61 to 63): a finding at a planted place is a hit
+    whatever its label; an omission is detected only by the owner's verdict. Every scripted
+    finding on an omission's anchor (H-007, H-014, C-003, C-006, both conditions) is a
+    candidate: identical findings from both runs merge, since the category is no part of the
+    item, giving one item per report, which the owner judges detected; structured H-007 r1
+    names the omission under another section: a second H-007 item, judged detected.
+
     Plain: every error found in every unit, except H-006 (found in repeat 1 only: 1 of 3 is no
-    majority, so missed: H6), H-002 (a near-miss in all 3 units: the right sentence, category
-    mapped to H1), H-004 (an unmapped category in repeats 1 and 2: one review item,
-    adjudicated detected), C-001 (repeat 3 invalid after two unreadable outputs; detected in
-    both valid units; one false alarm in repeat 1). H-003 adds one false alarm per unit; the
-    clean H-016 has one false alarm in repeats 1 and 2, so it fails by majority.
-    Recall: H2 1/2, H6 1/2, every other type all; overall 20/22. Weighted (47 - 3 - 3) = 41/47.
+    majority, so missed: H6) and C-001 (repeat 3 invalid after two unreadable outputs; detected
+    in both valid units; one false alarm in repeat 1). H-002 quotes the right sentence with
+    the H1 label: a hit (until EVAL-11 a near-miss). H-004's "odd wording" in repeats 1 and 2
+    quotes the right sentence: a hit (until EVAL-11 a review item). H-003 adds one false alarm
+    per unit; the clean H-016 has one false alarm in repeats 1 and 2, so it fails by majority.
+    Recall: H6 1/2, every other type all; overall 21/22. Weighted (47 - 3) = 44/47.
     False alarms per report (mean over valid units): planted (H-003 1 + C-001 1/2)/22 = 3/44,
     clean (H-016 2/3)/8 = 1/12, all (1 + 1/2 + 2/3)/30 = 13/180. Specificity: 7/8 by
     majority; per unit 22/24.
-    Calibration: 60 hits + 3 near-misses (outcome 1) and 6 false alarms (outcome 0), all at
-    0.8: Brier (63 x 0.04 + 6 x 0.64)/69 = 6.36/69; ECE |0.8 - 63/69| (one bin).
+    Calibration: 63 hits (the 12 omission findings by verdict; outcome 1) and 6 false alarms
+    (outcome 0), all at 0.8: Brier (63 x 0.04 + 6 x 0.64)/69 = 6.36/69; ECE |0.8 - 63/69|.
     Consistency: H-006 agrees in 1 of 3 pairs, every other error in all: (21 + 1/3)/22 =
     32/33, share 21/22; clean controls: H-016 agrees in 1 of 3 pairs, the other 7 in all:
     (1/3 + 7)/8 = 11/12, share 7/8.
@@ -512,15 +519,27 @@ def test_scored_split(world, capsys, monkeypatch):
     Structured: every error found in every unit, except H-013 (missed: H6). H-001 gives a
     duplicate in every unit; H-005's repeat 2 quotes only part of the sentence (overlap 0.4:
     one review item, adjudicated near_miss), so H-005 is found in 2 of 3; H-007's repeat 1
-    names the omission under another section (one review item, adjudicated detected); C-002's
-    repeat 1 is valid on its second attempt.
+    names the omission under another section (an omission candidate, adjudicated detected);
+    C-002's repeat 1 is valid on its second attempt.
     Recall: H6 1/2, every other type all; overall 21/22. Weighted 44/47. No false alarms:
     0, 0, 0. Specificity 8/8 and 24/24. Calibration: 66 findings, all outcome 1: Brier 0.04,
     ECE 0.2. Consistency: H-005 agrees in 1 of 3 pairs, the rest in all: (21 + 1/3)/22 =
     32/33, share 21/22; clean controls 1.0, 1.0.
 
-    Structured minus plain, over all 30 reports: recall +1/22; false alarms -13/180;
-    specificity (by majority) 8/8 - 7/8 = +1/8. Review items: 3 (2 detected, 1 near_miss).
+    Structured minus plain, over all 30 reports: recall 21/22 - 21/22 = 0 (until EVAL-11
+    +1/22: plain's H-002 was a near-miss); false alarms -13/180; specificity (by majority)
+    8/8 - 7/8 = +1/8. Review findings 25 (plain 12 on the four anchors; structured 12 there
+    plus H-005 r2) in 6 items: H-007 twice, H-014, C-003, C-006 (detected) and H-005
+    (near_miss).
+
+    Recall by severity (EVAL-09 G) changes for plain only, since H-002 (H2) is critical:
+    critical 7/8 in both conditions (until EVAL-11 plain 6/8).
+
+    Type agreement (EVAL-12): every structured finding carries its error's type id, so
+    hits and duplicates agree 65 of 65 (66 findings, less H-005 r2, a near-miss by verdict):
+    H1 12 (H-001 with its 3 duplicates, H-008, H-015), H2 6, H3 6, H4 6, H5 11 (H-005 2,
+    H-012, H-007, H-014), H6 3, C1 9, C2 6, C3 6. Plain used 11 distinct labels: the 9 plain
+    words, "odd wording" and "wording".
 
     Recall by severity (EVAL-09 G): critical 8 (H2, H3, H6 and C3, two each), major 9 (H-001,
     H-015, H4 2, H-005, H-012, C1 3), minor 5 (H-008 overridden, H-007, H-014, C2 2). Plain
@@ -553,18 +572,18 @@ def test_scored_split(world, capsys, monkeypatch):
 
     assert _main("map-list", "--runs", plain, structured) == 0
     listed = read_report_json(root / "results" / "scored" / "category_strings.json")
-    assert {c["category"]: c["mapped"] for c in listed["categories"]}["odd wording"] is False
-    write_report_json(
-        root / "data" / "category_map.json",
-        {"version": "1.0", "status": "approved", "map": CATEGORY_MAP},
-    )
+    by_label = {c["category"]: c["count"] for c in listed["categories"]}
+    assert by_label["odd wording"] == {"plain": 2, "structured": 0}  # listed, never mapped
+    assert not (root / "data" / "category_map.json").exists()  # EVAL-12: no map is used
     assert cfg.OWNER_CONFIRMED is True  # the owner's confirmation (EVAL-09 G)
     assert _main("adjudicate", "prepare", "--dataset", "scored", "--runs", plain, structured) == 0
     _assert_blind(root, "scored", [plain, structured])
     _fill_sheet(root, "scored", {
-        ("H-004", "unmapped_category"): ("detected", "the node count is the planted error"),
         ("H-005", "borderline_overlap"): ("near_miss", "the deep margin, not the sentence"),
-        ("H-007", "omission_other_section"): ("detected", "the missing PNI is the omission"),
+        ("H-007", "omission_candidate"): ("detected", "the missing PNI is the omission"),
+        ("H-014", "omission_candidate"): ("detected", "the missing PNI is the omission"),
+        ("C-003", "omission_candidate"): ("detected", "the unflagged count is the omission"),
+        ("C-006", "omission_candidate"): ("detected", "the unflagged count is the omission"),
     })  # fmt: skip
     assert _main("adjudicate", "apply", "--dataset", "scored") == 0
     assert _main("score", "--dataset", "scored", "--runs", plain, structured) == 0
@@ -576,14 +595,14 @@ def test_scored_split(world, capsys, monkeypatch):
               for c, m in (("plain", p), ("structured", s))}  # fmt: skip
     full = {"H1": (3, 3), "H2": (2, 2), "H3": (2, 2), "H4": (2, 2), "H5": (4, 4),
             "H6": (2, 2), "C1": (3, 3), "C2": (2, 2), "C3": (2, 2)}  # fmt: skip
-    assert recall["plain"] == full | {"H2": (1, 2), "H6": (1, 2)}
+    assert recall["plain"] == full | {"H6": (1, 2)}
     assert recall["structured"] == full | {"H6": (1, 2)}
-    assert (p["overall_recall"]["k"], p["overall_recall"]["n"]) == (20, 22)
+    assert (p["overall_recall"]["k"], p["overall_recall"]["n"]) == (21, 22)
     assert (s["overall_recall"]["k"], s["overall_recall"]["n"]) == (21, 22)
     weighted = {c: (m["severity_weighted_recall"]["detected_weight"],
                     m["severity_weighted_recall"]["planted_weight"])
                 for c, m in (("plain", p), ("structured", s))}  # fmt: skip
-    assert weighted == {"plain": (41, 47), "structured": (44, 47)}
+    assert weighted == {"plain": (44, 47), "structured": (44, 47)}
     rows = {(f["condition"], f["report_id"], f["repeat"], f["finding_index"]): f
             for f in score["findings"]}  # fmt: skip
     for cond in CONDITIONS:  # EVAL-10: the findings on other places are hits
@@ -603,19 +622,25 @@ def test_scored_split(world, capsys, monkeypatch):
                    for c, m in (("plain", p), ("structured", s))}  # fmt: skip
     major, minor = (9, 9, [0.7009, 1.0]), (5, 5, [0.5655, 1.0])
     assert by_severity == {
-        "plain": {"critical": (6, 8, [0.4093, 0.9285]), "major": major, "minor": minor},
+        "plain": {"critical": (7, 8, [0.5291, 0.9776]), "major": major, "minor": minor},
         "structured": {"critical": (7, 8, [0.5291, 0.9776]), "major": major, "minor": minor},
     }
     summary = (out / "summary.md").read_text(encoding="utf-8")
-    assert "| Critical | 6/8 = 75.0% (95% CI 40.9%–92.9%) | 7/8 = 87.5% (95% CI 52.9%–97.8%) |" in (
-        summary
-    )
+    critical = "7/8 = 87.5% (95% CI 52.9%–97.8%)"
+    assert f"| Critical | {critical} | {critical} |" in summary
+    agreement = s["type_agreement"]
+    assert (agreement["overall"]["k"], agreement["overall"]["n"]) == (65, 65)
+    assert {t: (v["k"], v["n"]) for t, v in agreement["per_type"].items()} == {
+        "H1": (12, 12), "H2": (6, 6), "H3": (6, 6), "H4": (6, 6), "H5": (11, 11),
+        "H6": (3, 3), "C1": (9, 9), "C2": (6, 6), "C3": (6, 6),
+    }  # fmt: skip
+    assert p["type_agreement"] == {"labels_scored": False, "distinct_labels": 11}
     wilson = {(1, 2): [0.0945, 0.9055], (2, 2): [0.3424, 1.0], (3, 3): [0.4385, 1.0],
               (4, 4): [0.5101, 1.0]}  # fmt: skip
     for m in (p, s):
         for tid, v in m["per_type_recall"].items():
             assert [round(x, 4) for x in v["interval"]] == wilson[(v["k"], v["n"])], tid
-    assert [round(x, 4) for x in p["overall_recall"]["interval"]] == [0.7219, 0.9747]
+    assert [round(x, 4) for x in p["overall_recall"]["interval"]] == [0.782, 0.9919]
     assert [round(x, 4) for x in s["overall_recall"]["interval"]] == [0.782, 0.9919]
     fa = {k: _value(v) for k, v in p["false_alarms_per_report"].items()}
     assert fa == pytest.approx({"planted": 3 / 44, "clean": 1 / 12, "all": 13 / 180}, abs=1e-6)
@@ -643,19 +668,19 @@ def test_scored_split(world, capsys, monkeypatch):
     assert (clean["mean_pairwise_agreement"], clean["share_same_in_every_unit"]) == (1.0, 1.0)
     comp = score["comparison"]
     assert comp["reports"] == 30 and comp["left_out"] == []
-    assert comp["overall_recall"]["difference"] == pytest.approx(1 / 22, abs=1e-6)
+    assert comp["overall_recall"]["difference"] == pytest.approx(0.0, abs=1e-6)
     assert comp["false_alarms_per_report"]["difference"] == pytest.approx(-13 / 180, abs=1e-6)
     assert comp["specificity"]["difference"] == pytest.approx(1 / 8, abs=1e-6)
     for key, pinned in BOOTSTRAP_PINNED.items():
         assert comp[key]["interval"] == pytest.approx(pinned, abs=1e-6), key
     counts = score["counts"]
-    assert counts["review_items"]["items"] == 3
-    assert counts["review_findings"] == 4  # H-004 r1 and r2 (one item), H-005 r2, H-007 r1
-    assert counts["review_items"]["verdicts"]["detected"] == 2
+    assert counts["review_items"]["items"] == 6
+    assert counts["review_findings"] == 25  # plain 12 and structured 12 on anchors, H-005 r2
+    assert counts["review_items"]["verdicts"]["detected"] == 5
     assert counts["review_items"]["verdicts"]["near_miss"] == 1
     by = counts["by_condition"]
     assert (by["plain"]["invalid_units"], by["structured"]["invalid_units"]) == (1, 0)
-    assert (by["plain"]["near_misses"], by["structured"]["near_misses"]) == (3, 1)
+    assert (by["plain"]["near_misses"], by["structured"]["near_misses"]) == (0, 1)
     assert (by["plain"]["duplicates"], by["structured"]["duplicates"]) == (0, 3)
     assert (by["plain"]["false_alarms"], by["structured"]["false_alarms"]) == (6, 0)
     calls = {c: read_report_json(root / "runs" / r / "results.json")["totals"]["calls"]
@@ -676,7 +701,8 @@ def test_scored_split(world, capsys, monkeypatch):
 
 
 # Pinned from the seeded scorer (10,000 resamples, seed 20261115); see the docstring.
-BOOTSTRAP_PINNED = {"overall_recall": [-0.1, 0.2], "false_alarms_per_report": [-0.161111, 0.0],
+BOOTSTRAP_PINNED = {"overall_recall": [-0.130435, 0.130435],  # EVAL-12 (was [-0.1, 0.2])
+                    "false_alarms_per_report": [-0.161111, 0.0],
                     "specificity": [0.0, 0.4]}  # fmt: skip
 
 
@@ -686,7 +712,8 @@ def _assert_blind(root: Path, dataset: str, run_ids: list[str]) -> None:
     rationale is the same invented sentence, so nothing can have been added to it)."""
     folder = root / "results" / dataset / "adjudication"
     items = read_report_json(folder / "adjudication.json")["items"]
-    assert {i["rationale"] for i in items} == {RATIONALE}
+    assert {i["rationale"] for i in items} <= {RATIONALE}
+    assert all("category" not in i for i in items)  # decision 63
     sheet = (folder / "adjudication_sheet.md").read_text(encoding="utf-8")
     assert [ln for ln in sheet.split("\n") if ln.startswith("# rationale:")] == [
         f"# rationale: {RATIONALE}"
@@ -699,14 +726,16 @@ def _assert_blind(root: Path, dataset: str, run_ids: list[str]) -> None:
 
 def test_dev_split(world, capsys, monkeypatch):
     """Dev split, no freeze: H-021 (H1), H-022 (H3), C-011 (C2) planted, H-023 clean. Both
-    conditions find every error in every unit and nothing else, except that plain gives H-021
-    an unmapped category in repeat 1: one review item, adjudicated detected, so it is a hit.
+    conditions find every error in every unit and nothing else; plain labels H-021's finding
+    "odd wording" in repeat 1, which is a hit by place (EVAL-12; until EVAL-11 it was a review
+    item, adjudicated detected). No review item, so nothing to adjudicate. Type agreement:
+    structured 9 of 9; plain used 4 distinct labels.
     Recall 3/3 in each (Wilson 0.4385 to 1), per type H1, H3 and C2 1/1 (0.2065 to 1);
     severity-weighted (H1 major 2 + H3 critical 3 + C2 minor 1) 6/6, and by severity
     (EVAL-09 G) critical, major and minor 1/1 each (0.2065 to 1); no false alarms;
     specificity 1/1 by majority and 3/3 per unit; calibration 9 findings, all outcome 1 at
     0.8: Brier 0.04, ECE 0.2; consistency 1.0 with every unit the same (3 errors; the one
-    clean control too); differences 0 with bootstrap intervals [0, 0]; review items 1."""
+    clean control too); differences 0 with bootstrap intervals [0, 0]."""
     root = world
     reports, drafts_before = _build(root, capsys)
     model = Model(reports)
@@ -714,21 +743,23 @@ def test_dev_split(world, capsys, monkeypatch):
     model.plans["plain", "H-021"] = [_out(odd)] + [_out(model.hit("H-021", "plain"))] * 2
     plain, structured = (_run(model, "dev", c, monkeypatch) for c in CONDITIONS)
     assert _main("map-list", "--runs", plain, structured) == 0
-    write_report_json(
-        root / "data" / "category_map.json",
-        {"version": "1.0", "status": "approved", "map": CATEGORY_MAP},
-    )
     assert _main("adjudicate", "prepare", "--dataset", "dev", "--runs", plain, structured) == 0
+    assert (
+        read_report_json(root / "results" / "dev" / "adjudication" / "adjudication.json")["items"]
+        == []
+    )
     _assert_blind(root, "dev", [plain, structured])
-    _fill_sheet(root, "dev", {("H-021", "unmapped_category"): ("detected", "the size")})
-    assert _main("adjudicate", "apply", "--dataset", "dev") == 0
     assert _main("score", "--dataset", "dev", "--runs", plain, structured) == 0
     out = root / "results" / "dev"
     first = {n: (out / n).read_bytes() for n in ("score.json", "summary.md")}
     assert _main("score", "--dataset", "dev", "--runs", plain, structured) == 0
     assert {n: (out / n).read_bytes() for n in ("score.json", "summary.md")} == first
     score = read_report_json(out / "score.json")
-    assert score["counts"]["review_items"]["verdicts"]["detected"] == 1
+    assert score["counts"]["review_items"] is None and score["counts"]["review_findings"] == 0
+    assert score["metrics"]["structured"]["type_agreement"]["overall"] == {
+        "k": 9, "n": 9, "value": 1.0,
+    }  # fmt: skip
+    assert score["metrics"]["plain"]["type_agreement"]["distinct_labels"] == 4
     for condition in ("plain", "structured"):
         m = score["metrics"][condition]
         assert (m["overall_recall"]["k"], m["overall_recall"]["n"]) == (3, 3)
@@ -739,8 +770,7 @@ def test_dev_split(world, capsys, monkeypatch):
         )  # fmt: skip
     for key in ("overall_recall", "false_alarms_per_report", "specificity"):
         assert score["comparison"][key]["difference"] == 0.0, key
-    assert score["counts"]["review_findings"] == 1
-    assert score["counts"]["review_items"]["items"] == 1
+    assert score["counts"]["review_findings"] == 0  # EVAL-12: H-021's finding is a hit
     for condition in ("plain", "structured"):
         m = score["metrics"][condition]
         assert {t: (v["k"], v["n"]) for t, v in m["per_type_recall"].items() if v["n"]} == {

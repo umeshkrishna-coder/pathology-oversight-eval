@@ -220,23 +220,17 @@ class SmokeConfig(StrictModel):
     sdk_version: str
 
 
-ReviewReason = Literal[
-    "unmapped_category",
-    "borderline_overlap",
-    "section_mismatch",
-    "omission_other_section",
-    "unmapped_omission",  # EVAL-09 C
-]
+ReviewReason = Literal["borderline_overlap", "section_mismatch", "omission_candidate"]
 
 
 class AdjudicationItem(StrictModel):
-    """Blind adjudication view: no condition, repeat, model or run (EVAL-05)."""
+    """Blind adjudication view: no category, condition, repeat, model or run (decisions 9
+    and 63)."""
 
     item_id: str
     report_id: str
     section: str
     quoted_sentence: str
-    category: str
     rationale: str
     candidate_error_id: str
     review_reason: ReviewReason

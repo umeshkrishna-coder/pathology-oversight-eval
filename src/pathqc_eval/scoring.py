@@ -7,7 +7,6 @@ score.json and summary.md: no clock time, sorted orders and a fixed bootstrap se
 
 from __future__ import annotations
 
-import json
 import math
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
@@ -20,16 +19,15 @@ from pydantic import Field
 
 from pathqc_eval import scoring_config as cfg
 from pathqc_eval.findings import ParsedFinding
-from pathqc_eval.freeze import LOCK_FILE, TAXONOMY_FILE, check_lock, compute_lock, normalized_sha256
+from pathqc_eval.freeze import LOCK_FILE, TAXONOMY_FILE, check_lock, compute_lock
 from pathqc_eval.harness import REPEATS, RUNS_DIR, run_hashes, valid_run_id
-from pathqc_eval.io import read_report_json, unique_keys
-from pathqc_eval.matching import OTHER, Outcome, classify, map_category, normalise_category
+from pathqc_eval.io import read_report_json
+from pathqc_eval.matching import Outcome, classify, normalise_category
 from pathqc_eval.matching import resolve as resolve_unit
 from pathqc_eval.schema import Report, RunConfig, StrictModel
 from pathqc_eval.stats import brier, ece, paired_bootstrap, wilson
 from pathqc_eval.taxonomy import Taxonomy, load_taxonomy
 
-CATEGORY_MAP_FILE = "data/category_map.json"
 REPORTS_DIR = "data/reports"
 RESULTS_DIR = "results"
 CONDITIONS = ("plain", "structured")
@@ -46,7 +44,7 @@ def _r(value: float | None) -> float | None:
     return None if value is None else round(value, 6) + 0.0
 
 
-# Inputs: runs, reports, taxonomy, category map
+# Inputs: runs, reports, taxonomy
 
 
 class ResultUnit(StrictModel):
@@ -124,74 +122,12 @@ def load_run(root: Path, run_id: str) -> tuple[Run | None, list[str]]:
     return Run(run_id, config, results), problems
 
 
-@dataclass(frozen=True)
-class CategoryMap:
-    entries: dict[str, str]
-    status: str  # proposed, approved, or missing (no file)
-    version: str | None
-    sha256: str | None
-
-    def describe(self) -> dict:
-        return {"status": self.status, "version": self.version, "sha256": self.sha256}
-
-
-def load_category_map(root: Path, taxonomy: Taxonomy) -> tuple[CategoryMap | None, list[str]]:
-    """data/category_map.json: version, status (proposed | approved) and map from a normalised
-    category to a taxonomy id or "other". A missing file is an empty map with status missing."""
-    path = root / CATEGORY_MAP_FILE
-    if not path.is_file():
-        return CategoryMap({}, "missing", None, None), []
-    try:
-        # A key given twice is refused: one string maps one way (decision 10).
-        data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_keys)
-    except (OSError, ValueError, RecursionError) as exc:
-        reason = "nested too deeply" if isinstance(exc, RecursionError) else _short(exc)
-        return None, [f"{CATEGORY_MAP_FILE} cannot be read ({reason})"]
-    if not isinstance(data, dict):
-        return None, [f"{CATEGORY_MAP_FILE} must be a JSON object with version, status and map"]
-    problems: list[str] = []
-    extra = sorted(str(key) for key in data if key not in ("version", "status", "map"))
-    if extra:
-        problems.append(f"{CATEGORY_MAP_FILE}: unknown keys: {', '.join(extra)}")
-    version, status, mapping = data.get("version"), data.get("status"), data.get("map")
-    if not isinstance(version, str) or not version.strip():
-        problems.append(f"{CATEGORY_MAP_FILE}: version must be a non-empty string")
-    if status not in ("proposed", "approved"):
-        problems.append(f"{CATEGORY_MAP_FILE}: status must be proposed or approved")
-    if not isinstance(mapping, dict):
-        problems.append(f"{CATEGORY_MAP_FILE}: map must be an object")
-        mapping = {}
-    ids = taxonomy.type_ids()
-    own = {tid.casefold() for tid in ids} | {OTHER}
-    for key, value in mapping.items():
-        if not isinstance(value, str) or (value not in ids and value != OTHER):
-            problems.append(
-                f"{CATEGORY_MAP_FILE}: '{_short(key, 60)}' maps to {_short(repr(value), 60)}, "
-                f"not to a taxonomy id ({', '.join(ids)}) or 'other'"
-            )
-        normal = normalise_category(key)
-        if normal != key:
-            problems.append(
-                f"{CATEGORY_MAP_FILE}: key '{_short(key, 60)}' is not normalised; "
-                f"write it as '{_short(normal, 60)}'"
-            )
-        elif key in own:
-            problems.append(
-                f"{CATEGORY_MAP_FILE}: key '{key}' is a taxonomy id or 'other', which map to "
-                "themselves; remove it"
-            )
-    if problems:
-        return None, problems
-    return CategoryMap(dict(mapping), status, version, normalized_sha256(path)), []
-
-
 @dataclass
 class Inputs:
     dataset: str
     runs: dict[str, Run]  # by condition
     reports: dict[str, Report]  # the split's reports, by id
     taxonomy: Taxonomy
-    category_map: CategoryMap
     lock_created_at: str | None
     warnings: list[str]  # dev only: the tree has changed since the runs
 
@@ -220,32 +156,6 @@ def _load_reports(root: Path, dataset: str) -> tuple[dict[str, Report], list[str
         if report.split == dataset:
             reports[report.id] = report
     return reports, problems
-
-
-def _remap_problems(root: Path, category_map: CategoryMap) -> list[str]:
-    """Owner decision (EVAL-09 H6; decision 10, nothing is remapped after scoring): once the
-    scored split has been scored, the category map must keep the sha256 that
-    results/scored/score.json records."""
-    where = f"{RESULTS_DIR}/scored/score.json"
-    path = root / RESULTS_DIR / "scored" / "score.json"
-    if not path.exists():
-        return []
-    try:
-        recorded = read_report_json(path)["inputs"]["category_map"]["sha256"]
-        if not isinstance(recorded, str):
-            raise TypeError(f"the recorded sha256 is {type(recorded).__name__}, not text")
-    except (OSError, ValueError, RecursionError, KeyError, TypeError) as exc:
-        return [
-            f"{where} cannot be read, so the category map recorded at the first scoring "
-            f"cannot be checked ({_short(exc)})"
-        ]
-    if recorded == category_map.sha256:
-        return []
-    return [
-        f"{CATEGORY_MAP_FILE} has changed since the scored split was scored: {where} records "
-        f"sha256 {recorded}, the map now has {category_map.sha256}; nothing is remapped after "
-        "scoring (decision 10)"
-    ]
 
 
 def load_inputs(root: Path, dataset: str, run_ids: Sequence[str]) -> tuple[Inputs | None, list]:
@@ -304,8 +214,6 @@ def load_inputs(root: Path, dataset: str, run_ids: Sequence[str]) -> tuple[Input
         for report_id, repeats in sorted(units.items()):
             if sorted(repeats) != list(range(1, REPEATS + 1)):
                 problems.append(f"run {run.run_id}: {report_id} does not have repeats 1 to 3")
-    category_map, found = load_category_map(root, taxonomy)
-    problems += found
     lock_created_at = None
     if dataset == "scored":
         outcome = check_lock(root)
@@ -321,23 +229,14 @@ def load_inputs(root: Path, dataset: str, run_ids: Sequence[str]) -> tuple[Input
                     problems.append(
                         f"run {run.run_id}: {', '.join(differ)} {verb} from {LOCK_FILE}"
                     )
-        if category_map is not None and category_map.status != "approved":
-            problems.append(
-                f"{CATEGORY_MAP_FILE} must have status approved to score the scored split "
-                f"(it is {category_map.status})"
-            )
-        if category_map is not None:
-            problems += _remap_problems(root, category_map)
         if not cfg.OWNER_CONFIRMED:
             problems.append(
                 "scoring_config.OWNER_CONFIRMED is False: the scorer defaults are not confirmed "
                 "by the owner"
             )
-    if problems or category_map is None:
+    if problems:
         return None, problems
-    inputs = Inputs(
-        dataset, by_condition, reports, taxonomy, category_map, lock_created_at, warnings
-    )
+    inputs = Inputs(dataset, by_condition, reports, taxonomy, lock_created_at, warnings)
     return inputs, []
 
 
@@ -352,8 +251,7 @@ class UnitView:
     repeat: int
     valid: bool
     findings: list[ParsedFinding]
-    mapped: list[str]
-    base: list[Outcome]  # one per finding: hit, review, near_miss or false_alarm
+    base: list[Outcome]  # one per finding: hit, review or false_alarm (decision 61)
     dropped: int
     model: str | None
 
@@ -362,7 +260,7 @@ Views = dict[str, dict[tuple[str, int], UnitView]]  # condition -> (report id, r
 
 
 def classify_runs(inputs: Inputs) -> Views:
-    type_ids = inputs.taxonomy.type_ids()
+    """Every finding by place (decision 61): no category is read."""
     views: Views = {}
     for cond in CONDITIONS:
         run = inputs.runs[cond]
@@ -371,15 +269,9 @@ def classify_runs(inputs: Inputs) -> Views:
             errors = inputs.reports[unit.report_id].errors
             valid = unit.status == "valid"
             findings = list(unit.findings) if valid else []
-            mapped = [
-                map_category(f.category, type_ids, inputs.category_map.entries) for f in findings
-            ]
-            base = [
-                classify(f.section, f.quoted_sentence, m, errors)
-                for f, m in zip(findings, mapped, strict=True)
-            ]
+            base = [classify(f.section, f.quoted_sentence, errors) for f in findings]
             units[(unit.report_id, unit.repeat)] = UnitView(
-                cond, run.run_id, unit.report_id, unit.repeat, valid, findings, mapped, base,
+                cond, run.run_id, unit.report_id, unit.repeat, valid, findings, base,
                 unit.dropped_count, unit.model_returned,
             )  # fmt: skip
         views[cond] = units
@@ -388,8 +280,8 @@ def classify_runs(inputs: Inputs) -> Views:
 
 @dataclass(frozen=True)
 class ReviewFinding:
-    """One review finding and one candidate error: a finding in review for several omission
-    errors (EVAL-09 C) gives one ReviewFinding, and so one review item, per omission."""
+    """One review finding and one candidate error: a finding in review for several errors
+    (decision 61) gives one ReviewFinding, and so one review item, per error."""
 
     unit: UnitView
     index: int  # 1-based position of the finding in its unit
@@ -406,8 +298,11 @@ def review_findings(views: Views) -> list[ReviewFinding]:
                 zip(unit.findings, unit.base, strict=True), start=1
             ):
                 if outcome.outcome == "review":
-                    for eid in outcome.ids:
-                        one = replace(outcome, error_id=eid, error_ids=())
+                    reasons = outcome.reasons or (outcome.reason,) * len(outcome.ids)
+                    for eid, reason in zip(outcome.ids, reasons, strict=True):
+                        one = replace(
+                            outcome, error_id=eid, reason=reason, error_ids=(), reasons=()
+                        )
                         found.append(ReviewFinding(unit, index, finding, one))
     return found
 
@@ -532,6 +427,7 @@ def condition_metrics(inputs: Inputs, views: dict, facts: ConditionFacts) -> dic
     clean_ids = [rid for rid in sorted(reports) if not reports[rid].errors]
     clean_units = [o for rid in clean_ids for _, o in facts.valid[rid]]
 
+    type_agreement = _type_agreement(inputs, views, facts)
     pairs: list[tuple[float, int]] = []
     left_out_review = left_out_no_confidence = 0
     for rid in sorted(reports):
@@ -576,11 +472,47 @@ def condition_metrics(inputs: Inputs, views: dict, facts: ConditionFacts) -> dic
             "clean_controls_any_false_alarm": _consistency(clean_flags),
         },
         "recall_by_severity": by_severity,
+        "type_agreement": type_agreement,
         "severity_weighted_recall": {
             "detected_weight": detected_weight,
             "planted_weight": planted_weight,
             "value": _r(detected_weight / planted_weight) if planted_weight else None,
         },
+    }
+
+
+def _type_agreement(inputs: Inputs, views: dict, facts: ConditionFacts) -> dict:
+    """Decision 61: labels decide nothing. For the structured condition, over hits and
+    duplicates in valid units (one per finding and error; adjudicated detections included),
+    the share whose normalised category equals the error's type id, overall and per type. For
+    the plain condition the labels were free text and are not scored: only the number of
+    distinct normalised labels in valid units is given."""
+    condition = next(iter(views.values())).condition if views else "plain"
+    if condition == "plain":
+        labels = {
+            normalise_category(f.category)
+            for unit in views.values()
+            if unit.valid
+            for f in unit.findings
+        }
+        return {"labels_scored": False, "distinct_labels": len(labels)}
+    error_type = {e.error_id: e.type for r in inputs.reports.values() for e in r.errors}
+    tally = {tid: [0, 0] for tid in inputs.taxonomy.type_ids()}
+    for rid, units in facts.valid.items():
+        for rep, outcomes in units:
+            for finding, outcome in zip(views[(rid, rep)].findings, outcomes, strict=True):
+                if outcome.outcome not in ("hit", "duplicate"):
+                    continue
+                for eid in outcome.ids:
+                    tid = error_type[eid]
+                    tally[tid][1] += 1
+                    tally[tid][0] += normalise_category(finding.category) == tid.casefold()
+    k = sum(v[0] for v in tally.values())
+    n = sum(v[1] for v in tally.values())
+    return {
+        "labels_scored": True,
+        "overall": _proportion(k, n),
+        "per_type": {tid: _proportion(v[0], v[1]) for tid, v in tally.items()},
     }
 
 
@@ -690,8 +622,8 @@ def finding_table(views: Views, resolved: Resolved, verdict_of: Callable) -> lis
     for cond in CONDITIONS:
         for key in sorted(views[cond]):
             unit = views[cond][key]
-            for index, (finding, mapped, base, final) in enumerate(
-                zip(unit.findings, unit.mapped, unit.base, resolved[cond][key], strict=True),
+            for index, (finding, base, final) in enumerate(
+                zip(unit.findings, unit.base, resolved[cond][key], strict=True),
                 start=1,
             ):
                 rows.append(
@@ -703,11 +635,10 @@ def finding_table(views: Views, resolved: Resolved, verdict_of: Callable) -> lis
                         "finding_index": index,
                         "section": finding.section,
                         "category": finding.category,
-                        "mapped": mapped,
                         "outcome": final.outcome,
                         "error_id": final.error_id,
                         "error_ids": list(final.ids),
-                        "review_reason": base.reason,
+                        "review_reason": _reasons(base),
                         "verdict": _verdicts(verdict_of, unit, index, base),
                         "overlap": _r(base.overlap),
                     }
@@ -715,9 +646,17 @@ def finding_table(views: Views, resolved: Resolved, verdict_of: Callable) -> lis
     return rows
 
 
+def _reasons(base: Outcome):
+    """A review finding's reason; for one in review for several errors, by error id."""
+    if base.outcome != "review":
+        return None
+    if len(base.ids) > 1:
+        return dict(zip(base.ids, base.reasons, strict=True))
+    return base.reason
+
+
 def _verdicts(verdict_of: Callable, unit: UnitView, index: int, base: Outcome):
-    """A review finding's verdict; for one in review for several omission errors (EVAL-09 C),
-    the verdict on each, by error id."""
+    """A review finding's verdict; for one in review for several errors, by error id."""
     if base.outcome != "review":
         return None
     if len(base.ids) > 1:

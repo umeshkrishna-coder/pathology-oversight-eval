@@ -199,7 +199,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     two_runs = {"nargs": 2, "required": True, "metavar": ("PLAIN_RUN_ID", "STRUCTURED_RUN_ID")}
     map_cmd = sub.add_parser(
-        "map-list", help="list the runs' distinct categories and whether each is mapped"
+        "map-list", help="list the runs' distinct categories, with their count per condition"
     )
     map_cmd.add_argument("--runs", nargs="+", required=True, metavar="RUN_ID")
     adjudicate = sub.add_parser("adjudicate", help="blind adjudication of review findings")

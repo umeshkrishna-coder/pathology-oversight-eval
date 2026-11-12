@@ -19,7 +19,7 @@ from pathlib import Path
 
 from pathqc_eval import adjudication
 from pathqc_eval import scoring_config as cfg
-from pathqc_eval.matching import UNMAPPED, VERDICTS, map_category, normalise_category
+from pathqc_eval.matching import VERDICTS, normalise_category
 from pathqc_eval.scoring import (
     CONDITIONS,
     RESULTS_DIR,
@@ -29,14 +29,12 @@ from pathqc_eval.scoring import (
     error_table,
     finding_count,
     finding_table,
-    load_category_map,
     load_inputs,
     load_run,
     planted_by_type,
     review_findings,
     score_body,
 )
-from pathqc_eval.taxonomy import load_taxonomy
 
 TABLES_LEFT_OUT = (
     "The per-error and per-finding tables are left out of provisional scores, so that no "
@@ -196,7 +194,6 @@ def run_score(
             "lock_created_at": inputs.lock_created_at,
             "dataset_hash": inputs.runs["plain"].config.dataset_hash,
             "taxonomy_hash": inputs.runs["plain"].config.taxonomy_hash,
-            "category_map": inputs.category_map.describe(),
             "scoring_config": cfg.config_values(),
             "models_returned": inputs.models_returned(),
             "drafted_by": sorted({r.provenance.drafted_by for r in inputs.reports.values()}),
@@ -285,9 +282,7 @@ def summary_markdown(score: dict, inputs: Inputs) -> str:
     out = [f"# {score['title']}", ""]
     out.append(
         f"Runs: plain {inp['runs']['plain']}, structured {inp['runs']['structured']}. "
-        f"Category map: {inp['category_map']['status']}"
-        + (f", version {inp['category_map']['version']}" if inp["category_map"]["version"] else "")
-        + f". Lock created: {inp['lock_created_at'] or 'none (dev split)'}. "
+        f"Lock created: {inp['lock_created_at'] or 'none (dev split)'}. "
         f"Scorer commit: {inp['scorer_commit']}."
     )
     for warning in inp["warnings"]:
@@ -372,6 +367,29 @@ def summary_markdown(score: dict, inputs: Inputs) -> str:
             ),
         )
     )
+    out += ["", f"## {prefix}Type agreement (structured condition)", ""]
+    out += [
+        "Labels decide no detection (decision 61). Over the structured condition's hits and "
+        "duplicates, the share whose category is the planted error's type id:",
+        "",
+        "| | Structured |",
+        "|---|---|",
+    ]
+    s_pair = pair["structured"]
+
+    def agreement(label: str, pick: Callable[[dict], dict]) -> str:
+        cells = [_prop(pick(m["type_agreement"])) for m in s_pair]
+        return f"| {label} | {_between(cells[0], cells[1])} |"
+
+    out.append(agreement("Overall", lambda a: a["overall"]))
+    for tid in inputs.taxonomy.type_ids():
+        out.append(agreement(tid, lambda a, t=tid: a["per_type"][t]))
+    labels = pair["plain"][0]["type_agreement"]["distinct_labels"]
+    out += [
+        "",
+        "Plain condition: labels were free text and were not scored "
+        f"({labels} distinct label{'' if labels == 1 else 's'}).",
+    ]
     out += [
         "",
         f"## {prefix}Structured minus plain",
@@ -456,11 +474,7 @@ def summary_markdown(score: dict, inputs: Inputs) -> str:
             "logged and will be disclosed with the final scores."
         )
     elif items:
-        by_hand = (
-            f"{adjudicated} review item(s) were adjudicated by hand by the owner, from a sheet "
-            "that names no condition, repeat, model or run (decision 9). A finding's category "
-            "can still suggest its condition."
-        )
+        by_hand = f"{adjudicated} review item(s) were adjudicated by hand by the owner."
     else:
         by_hand = f"{adjudicated} review item(s) were adjudicated by hand."
     before = counts.get("provisional_scores_before_completion")
@@ -484,7 +498,11 @@ def summary_markdown(score: dict, inputs: Inputs) -> str:
         f"The reports are synthetic: drafted by {drafted} and corrected by the owner. Sampling "
         f"was the API default. One evaluated model was used; the API returned the model string "
         f"{models}. {counts['reports']} reports were scored ({score['dataset']} split). "
-        f"{by_hand}",
+        "A detection means the finding quoted the planted sentence or one of its named other "
+        f"places, in the right section, with a token overlap of at least "
+        f"{cfg.OVERLAP_THRESHOLD:g}; an omission is detected only by the owner's verdict. "
+        "Labels (categories) were not used to decide detections. The adjudication sheet showed "
+        f"no category, condition, repeat, model or run. {by_hand}",
     ]
     return "\n".join(out) + "\n"
 
@@ -508,51 +526,25 @@ def map_list(root: Path, run_ids: list[str]) -> Outcome:
     datasets = sorted({run.config.dataset for run in runs})
     if len(datasets) != 1:
         return _refused([f"the runs are for different splits ({', '.join(datasets)})"], "map-list")
-    try:
-        taxonomy = load_taxonomy(root / "data" / "taxonomy.json")
-    except (OSError, ValueError) as exc:
-        return _refused([f"data/taxonomy.json cannot be loaded ({str(exc)[:200]})"], "map-list")
-    category_map, problems = load_category_map(root, taxonomy)
-    if category_map is None:
-        return _refused(problems, "map-list")
     counts: dict[str, Counter] = {}
     for run in runs:
         for unit in run.results.units:
             if unit.status == "valid":
                 for f in unit.findings:
                     counts.setdefault(normalise_category(f.category), Counter())[run.condition] += 1
-    type_ids = taxonomy.type_ids()
-    rows = []
-    for category in sorted(counts):
-        mapped = map_category(category, type_ids, category_map.entries)
-        rows.append(
-            {
-                "category": category,
-                "count": {cond: counts[category][cond] for cond in CONDITIONS},
-                "mapped": mapped != UNMAPPED,
-                "maps_to": None if mapped == UNMAPPED else mapped,
-            }
-        )
+    rows = [
+        {"category": category, "count": {cond: counts[category][cond] for cond in CONDITIONS}}
+        for category in sorted(counts)
+    ]
     dataset = datasets[0]
-    out = {
-        "dataset": dataset,
-        "runs": sorted(run.run_id for run in runs),
-        "category_map": category_map.describe(),
-        "categories": rows,
-    }
+    out = {"dataset": dataset, "runs": sorted(run.run_id for run in runs), "categories": rows}
     path = root / RESULTS_DIR / dataset / "category_strings.json"
     problem = _write_outputs(root, {path: _json_bytes(out)})
     if problem:
         return _refused([problem], "map-list")
-    lines = [f"{'plain':>5} {'struct':>6}  {'maps to':<8} category"]
-    for r in rows:
-        lines.append(
-            f"{r['count']['plain']:>5} {r['count']['structured']:>6}  "
-            f"{r['maps_to'] or '-':<8} {r['category']}"
-        )
-    unmapped = sum(not r["mapped"] for r in rows)
-    lines.append(
-        f"{len(rows)} distinct categories, {unmapped} unmapped; wrote {path.as_posix()} "
-        f"(the category map is {category_map.status}; map-list never writes it)"
-    )
+    lines = [f"{'plain':>5} {'struct':>6}  category"]
+    lines += [
+        f"{r['count']['plain']:>5} {r['count']['structured']:>6}  {r['category']}" for r in rows
+    ]
+    lines.append(f"{len(rows)} distinct categories; wrote {path.as_posix()}")
     return Outcome(lines, True)

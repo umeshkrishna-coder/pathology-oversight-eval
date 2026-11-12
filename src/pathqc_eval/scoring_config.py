@@ -8,7 +8,7 @@ False, `pathqc-eval score --dataset scored` refuses.
 """
 
 OVERLAP_THRESHOLD = 0.6  # decision 8: token containment, the larger of the two directions
-BORDERLINE_LOW = 0.4  # type and section right, overlap from here up to the threshold: review
+BORDERLINE_LOW = 0.4  # section right, overlap from here up to the threshold: review (decision 61)
 SEVERITY_WEIGHTS = {"critical": 3, "major": 2, "minor": 1}  # for severity-weighted recall
 ECE_BINS = 5  # decision 7: equal-width confidence bins on 0 to 1
 BOOTSTRAP_RESAMPLES = 10000  # resamples in the paired bootstrap over reports

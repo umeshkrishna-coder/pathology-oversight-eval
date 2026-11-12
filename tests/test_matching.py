@@ -5,7 +5,6 @@ import pytest
 from pathqc_eval.matching import (
     Outcome,
     classify,
-    map_category,
     normalise_category,
     normalise_section,
     overlap,
@@ -73,26 +72,8 @@ def test_overlap_treats_a_decimal_as_one_token():
     assert overlap("Hb 6.2", "Hb 6.20") == 0.5  # 6.2 and 6.20 are different tokens
 
 
-# 6.3 Mapping
-
-
-def test_a_category_equal_to_a_taxonomy_id_maps_to_it():
-    assert map_category("H1", IDS, {}) == "H1"
-    assert map_category(" h1. ", IDS, {"h1": "H2"}) == "H1"
-
-
-def test_other_maps_to_other_and_the_map_decides_the_rest():
-    mapping = {"size mismatch": "H1", "style": "other"}
-    assert map_category("Other", IDS, {}) == "other"
-    assert map_category("Size  MISMATCH!", IDS, mapping) == "H1"
-    assert map_category("style", IDS, mapping) == "other"
-    assert map_category("something odd", IDS, mapping) == "unmapped"
-
-
-def test_the_same_string_always_maps_the_same_way():
-    mapping = {"size mismatch": "H1"}
-    results = {map_category(text, IDS, mapping) for text in ("Size mismatch", "size mismatch.")}
-    assert results == {"H1"}
+# 6.3 Categories (EVAL-12: no category map; categories are normalised only to be listed and
+# for type agreement)
 
 
 def test_normalise_category_drops_trailing_punctuation():
@@ -106,7 +87,7 @@ def test_normalise_category_drops_trailing_punctuation():
     assert normalise_category("H1 +") == "h1 +"
 
 
-# 6.4 Classification
+# 6.4 Classification by place (decision 61, EVAL-12): no category is read
 
 
 STATEMENT = _error(1, "H1", "Microscopic description", "Tumour measures 25 mm.")
@@ -114,22 +95,18 @@ OMISSION = _error(2, "H5", "Synoptic summary", "LVI absent; PNI absent.", kind="
 
 
 @pytest.mark.parametrize(
-    ("mapped", "section", "quote", "expected"),
+    ("section", "quote", "expected"),
     [
-        ("H1", "Microscopic description", "Tumour measures 25 mm.", ("hit", None)),
-        ("H2", "Microscopic description", "Tumour measures 25 mm.", ("near_miss", None)),
-        ("other", "Microscopic description", "Tumour measures 25 mm.", ("near_miss", None)),
-        ("unmapped", "Microscopic description", "Tumour measures 25 mm.",
-         ("review", "unmapped_category")),
-        ("H1", "Microscopic description", "Tumour size given as 25 cm",
+        ("Microscopic description", "Tumour measures 25 mm.", ("hit", None)),
+        ("Microscopic description", "Tumour size given as 25 cm",
          ("review", "borderline_overlap")),
-        ("H1", "Diagnosis", "Tumour measures 25 mm.", ("review", "section_mismatch")),
-        ("H1", "Microscopic description", "Grade is two.", ("false_alarm", None)),
-        ("H2", "Diagnosis", "Tumour measures 25 mm.", ("false_alarm", None)),
+        ("Diagnosis", "Tumour measures 25 mm.", ("review", "section_mismatch")),
+        ("Microscopic description", "Grade is two.", ("false_alarm", None)),
+        ("Diagnosis", "Grade is two.", ("false_alarm", None)),
     ],
 )  # fmt: skip
-def test_statement_rules(mapped, section, quote, expected):
-    result = classify(section, quote, mapped, [STATEMENT])
+def test_statement_rules(section, quote, expected):
+    result = classify(section, quote, [STATEMENT])
     assert (result.outcome, result.reason) == expected
     if expected[0] != "false_alarm":
         assert result.error_id == "H-001-E1"
@@ -139,24 +116,22 @@ BOUNDARY = _error(1, "H1", "Microscopic description", "alpha beta gamma delta ep
 
 
 @pytest.mark.parametrize(
-    ("mapped", "section", "quote", "expected"),
+    ("section", "quote", "expected"),
     [
         # 3 of 5 tokens shared: ov 0.6 exactly, the threshold
-        ("H1", "Microscopic description", "alpha beta gamma zeta eta", ("hit", None)),
-        ("unmapped", "Microscopic description", "alpha beta gamma zeta eta",
-         ("review", "unmapped_category")),
-        ("H1", "Diagnosis", "alpha beta gamma zeta eta", ("review", "section_mismatch")),
+        ("Microscopic description", "alpha beta gamma zeta eta", ("hit", None)),
+        ("Diagnosis", "alpha beta gamma zeta eta", ("review", "section_mismatch")),
         # 2 of 5: ov 0.4 exactly, the low end of the borderline band
-        ("H1", "Microscopic description", "alpha beta zeta eta theta",
+        ("Microscopic description", "alpha beta zeta eta theta",
          ("review", "borderline_overlap")),
-        ("unmapped", "Microscopic description", "alpha beta zeta eta theta", ("false_alarm", None)),
+        ("Diagnosis", "alpha beta zeta eta theta", ("false_alarm", None)),
         # 1 of 5: ov 0.2, below the band
-        ("H1", "Microscopic description", "alpha zeta eta theta iota", ("false_alarm", None)),
-        ("unmapped", "Microscopic description", "zeta eta theta iota kappa", ("false_alarm", None)),
+        ("Microscopic description", "alpha zeta eta theta iota", ("false_alarm", None)),
+        ("Microscopic description", "zeta eta theta iota kappa", ("false_alarm", None)),
     ],
 )  # fmt: skip
-def test_statement_rules_at_the_boundaries(mapped, section, quote, expected):
-    result = classify(section, quote, mapped, [BOUNDARY])
+def test_statement_rules_at_the_boundaries(section, quote, expected):
+    result = classify(section, quote, [BOUNDARY])
     assert (result.outcome, result.reason) == expected
 
 
@@ -167,47 +142,43 @@ def test_a_point_between_a_letter_and_a_digit_splits_tokens():
 
 
 @pytest.mark.parametrize(
-    ("mapped", "section", "quote", "expected"),
+    ("section", "quote"),
     [
-        ("H5", "Synoptic summary", "Anything at all", ("hit", None)),
-        ("H5", "Microscopic description", "LVI absent; PNI absent.",
-         ("review", "omission_other_section")),
-        ("unmapped", "Synoptic summary", "LVI absent; PNI absent.",
-         ("review", "unmapped_category")),
-        ("unmapped", "Synoptic summary", "Something unrelated",
-         ("review", "unmapped_omission")),  # EVAL-09 C; a false alarm before
-        ("H4", "Synoptic summary", "LVI absent; PNI absent.", ("false_alarm", None)),
+        ("Synoptic summary", "LVI absent; PNI absent."),  # the anchor itself: no automatic hit
+        ("Synoptic summary", "Anything at all"),
+        ("Microscopic description", "LVI absent; PNI absent."),
+        ("Diagnosis", "Something unrelated"),
     ],
-)  # fmt: skip
-def test_omission_rules(mapped, section, quote, expected):
-    result = classify(section, quote, mapped, [OMISSION])
-    assert (result.outcome, result.reason) == expected
-
-
-def test_hit_comes_before_review_before_near_miss():
-    near = _error(1, "H2", "Microscopic description", "Tumour measures 25 mm.")
-    review = _error(2, "H1", "Diagnosis", "Tumour measures 25 mm.")
-    hit = _error(3, "H1", "Microscopic description", "Tumour measures 25 mm. Margins clear.")
-    # E1 would be a near_miss (H2), E2 a review (section_mismatch), E3 a hit.
-    found = classify("Microscopic description", "Tumour measures 25 mm.", "H1", [near, review, hit])
-    assert (found.outcome, found.error_id) == ("hit", "H-001-E3")
-    found = classify("Microscopic description", "Tumour measures 25 mm.", "H1", [near, review])
-    assert (found.outcome, found.reason, found.error_id) == (
-        "review", "section_mismatch", "H-001-E2",
+)
+def test_every_finding_in_a_report_with_an_omission_is_a_candidate_for_it(section, quote):
+    """Decision 62 (EVAL-12): an omission is never an automatic hit; every finding that is not
+    a hit for another error is a candidate for it."""
+    result = classify(section, quote, [OMISSION])
+    assert (result.outcome, result.reason, result.error_ids) == (
+        "review", "omission_candidate", ("H-001-E2",)
     )  # fmt: skip
-    found = classify("Microscopic description", "Tumour measures 25 mm.", "H1", [near])
-    assert (found.outcome, found.error_id) == ("near_miss", "H-001-E1")
 
 
-def test_within_a_level_the_highest_overlap_then_the_lowest_error_id_wins():
+def test_a_hit_comes_before_any_review():
+    review = _error(1, "H1", "Diagnosis", "Tumour measures 25 mm.")
+    hit = _error(2, "H1", "Microscopic description", "Tumour measures 25 mm. Margins clear.")
+    found = classify("Microscopic description", "Tumour measures 25 mm.", [review, hit])
+    assert (found.outcome, found.error_id) == ("hit", "H-001-E2")
+    found = classify("Microscopic description", "Tumour measures 25 mm.", [review])
+    assert (found.outcome, found.reason, found.error_id) == (
+        "review", "section_mismatch", "H-001-E1",
+    )  # fmt: skip
+
+
+def test_among_hits_the_highest_overlap_then_the_lowest_error_id_wins():
     partial = _error(1, "H1", "Microscopic description", "Tumour measures 25 mm in total size.")
     exact = _error(2, "H1", "Microscopic description", "Tumour measures 25 mm.")
-    found = classify("Microscopic description", "Tumour measures 25 mm.", "H1", [partial, exact])
+    found = classify("Microscopic description", "Tumour measures 25 mm.", [partial, exact])
     # E1: 4 shared of the finding's 4 -> 1.0 as well; E2: 1.0: a tie, so the lowest id, E1
     assert found.error_id == "H-001-E1"
     other = _error(2, "H1", "Microscopic description", "Tumour measures 25 mm and more mm.")
     tenth = _error(10, "H1", "Microscopic description", "Tumour measures 25 mm.")
-    found = classify("Microscopic description", "Tumour measures 25 mm.", "H1", [tenth, other])
+    found = classify("Microscopic description", "Tumour measures 25 mm.", [tenth, other])
     assert found.error_id == "H-001-E2"  # E2 before E10: numbers, not text, are compared
 
 
@@ -216,15 +187,11 @@ def test_highest_overlap_wins_over_a_lower_error_id():
     stronger = _error(2, "H1", "Microscopic description", "Tumour measures 25 mm.")
     quote = "Tumour measures 25 mm."
     assert overlap(quote, weaker.quoted_sentence) < overlap(quote, stronger.quoted_sentence)
-    assert classify("Microscopic description", quote, "H1", [weaker, stronger]).error_id == (
-        "H-001-E2"
-    )
+    assert classify("Microscopic description", quote, [weaker, stronger]).error_id == "H-001-E2"
 
 
 def test_every_finding_in_a_clean_report_is_a_false_alarm():
-    assert classify("Interpretation", "All values within range.", "C1", []) == Outcome(
-        "false_alarm"
-    )
+    assert classify("Interpretation", "All values within range.", []) == Outcome("false_alarm")
 
 
 def test_further_hits_on_the_same_error_are_duplicates():
@@ -242,8 +209,8 @@ def test_verdicts_resolve_review_findings():
     base = [
         Outcome("review", "H-001-E1", "section_mismatch", 1.0),
         Outcome("review", "H-001-E2", "borderline_overlap", 0.5),
-        Outcome("review", "H-001-E1", "unmapped_category", 1.0),
-        Outcome("review", "H-001-E2", "unmapped_category", 1.0),
+        Outcome("review", "H-001-E1", "omission_candidate", 1.0),
+        Outcome("review", "H-001-E2", "section_mismatch", 1.0),
         Outcome("review", "H-001-E1", "section_mismatch", 0.9),
     ]
     verdicts = {1: "detected", 2: "near_miss", 3: "false_alarm", 4: "miss", 5: "detected"}
@@ -258,45 +225,44 @@ def test_verdicts_resolve_review_findings():
     assert resolve(base, lambda i, o: None) == base  # undecided findings stay in review
 
 
-# EVAL-09 C (owner decision, 2026-11-11): in a report with an omission error, an unmapped
-# finding that is not already a hit or a review item becomes a review item for each omission.
+# Omission candidates (decision 62; replaces EVAL-09 C, decision 50's combination kept)
 
 OMISSION_E2 = _error(2, "H5", "Diagnosis", "Invasive tumour, grade 2.", kind="omission")
 OMISSION_E3 = _error(3, "H5", "Synoptic summary", "pT1c pN0.", kind="omission")
 STATEMENT_E1 = _error(1, "H1", "Microscopic description", "Tumour measures 25 mm.")
 
 
-def test_an_unmapped_finding_beside_an_omission_is_reviewed_for_it():
-    errors = [STATEMENT_E1, OMISSION_E2]
-    outcome = classify("Gross description", "Fatty tissue.", "unmapped", errors)
-    assert outcome == Outcome("review", "H-001-E2", "unmapped_omission", None, ("H-001-E2",))
+def test_a_finding_beside_an_omission_is_a_candidate_for_it_whatever_its_label():
+    outcome = classify("Gross description", "Fatty tissue.", [STATEMENT_E1, OMISSION_E2])
+    assert outcome == Outcome(
+        "review", "H-001-E2", "omission_candidate", 0.0, ("H-001-E2",), ("omission_candidate",)
+    )
 
 
-def test_an_unmapped_finding_beside_two_omissions_is_reviewed_for_each():
+def test_a_finding_beside_two_omissions_is_a_candidate_for_each():
     errors = [STATEMENT_E1, OMISSION_E2, OMISSION_E3]
-    outcome = classify("Gross description", "Fatty tissue.", "unmapped", errors)
-    assert (outcome.outcome, outcome.reason) == ("review", "unmapped_omission")
+    outcome = classify("Gross description", "Fatty tissue.", errors)
+    assert (outcome.outcome, outcome.reason) == ("review", "omission_candidate")
     assert outcome.error_ids == ("H-001-E2", "H-001-E3")
 
 
-def test_an_unmapped_finding_already_in_review_for_another_error_keeps_that_item():
+def test_a_finding_in_review_for_a_statement_error_is_also_an_omission_candidate():
     errors = [STATEMENT_E1, OMISSION_E2]
-    outcome = classify("Microscopic description", "Tumour measures 25 mm.", "unmapped", errors)
-    assert (outcome.outcome, outcome.error_id, outcome.reason) == (
-        "review", "H-001-E1", "unmapped_category"
+    outcome = classify("Diagnosis", "Tumour measures 25 mm.", errors)
+    assert (outcome.error_ids, outcome.reasons) == (
+        ("H-001-E1", "H-001-E2"), ("section_mismatch", "omission_candidate")
     )  # fmt: skip
 
 
-@pytest.mark.parametrize("mapped", ["H2", "other"])
-def test_a_mapped_finding_beside_an_omission_stays_a_false_alarm(mapped):
-    errors = [STATEMENT_E1, OMISSION_E2]
-    assert classify("Gross description", "Fatty tissue.", mapped, errors) == Outcome("false_alarm")
-
-
-def test_an_unmapped_finding_without_an_omission_stays_a_false_alarm():
-    assert classify("Gross description", "Fatty tissue.", "unmapped", [STATEMENT_E1]) == Outcome(
-        "false_alarm"
+def test_a_hit_beside_an_omission_is_no_candidate():
+    outcome = classify(
+        "Microscopic description", "Tumour measures 25 mm.", [STATEMENT_E1, OMISSION_E2]
     )
+    assert (outcome.outcome, outcome.error_id, outcome.error_ids) == ("hit", "H-001-E1", ())
+
+
+def test_a_finding_without_an_omission_or_a_place_is_a_false_alarm():
+    assert classify("Gross description", "Fatty tissue.", [STATEMENT_E1]) == Outcome("false_alarm")
 
 
 @pytest.mark.parametrize(
@@ -310,13 +276,19 @@ def test_an_unmapped_finding_without_an_omission_stays_a_false_alarm():
     ],
 )
 def test_one_verdict_per_omission_resolves_the_finding(verdicts, expected):
-    review = Outcome("review", "H-001-E2", "unmapped_omission", None, ("H-001-E2", "H-001-E3"))
+    review = Outcome(
+        "review", "H-001-E2", "omission_candidate", None, ("H-001-E2", "H-001-E3"),
+        ("omission_candidate", "omission_candidate"),
+    )  # fmt: skip
     (resolved,) = resolve([review], lambda i, o: verdicts[o.error_id])
     assert (resolved.outcome, resolved.ids) == expected
 
 
 def test_a_finding_hitting_two_omissions_is_a_duplicate_only_where_both_were_hit():
-    review = Outcome("review", "H-001-E2", "unmapped_omission", None, ("H-001-E2", "H-001-E3"))
+    review = Outcome(
+        "review", "H-001-E2", "omission_candidate", None, ("H-001-E2", "H-001-E3"),
+        ("omission_candidate", "omission_candidate"),
+    )  # fmt: skip
     base = [Outcome("hit", "H-001-E2", None, 1.0), review, review]
     resolved = resolve(base, lambda i, o: "detected")
     assert [(o.outcome, o.ids) for o in resolved] == [
@@ -326,9 +298,7 @@ def test_a_finding_hitting_two_omissions_is_a_duplicate_only_where_both_were_hit
     ]
 
 
-# EVAL-10 K (owner decision, 2026-11-11): an error may name up to three other places. A finding
-# quoting any of the error's places is treated as one quoting its main sentence, using the
-# best-matching place; for an omission, the right type in the section of any place is a hit.
+# Other places (decision 56, EVAL-10), by place only since EVAL-12
 
 SYN_PT = "pT: pT3"
 DIAG_PT = "Invasive tumour, pT3, grade 2."
@@ -347,68 +317,52 @@ def _stage() -> PlantedError:
 
 
 @pytest.mark.parametrize(
-    ("mapped", "section", "quote", "expected"),
+    ("section", "quote", "expected"),
     [
-        ("H3", "Diagnosis", DIAG_PT, ("hit", None, 1.0)),
-        ("H1", "Diagnosis", DIAG_PT, ("near_miss", None, 1.0)),
-        ("unmapped", "Diagnosis", DIAG_PT, ("review", "unmapped_category", 1.0)),
-        ("H3", "Diagnosis", "Invasive tumour with deep margin unusual today here.",
+        ("Diagnosis", DIAG_PT, ("hit", None, 1.0)),
+        ("Diagnosis", "Invasive tumour with deep margin unusual today here.",
          ("review", "borderline_overlap", 0.4)),
-        ("H3", "Microscopic description", DIAG_PT, ("review", "section_mismatch", 1.0)),
-        ("H3", "Synoptic summary", SYN_PT, ("hit", None, 1.0)),  # the main place still counts
+        ("Microscopic description", DIAG_PT, ("review", "section_mismatch", 1.0)),
+        ("Synoptic summary", SYN_PT, ("hit", None, 1.0)),  # the main place still counts
     ],
 )  # fmt: skip
-def test_a_finding_quoting_an_other_place_follows_the_same_rules(mapped, section, quote, expected):
-    result = classify(section, quote, mapped, [_stage()])
+def test_a_finding_quoting_an_other_place_follows_the_same_rules(section, quote, expected):
+    result = classify(section, quote, [_stage()])
     assert (result.outcome, result.reason, round(result.overlap, 3)) == expected
     assert result.error_id == "H-001-E1"
 
 
 def test_the_best_matching_place_wins_over_a_closer_sentence_elsewhere():
-    """Main place: the same section, the right type, the finding contained in it (a hit); the other
-    place: the exact sentence in another section (a section mismatch). The hit wins."""
+    """Main place: the same section, the finding contained in it (a hit); the other place:
+    the exact sentence in another section (a section mismatch). The hit wins."""
     err = _with_places(
         _error(1, "H3", "Diagnosis", "Invasive tumour, pT3, grade 2 of 3 here."),
         ("Synoptic summary", "Invasive tumour, pT3, grade 2."),
     )
-    result = classify("Diagnosis", "Invasive tumour, pT3, grade 2.", "H3", [err])
+    result = classify("Diagnosis", "Invasive tumour, pT3, grade 2.", [err])
     assert (result.outcome, result.reason) == ("hit", None)
 
 
 def test_without_other_places_the_other_sentence_is_a_false_alarm():
     plain = _error(1, "H3", "Synoptic summary", SYN_PT)
-    assert classify("Diagnosis", DIAG_PT, "H3", [plain]) == Outcome("false_alarm")
+    assert classify("Diagnosis", DIAG_PT, [plain]) == Outcome("false_alarm")
 
 
-def test_an_omission_is_hit_through_the_section_of_an_other_place():
+def test_an_omission_with_other_places_is_still_only_a_candidate():
     omission = _with_places(
         _error(2, "H5", "Synoptic summary", "LVI absent", kind="omission"),
         ("Microscopic description", "Margins are clear."),
     )
-    hit = classify("Microscopic description", "No PNI is mentioned.", "H5", [omission])
-    assert (hit.outcome, hit.error_id) == ("hit", "H-001-E2")
-    elsewhere = classify("Diagnosis", "No PNI is mentioned.", "H5", [omission])
-    assert (elsewhere.outcome, elsewhere.reason) == ("review", "omission_other_section")
-
-
-def test_an_unmapped_finding_on_an_omissions_other_place_is_reviewed_as_unmapped_category():
-    omission = _with_places(
-        _error(2, "H5", "Synoptic summary", "LVI absent", kind="omission"),
-        ("Microscopic description", "Margins are clear."),
-    )
-    result = classify("Microscopic description", "Margins are clear.", "unmapped", [omission])
-    assert (result.outcome, result.reason, result.error_id) == (
-        "review", "unmapped_category", "H-001-E2"
+    result = classify("Microscopic description", "Margins are clear.", [omission])
+    assert (result.outcome, result.reason, result.error_id, result.overlap) == (
+        "review", "omission_candidate", "H-001-E2", 1.0
     )  # fmt: skip
 
 
 def test_a_finding_on_two_errors_places_gets_one_outcome_by_the_existing_precedence():
-    """E1 (H1) names the Diagnosis sentence as an other place; E3 (H3) has it as its main
-    sentence. An H3 finding there is a hit for E3 (a near-miss for E1); an H1 finding is a
-    hit for E1 through its other place (a near-miss for E3)."""
+    """E1 names the Diagnosis sentence as an other place; E3 has it as its main sentence.
+    Both overlap 1.0, so the lowest error id, E1, has the one hit."""
     e1 = _with_places(_error(1, "H1", "Gross description", GROSS), ("Diagnosis", DIAG_PT))
     e3 = _error(3, "H3", "Diagnosis", DIAG_PT)
-    as_h3 = classify("Diagnosis", DIAG_PT, "H3", [e1, e3])
-    as_h1 = classify("Diagnosis", DIAG_PT, "H1", [e1, e3])
-    assert (as_h3.outcome, as_h3.error_id) == ("hit", "H-001-E3")
-    assert (as_h1.outcome, as_h1.error_id) == ("hit", "H-001-E1")
+    result = classify("Diagnosis", DIAG_PT, [e1, e3])
+    assert (result.outcome, result.error_id, result.error_ids) == ("hit", "H-001-E1", ())

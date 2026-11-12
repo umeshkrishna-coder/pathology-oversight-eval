@@ -154,11 +154,10 @@ def _adjudication_item(**overrides) -> dict:
         "report_id": "H-001",
         "section": "Microscopic description",
         "quoted_sentence": "Tumour measures 25 mm.",
-        "category": "size mismatch",
         "rationale": "Differs from the gross size.",
         # EVAL-05 fields
         "candidate_error_id": "H-001-E1",
-        "review_reason": "unmapped_category",
+        "review_reason": "borderline_overlap",  # EVAL-12: no category on an item (decision 63)
     }
     return data | overrides
 
@@ -170,7 +169,7 @@ def test_adjudication_item_starts_without_verdict():
 
 
 def test_adjudication_item_is_blind():
-    for hidden in ("condition", "repeat", "model", "run_id"):
+    for hidden in ("category", "condition", "repeat", "model", "run_id"):
         assert hidden not in AdjudicationItem.model_fields
         with pytest.raises(ValidationError):
             AdjudicationItem.model_validate(_adjudication_item(**{hidden: "x"}))

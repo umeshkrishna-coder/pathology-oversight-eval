@@ -1,10 +1,10 @@
 """Blind adjudication of review findings (EVAL-05 6.7; decision 9).
 
 `prepare` collects every review finding of the two runs and merges identical ones into items.
-The owner sees only adjudication_sheet.md (and adjudication.json): report, section, quoted
-sentence, category, rationale, the planted error it may match and the reason it needs review,
-never a condition, repeat, model or run (decision 9 as reworded on 2026-11-11). A finding in
-review for several omission errors gives one item per omission (EVAL-09 C).
+The owner sees only adjudication_sheet.md (and adjudication.json): the finding's report,
+section, quoted sentence and rationale, the candidate planted error with its other places, and
+the reason it needs review; never a category, condition, repeat, model or run (decisions 9 and
+63). A finding in review for several errors gives one item per error (decision 61).
 adjudication_hidden.json maps each item to its findings; only the scorer reads it, and only
 once every verdict is filled; it then writes adjudication_log.json. It is gitignored, with
 results/*/provisional/, until the reveal (EVAL-09 A).
@@ -31,7 +31,6 @@ from pathqc_eval import scoring_config as cfg
 from pathqc_eval.io import read_report_json, unique_keys, write_report_json
 from pathqc_eval.matching import (
     VERDICTS,
-    normalise_category,
     normalise_quote,
     normalise_section,
 )
@@ -53,13 +52,10 @@ def sheet_lines(text: str) -> list[str]:
 
 
 REASON_WORDS = {
-    "unmapped_category": "its category is not in the category map; the section and the quoted "
-    "sentence match this planted error",
-    "section_mismatch": "type and quoted sentence are right, but the finding names another section",
-    "omission_other_section": "the type matches this omission, but the finding is in another "
-    "section than the anchor",
-    "unmapped_omission": "its category is not in the category map, and this report has an "
-    "omission error; the finding may be reporting what is missing (the finding has one item "
+    "section_mismatch": "the quoted sentence matches this planted error (or one of its other "
+    "places), but the finding names another section",
+    "omission_candidate": "this report has an omission error, and the finding is not a "
+    "detection of another error; it may be reporting what is missing (the finding has one item "
     "for each omission error of the report)",
 }
 
@@ -68,8 +64,9 @@ def reason_words(reason: str) -> str:
     """A review reason in plain words; the borderline band comes from the scorer settings."""
     if reason == "borderline_overlap":
         return (
-            "type and section are right, but the quoted sentence only partly matches (overlap "
-            f"of at least {cfg.BORDERLINE_LOW:g} and below {cfg.OVERLAP_THRESHOLD:g})"
+            "the section is right, but the quoted sentence only partly matches this planted "
+            f"error (overlap of at least {cfg.BORDERLINE_LOW:g} and below "
+            f"{cfg.OVERLAP_THRESHOLD:g})"
         )
     return REASON_WORDS[reason]
 
@@ -176,7 +173,8 @@ class Prepared:
 
 def build_items(found: list, reports: dict) -> Prepared:
     """Merge review findings identical in report, normalised section, normalised quote,
-    normalised category and candidate error into one item; ids in a seeded shuffled order."""
+    rationale and candidate error into one item (decision 63: the category plays no part);
+    ids in a seeded shuffled order."""
     groups: dict[tuple, list] = {}
     for review in found:
         f = review.finding
@@ -184,7 +182,7 @@ def build_items(found: list, reports: dict) -> Prepared:
             review.unit.report_id,
             normalise_section(f.section),
             normalise_quote(f.quoted_sentence),
-            normalise_category(f.category),
+            f.rationale or "",
             review.outcome.error_id,
         )
         groups.setdefault(key, []).append(review)
@@ -202,8 +200,7 @@ def build_items(found: list, reports: dict) -> Prepared:
                 report_id=key[0],
                 section=min(f.section for f in findings),
                 quoted_sentence=min(f.quoted_sentence for f in findings),
-                category=min(f.category for f in findings),
-                rationale="\n".join(sorted({f.rationale for f in findings if f.rationale})),
+                rationale=key[3],
                 candidate_error_id=key[4],
                 review_reason=members[0].outcome.reason,
             )
@@ -249,7 +246,6 @@ def sheet_text(dataset: str, items: list[AdjudicationItem], reports: dict) -> st
         out += _comment("report", item.report_id)
         out += _comment("section", item.section)
         out += _comment("quoted sentence", item.quoted_sentence)
-        out += _comment("category", item.category)
         out += _comment("rationale", item.rationale)
         out += _comment(
             "candidate planted error",
@@ -361,7 +357,7 @@ def _finding_count(found: list) -> int:
 def stale_message(folder: Path) -> str:
     return (
         f"the adjudication in {folder.as_posix()} was prepared from other review findings "
-        "than these runs give now (the runs, the category map or the scorer settings "
+        "than these runs give now (the runs, the reports or the scorer settings "
         "changed); move that folder aside and prepare again"
     )
 
