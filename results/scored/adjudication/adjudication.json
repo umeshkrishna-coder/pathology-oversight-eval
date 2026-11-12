@@ -1,6 +1,6 @@
 {
   "prepared_at": "2026-11-12T15:38:53Z",
-  "completed_at": null,
+  "completed_at": "2026-11-12T16:29:06Z",
   "items": [
     {
       "item_id": "A001",
@@ -10,8 +10,8 @@
       "rationale": "Perineural invasion is not assessed anywhere in the microscopic description, so 'Not applicable' is inconsistent. Lymphovascular invasion, which was assessed, is missing from the synoptic summary.",
       "candidate_error_id": "H-007-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "detected",
+      "verdict_reason": "says the lymphovascular invasion line is missing from the synoptic summary"
     },
     {
       "item_id": "A002",
@@ -21,8 +21,8 @@
       "rationale": "The absolute basophil count of 0.19 exceeds the stated upper limit of 0.10, yet the interpretation does not address it. It is also high relative to a basophil fraction of 1%, so either the reference range or the value looks wrong.",
       "candidate_error_id": "C-006-E3",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A003",
@@ -32,8 +32,8 @@
       "rationale": "A platelet count of 95 x10^9/L is below 100 and is often graded as moderate rather than mild thrombocytopenia. The grading is borderline, and the treatment-related attribution is reasonable.",
       "candidate_error_id": "C-005-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "a debatable point about the platelet grading, but not the planted error"
     },
     {
       "item_id": "A004",
@@ -43,8 +43,8 @@
       "rationale": "A WBC of 0.9 x10^9/L with an ANC of 0.2 x10^9/L is a critical value in a patient on chemotherapy. The report has no critical flag, no urgent communication and no recommendation such as neutropenic precautions, fever assessment or oncology contact. It labels the neutropenia as mild instead.",
       "candidate_error_id": "C-005-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "detected",
+      "verdict_reason": "says the critical neutrophil count has no critical-value flag or recommendation"
     },
     {
       "item_id": "A005",
@@ -54,8 +54,8 @@
       "rationale": "The report gives no clinical history, diagnosis or treatment timing, so the breast cancer and the 'ten days after a cycle' statement cannot be verified against the data presented.",
       "candidate_error_id": "C-005-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "false_alarm",
+      "verdict_reason": "an interpretation that refers to the clinical history is not an error"
     },
     {
       "item_id": "A006",
@@ -65,8 +65,8 @@
       "rationale": "The report gives no clinical history, so the menorrhagia is not supported by anything shown. The conclusion that blood loss is the most likely cause rests on it.",
       "candidate_error_id": "C-001-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "false_alarm",
+      "verdict_reason": "an interpretation that refers to the clinical history is not an error"
     },
     {
       "item_id": "A007",
@@ -76,8 +76,8 @@
       "rationale": "WBC 0.9 and ANC 0.2 x10^9/L are critical values in a patient on chemotherapy. The report has no critical-value flag, urgent notification or recommendation (e.g. neutropenic precautions, fever assessment, clinician contact), and the 'mild' wording could delay action.",
       "candidate_error_id": "C-005-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "detected",
+      "verdict_reason": "says the critical neutrophil count has no critical-value flag or recommendation"
     },
     {
       "item_id": "A008",
@@ -87,8 +87,8 @@
       "rationale": "The synoptic has no lymphovascular invasion field, although LVI is reported as not identified in the microscopic description and diagnosis. The synoptic is therefore incomplete.",
       "candidate_error_id": "H-007-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "detected",
+      "verdict_reason": "says the synoptic summary has no lymphovascular invasion line"
     },
     {
       "item_id": "A009",
@@ -98,8 +98,8 @@
       "rationale": "The report contains no clinical history or request details that mention menorrhagia, so this statement is not supported by the data shown.",
       "candidate_error_id": "C-001-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "false_alarm",
+      "verdict_reason": "an interpretation that refers to the clinical history is not an error"
     },
     {
       "item_id": "A010",
@@ -109,8 +109,8 @@
       "rationale": "The report contains no clinical details about chemotherapy, timing or breast cancer. This history appears to be assumed or fabricated, and the cause is stated more firmly than the data support.",
       "candidate_error_id": "C-005-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "false_alarm",
+      "verdict_reason": "an interpretation that refers to the clinical history is not an error"
     },
     {
       "item_id": "A011",
@@ -120,8 +120,8 @@
       "rationale": "The report gives no clinical history, so the menorrhagia cannot be verified from the data. The conclusion that blood loss is the most likely cause rests on that unverified statement.",
       "candidate_error_id": "C-001-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "false_alarm",
+      "verdict_reason": "an interpretation that refers to the clinical history is not an error"
     },
     {
       "item_id": "A012",
@@ -131,8 +131,8 @@
       "rationale": "Perineural invasion is not assessed anywhere in the microscopic description. Marking it 'not applicable' rather than 'not identified' or 'not assessed' is inconsistent, though it is not a clear error.",
       "candidate_error_id": "H-007-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "near_miss",
+      "verdict_reason": "right place, but it is about the perineural invasion wording, not the missing line"
     },
     {
       "item_id": "A013",
@@ -142,8 +142,8 @@
       "rationale": "Hb 6.2 g/dL is below the usual critical threshold of about 7 g/dL. The report has no critical-value flag, no urgent notification to the clinician and no advice about clinical assessment or transfusion. It recommends only routine confirmatory tests.",
       "candidate_error_id": "C-001-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "detected",
+      "verdict_reason": "says the critical haemoglobin has no critical-value flag or urgent recommendation"
     },
     {
       "item_id": "A014",
@@ -153,8 +153,8 @@
       "rationale": "The absolute basophil count of 0.19 is above the stated upper limit of 0.10. It is not flagged or commented on, and it is probably an artefact of the 1% differential on a high WBC.",
       "candidate_error_id": "C-006-E2",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A015",
@@ -164,8 +164,8 @@
       "rationale": "The absolute basophil count of 0.19 exceeds the stated upper limit of 0.10, yet the interpretation does not address it. It is also high relative to a basophil fraction of 1%, so either the reference range or the value looks wrong.",
       "candidate_error_id": "C-006-E2",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A016",
@@ -175,8 +175,8 @@
       "rationale": "The absolute basophil count is nearly five times the upper reference limit, yet it is not commented on in the interpretation. It is arithmetically consistent with 1% of the WBC, so the issue is a missing comment rather than a wrong value.",
       "candidate_error_id": "C-002-E2",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A017",
@@ -186,8 +186,8 @@
       "rationale": "The absolute basophil count exceeds the upper reference limit of 0.10. It is arithmetically consistent with 1% of the WBC, but it is not commented on in the interpretation.",
       "candidate_error_id": "C-006-E2",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A018",
@@ -197,8 +197,8 @@
       "rationale": "The absolute basophil count is above the reference range but is not commented on, although basophilia would be relevant in a suspected myeloproliferative neoplasm.",
       "candidate_error_id": "C-007-E2",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A019",
@@ -208,8 +208,8 @@
       "rationale": "A WBC of 0.9 and an ANC of 0.2 in a patient ten days after chemotherapy is a critical finding, with a high risk of neutropenic sepsis. The report has no critical-value flag, no urgent communication and no recommendation for clinical action.",
       "candidate_error_id": "C-005-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "detected",
+      "verdict_reason": "says the critical neutrophil count has no critical-value flag or recommendation"
     },
     {
       "item_id": "A020",
@@ -219,8 +219,8 @@
       "rationale": "The absolute basophil count is nearly five times the upper reference limit, yet it is not commented on in the interpretation. It is arithmetically consistent with 1% of the WBC, so the issue is a missing comment rather than a wrong value.",
       "candidate_error_id": "C-002-E1",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A021",
@@ -230,8 +230,8 @@
       "rationale": "The absolute basophil count of 0.19 is above the stated upper limit of 0.10. It is not flagged or commented on, and it is probably an artefact of the 1% differential on a high WBC.",
       "candidate_error_id": "C-006-E3",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A022",
@@ -241,8 +241,8 @@
       "rationale": "Perineural invasion is not a standard renal cell carcinoma synoptic element. Listing it as 'Not applicable' is odd. Elsewhere in the report, lymphovascular invasion is the element that is addressed.",
       "candidate_error_id": "H-007-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "near_miss",
+      "verdict_reason": "right place, but it is about the perineural invasion line, and it does not say a line is missing"
     },
     {
       "item_id": "A023",
@@ -252,8 +252,8 @@
       "rationale": "The absolute basophil count exceeds the upper reference limit of 0.10. It is arithmetically consistent with 1% of the WBC, but it is not commented on in the interpretation.",
       "candidate_error_id": "C-006-E3",
       "review_reason": "borderline_overlap",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "miss",
+      "verdict_reason": "the basophil count is truly above the printed range and not commented on; not the planted error"
     },
     {
       "item_id": "A024",
@@ -263,8 +263,8 @@
       "rationale": "Hb 6.2 g/dL is below the commonly used critical threshold of about 7 g/dL. The report gives no critical-value flag, urgent notification or advice on clinical assessment or transfusion, and only recommends routine confirmatory tests.",
       "candidate_error_id": "C-001-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "detected",
+      "verdict_reason": "says the critical haemoglobin has no critical-value flag or urgent recommendation"
     },
     {
       "item_id": "A025",
@@ -274,8 +274,8 @@
       "rationale": "The report contains no clinical history, diagnosis or treatment timing. The breast cancer, the chemotherapy and the ten-day interval are not supported by the data shown.",
       "candidate_error_id": "C-005-E2",
       "review_reason": "omission_candidate",
-      "verdict": null,
-      "verdict_reason": null
+      "verdict": "false_alarm",
+      "verdict_reason": "an interpretation that refers to the clinical history is not an error"
     }
   ]
 }

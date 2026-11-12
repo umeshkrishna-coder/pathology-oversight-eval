@@ -1,0 +1,1101 @@
+{
+  "dataset": "scored",
+  "runs": [
+    "20261112-153246-scored-plain",
+    "20261112-153532-scored-structured"
+  ],
+  "categories": [
+    {
+      "category": "abnormal value not flagged / inconsistent reference",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "abnormal value not flagged or addressed",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "ambiguous or misplaced statement",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "ambiguous specimen handling",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "ambiguous/incorrect wording",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "anatomic inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "c1",
+      "count": {
+        "plain": 0,
+        "structured": 34
+      }
+    },
+    {
+      "category": "c2",
+      "count": {
+        "plain": 0,
+        "structured": 9
+      }
+    },
+    {
+      "category": "c3",
+      "count": {
+        "plain": 0,
+        "structured": 8
+      }
+    },
+    {
+      "category": "calculation / classification check",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "calculation inconsistency",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "calculation inconsistency / transcription error",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "contradiction with data",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "contradiction with data / missed pancytopenia",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "contradictory specimen handling",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "contradicts reported data",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "contradicts reported value",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis contradicts ihc",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis contradicts ihc findings",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis inconsistent with ihc",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis inconsistent with ihc / incorrect cell-of-origin subtype",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis not supported by data",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis not supported by immunohistochemistry",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis not supported by microscopic description",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "diagnosis not supported by microscopy",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "differential does not add up / inconsistent value",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "discrepancy between sections (grade",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "gleason pattern wording inconsistent with score",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "grade inconsistent with histology",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "grade vs description",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "grading criteria",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "h1",
+      "count": {
+        "plain": 0,
+        "structured": 18
+      }
+    },
+    {
+      "category": "h2",
+      "count": {
+        "plain": 0,
+        "structured": 15
+      }
+    },
+    {
+      "category": "h3",
+      "count": {
+        "plain": 0,
+        "structured": 23
+      }
+    },
+    {
+      "category": "h4",
+      "count": {
+        "plain": 0,
+        "structured": 12
+      }
+    },
+    {
+      "category": "h5",
+      "count": {
+        "plain": 0,
+        "structured": 25
+      }
+    },
+    {
+      "category": "h6",
+      "count": {
+        "plain": 0,
+        "structured": 12
+      }
+    },
+    {
+      "category": "histologic subtype discrepancy",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "histologic subtype inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "inappropriate staging system",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "inappropriate synoptic content",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "inappropriate synoptic field",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "inappropriate synoptic item",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incomplete documentation",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incomplete grading components",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incomplete interpretation / unsupported statement",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incomplete recommendation",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "inconsistent laterality / wording",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "inconsistent recommendation",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "inconsistent specimen labelling",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incorrect red cell classification",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incorrect red cell morphology classification",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incorrect risk classification",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incorrect risk stratification",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incorrect stage group",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "incorrect stage grouping",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal contradiction",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal contradiction (histology vs diagnosis",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal contradiction (margin status",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal contradiction (specimen handling",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal contradiction (specimen state",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal contradiction / margin status",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal contradiction in specimen handling",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency",
+      "count": {
+        "plain": 4,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (grade",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (histology vs diagnosis",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (lymph node count",
+      "count": {
+        "plain": 4,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (margin status",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (margins",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (nodal stage",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (node count",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (specimen handling",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (synoptic vs. microscopic/diagnosis",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (tumour grade",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency (tumour size",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency / calculation error",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency / immunophenotype does not support diagnosis",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency / wording",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency in calculated index",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency in differential",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency in node count",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency in node size",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency in sampling",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "internal inconsistency in staging",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "interpretation contradicts data",
+      "count": {
+        "plain": 14,
+        "structured": 0
+      }
+    },
+    {
+      "category": "laterality discrepancy",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "laterality error",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "laterality inconsistency",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "laterality mismatch",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "lymph node count discrepancy",
+      "count": {
+        "plain": 4,
+        "structured": 0
+      }
+    },
+    {
+      "category": "margin description inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "margin inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "measurement inconsistency",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "minor/possible internal inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "missing data",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "missing information",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "omission / incomplete sampling description",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "omission / incomplete tubal examination",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "omission in synoptic",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "omission: fallopian tubes not described microscopically",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "other",
+      "count": {
+        "plain": 0,
+        "structured": 12
+      }
+    },
+    {
+      "category": "out-of-range value not flagged",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "out-of-range value not flagged or addressed",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "overreaching conclusion",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "overreaching interpretation",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "overstated clinical significance",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "overstated conclusion",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "overstated or unqualified conclusion",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "possible dimension or laterality error",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "possible inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "possible omission/inconsistency in tumour location",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "questionable recommendation",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "questionable statement",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "questionable synoptic item",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "sampling inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "severity misclassification",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "site discrepancy",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "specimen description inconsistency",
+      "count": {
+        "plain": 4,
+        "structured": 0
+      }
+    },
+    {
+      "category": "specimen handling inconsistency",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "specimen handling inconsistency / missing fresh-tissue studies",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "specimen handling/omission",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "specimen/site inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging completeness",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging error",
+      "count": {
+        "plain": 17,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging error (pt category",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging error (tumour size",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging error / inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging inconsistency",
+      "count": {
+        "plain": 5,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging system / edition inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging terminology",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging with incomplete m category",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "staging with unassessed m category",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "subtype classification inconsistent with ihc",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "subtype inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "synoptic inappropriate for metastatic biopsy",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "synoptic inconsistency",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      }
+    },
+    {
+      "category": "synoptic item not applicable",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "synoptic item not supported by the body of the report",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "synoptic omission",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "template carry-over / irrelevant fields",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unclear or incomplete staging statement",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unflagged abnormal value / not addressed",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unsupported clinical claim",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unsupported clinical history",
+      "count": {
+        "plain": 11,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unsupported clinical information",
+      "count": {
+        "plain": 8,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unsupported finding / specimen mismatch",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unsupported gross statement",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unsupported statement",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "unsupported statement / missing data",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "value discrepancy / inappropriate critical flag",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      }
+    },
+    {
+      "category": "value discrepancy / transcription error",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "value discrepancy with results table",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "value mismatch / false critical flag",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "value mismatch / wrong magnitude",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    },
+    {
+      "category": "wording inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      }
+    }
+  ]
+}

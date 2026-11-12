@@ -15,8 +15,8 @@
 #   its quoted sentence: Perineural invasion: Not applicable
 #   its description: The synoptic summary has no line for lymphovascular invasion.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: detected
+reason: says the lymphovascular invasion line is missing from the synoptic summary
 
 == A002 ==
 # report: C-006
@@ -30,8 +30,8 @@ reason:
 #   its other place 3: Interpretation: Marked neutrophilic leucocytosis with a neutrophil fraction of 86 per cent and relative lymphopenia, a pattern consistent with acute bacterial infection in the context of four days of fever and productive cough.
 #   its description: The absolute neutrophil count is given as 6.00; 86 percent of a white cell count of 18.60 is 16.00.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A003 ==
 # report: C-005
@@ -42,8 +42,8 @@ reason:
 #   its quoted sentence: Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)
 #   its description: The absolute neutrophil count of 0.20 is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: miss
+reason: a debatable point about the platelet grading, but not the planted error
 
 == A004 ==
 # report: C-005
@@ -54,8 +54,8 @@ reason:
 #   its quoted sentence: Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)
 #   its description: The absolute neutrophil count of 0.20 is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: detected
+reason: says the critical neutrophil count has no critical-value flag or recommendation
 
 == A005 ==
 # report: C-005
@@ -66,8 +66,8 @@ reason:
 #   its quoted sentence: Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)
 #   its description: The absolute neutrophil count of 0.20 is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: false_alarm
+reason: an interpretation that refers to the clinical history is not an error
 
 == A006 ==
 # report: C-001
@@ -78,8 +78,8 @@ reason:
 #   its quoted sentence: Hb: 6.2 g/dL (ref 12.0–15.0)
 #   its description: The haemoglobin of 6.2 g/dL is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: false_alarm
+reason: an interpretation that refers to the clinical history is not an error
 
 == A007 ==
 # report: C-005
@@ -90,8 +90,8 @@ reason:
 #   its quoted sentence: Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)
 #   its description: The absolute neutrophil count of 0.20 is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: detected
+reason: says the critical neutrophil count has no critical-value flag or recommendation
 
 == A008 ==
 # report: H-007
@@ -102,8 +102,8 @@ reason:
 #   its quoted sentence: Perineural invasion: Not applicable
 #   its description: The synoptic summary has no line for lymphovascular invasion.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: detected
+reason: says the synoptic summary has no lymphovascular invasion line
 
 == A009 ==
 # report: C-001
@@ -114,8 +114,8 @@ reason:
 #   its quoted sentence: Hb: 6.2 g/dL (ref 12.0–15.0)
 #   its description: The haemoglobin of 6.2 g/dL is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: false_alarm
+reason: an interpretation that refers to the clinical history is not an error
 
 == A010 ==
 # report: C-005
@@ -126,8 +126,8 @@ reason:
 #   its quoted sentence: Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)
 #   its description: The absolute neutrophil count of 0.20 is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: false_alarm
+reason: an interpretation that refers to the clinical history is not an error
 
 == A011 ==
 # report: C-001
@@ -138,8 +138,8 @@ reason:
 #   its quoted sentence: Hb: 6.2 g/dL (ref 12.0–15.0)
 #   its description: The haemoglobin of 6.2 g/dL is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: false_alarm
+reason: an interpretation that refers to the clinical history is not an error
 
 == A012 ==
 # report: H-007
@@ -150,8 +150,8 @@ reason:
 #   its quoted sentence: Perineural invasion: Not applicable
 #   its description: The synoptic summary has no line for lymphovascular invasion.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: near_miss
+reason: right place, but it is about the perineural invasion wording, not the missing line
 
 == A013 ==
 # report: C-001
@@ -162,8 +162,8 @@ reason:
 #   its quoted sentence: Hb: 6.2 g/dL (ref 12.0–15.0)
 #   its description: The haemoglobin of 6.2 g/dL is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: detected
+reason: says the critical haemoglobin has no critical-value flag or urgent recommendation
 
 == A014 ==
 # report: C-006
@@ -175,8 +175,8 @@ reason:
 #   its other place 1: Values: Platelets: 245 x10^9/L (ref 150–410)
 #   its description: The interpretation says the platelet count is raised; the count is 245, within the reference range.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A015 ==
 # report: C-006
@@ -188,8 +188,8 @@ reason:
 #   its other place 1: Values: Platelets: 245 x10^9/L (ref 150–410)
 #   its description: The interpretation says the platelet count is raised; the count is 245, within the reference range.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A016 ==
 # report: C-002
@@ -201,8 +201,8 @@ reason:
 #   its other place 1: Values: Neutrophils absolute: 5.76 x10^9/L (ref 2.00–7.00)
 #   its description: Neutrophils are given as 22 percent; the differential then adds up to 110 and does not fit the absolute neutrophil count.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A017 ==
 # report: C-006
@@ -214,8 +214,8 @@ reason:
 #   its other place 1: Values: Platelets: 245 x10^9/L (ref 150–410)
 #   its description: The interpretation says the platelet count is raised; the count is 245, within the reference range.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A018 ==
 # report: C-007
@@ -227,8 +227,8 @@ reason:
 #   its other place 1: Interpretation: Mild leucocytosis with neutrophil predominance and thrombocytosis, together with headache, plethoric facies and pruritus after bathing, raise suspicion of a myeloproliferative neoplasm such as polycythaemia vera, although secondary causes of erythrocytosis must be excluded.
 #   its description: The Values give a platelet count of 250, within the reference range; the interpretation speaks of thrombocytosis.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A019 ==
 # report: C-005
@@ -239,8 +239,8 @@ reason:
 #   its quoted sentence: Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)
 #   its description: The absolute neutrophil count of 0.20 is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: detected
+reason: says the critical neutrophil count has no critical-value flag or recommendation
 
 == A020 ==
 # report: C-002
@@ -252,8 +252,8 @@ reason:
 #   its other place 1: Values: Platelets: 152 x10^9/L (ref 150–410)
 #   its description: The interpretation says the platelet count is markedly reduced; the count is 152, within the reference range.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A021 ==
 # report: C-006
@@ -267,8 +267,8 @@ reason:
 #   its other place 3: Interpretation: Marked neutrophilic leucocytosis with a neutrophil fraction of 86 per cent and relative lymphopenia, a pattern consistent with acute bacterial infection in the context of four days of fever and productive cough.
 #   its description: The absolute neutrophil count is given as 6.00; 86 percent of a white cell count of 18.60 is 16.00.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A022 ==
 # report: H-007
@@ -279,8 +279,8 @@ reason:
 #   its quoted sentence: Perineural invasion: Not applicable
 #   its description: The synoptic summary has no line for lymphovascular invasion.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: near_miss
+reason: right place, but it is about the perineural invasion line, and it does not say a line is missing
 
 == A023 ==
 # report: C-006
@@ -294,8 +294,8 @@ reason:
 #   its other place 3: Interpretation: Marked neutrophilic leucocytosis with a neutrophil fraction of 86 per cent and relative lymphopenia, a pattern consistent with acute bacterial infection in the context of four days of fever and productive cough.
 #   its description: The absolute neutrophil count is given as 6.00; 86 percent of a white cell count of 18.60 is 16.00.
 # why it needs you: the section is right, but the quoted sentence only partly matches this planted error (overlap of at least 0.4 and below 0.6)
-verdict:
-reason:
+verdict: miss
+reason: the basophil count is truly above the printed range and not commented on; not the planted error
 
 == A024 ==
 # report: C-001
@@ -306,8 +306,8 @@ reason:
 #   its quoted sentence: Hb: 6.2 g/dL (ref 12.0–15.0)
 #   its description: The haemoglobin of 6.2 g/dL is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: detected
+reason: says the critical haemoglobin has no critical-value flag or urgent recommendation
 
 == A025 ==
 # report: C-005
@@ -318,5 +318,5 @@ reason:
 #   its quoted sentence: Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)
 #   its description: The absolute neutrophil count of 0.20 is a critical value, and the report carries no critical-value flag, comment or recommendation.
 # why it needs you: this report has an omission error, and the finding is not a detection of another error; it may be reporting what is missing (the finding has one item for each omission error of the report)
-verdict:
-reason:
+verdict: false_alarm
+reason: an interpretation that refers to the clinical history is not an error
