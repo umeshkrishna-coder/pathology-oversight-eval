@@ -1,0 +1,381 @@
+{
+  "run_id": "20261112-133439-dev-structured",
+  "dataset": "dev",
+  "condition": "structured",
+  "units": [
+    {
+      "report_id": "C-011",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Hct: 20.0 % (ref 40.0–50.0)",
+          "section": "Values",
+          "category": "C2",
+          "severity": "major",
+          "confidence": 0.93,
+          "rationale": "Hct 20.0% is incompatible with the reported indices. Hb 16.0 and RBC 5.45 give an MCV of 88.1 only if Hct is about 48%, and MCHC 33.3 also implies 48%. With Hct 20% the MCV would be about 37 fL and the MCHC 80 g/dL. This looks like a clerical or transcription error (48.0 entered as 20.0) and needs an amended report."
+        },
+        {
+          "quoted_sentence": "The haematocrit of 48% sits at the upper end of the adult male reference range, with haemoglobin of 16.0 g/dL, which is consistent with haemoconcentration from plasma leakage rather than true polycythaemia.",
+          "section": "Interpretation",
+          "category": "C1",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "The interpretation cites an Hct of 48%, but the reported Hct value is 20.0%, which is flagged low. The report contradicts itself, and the Hct is the key marker for dengue plasma leakage. The 48% figure agrees with the derived indices, so the Values entry is the likely error."
+        },
+        {
+          "quoted_sentence": "No critical value is present.",
+          "section": "Comment/recommendation",
+          "category": "C3",
+          "severity": "major",
+          "confidence": 0.2,
+          "rationale": "A platelet count of 38 x10^9/L in dengue on day 5 is marked thrombocytopenia and may reach some labs' critical or alert threshold. The Hct of 20.0% as printed would also be critical if it were real. Neither is flagged for urgent notification, though the monitoring advice is given."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1486,
+      "output_tokens": 1472,
+      "cost_usd": 0.017692
+    },
+    {
+      "report_id": "C-011",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Hct: 20.0 % (ref 40.0–50.0)",
+          "section": "Values",
+          "category": "C2",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "Hct 20.0% is incompatible with the other red cell values. With RBC 5.45, MCV would be about 36.7 fL rather than the reported 88.1, and Hb/Hct would give an MCHC of 80 g/dL rather than 33.3. The reported MCV, MCH and MCHC all fit Hct of about 48%, so 20.0 is probably a transcription error (or a machine error) for 48.0."
+        },
+        {
+          "quoted_sentence": "The haematocrit of 48% sits at the upper end of the adult male reference range, with haemoglobin of 16.0 g/dL, which is consistent with haemoconcentration from plasma leakage rather than true polycythaemia.",
+          "section": "Interpretation",
+          "category": "C1",
+          "severity": "major",
+          "confidence": 0.93,
+          "rationale": "The interpretation cites a haematocrit of 48%, but the Values table reports 20.0%, flagged as low. The report contradicts itself, and since Hct is the key marker for plasma leakage in dengue, an amended report is needed."
+        },
+        {
+          "quoted_sentence": "No critical value is present.",
+          "section": "Comment/recommendation",
+          "category": "C3",
+          "severity": "major",
+          "confidence": 0.3,
+          "rationale": "Platelets of 38 x10^9/L on day 5 of dengue are marked thrombocytopenia, which many laboratories treat as a critical or call-back value (often below 50, or below 20–30). Taken at face value, the Hct of 20.0% would also be a critical low, yet it is neither flagged nor commented on. This depends on local critical-value thresholds."
+        },
+        {
+          "quoted_sentence": "the differential shows relative lymphocyte predominance with an absolute neutrophil count of about 1.3 x10^9/L.",
+          "section": "Interpretation",
+          "category": "C1",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "Neutrophils (45%) slightly exceed lymphocytes (44%), so lymphocytes do not predominate, though they are above the reference range. The absolute neutrophil count of 1.26 is below range (mild neutropenia) and is not clearly called out."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1486,
+      "output_tokens": 1635,
+      "cost_usd": 0.019322
+    },
+    {
+      "report_id": "C-011",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Hct: 20.0 % (ref 40.0–50.0)",
+          "section": "Values",
+          "category": "C2",
+          "severity": "major",
+          "confidence": 0.93,
+          "rationale": "RBC × MCV / 10 = 5.45 × 88.1 / 10 ≈ 48.0%, and Hb/Hct = 16.0/48.0 gives the reported MCHC of 33.3. A Hct of 20.0% is incompatible with Hb 16.0 (Hb:Hct about 1:3), so it is probably a transcription or machine error for 48.0% and needs correcting in an amended report."
+        },
+        {
+          "quoted_sentence": "The haematocrit of 48% sits at the upper end of the adult male reference range, with haemoglobin of 16.0 g/dL, which is consistent with haemoconcentration from plasma leakage rather than true polycythaemia.",
+          "section": "Interpretation",
+          "category": "C1",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The interpretation cites a Hct of 48%, but the Values table lists 20.0% (flagged low), so the text and the reported number contradict each other. The 48% fits the other indices, which points to the table entry being wrong."
+        },
+        {
+          "quoted_sentence": "No critical value is present.",
+          "section": "Comment/recommendation",
+          "category": "C3",
+          "severity": "critical",
+          "confidence": 0.15,
+          "rationale": "A platelet count of 38 x10^9/L on day 5 of dengue may fall under some laboratories' critical or alert limits (<50) and warrants an explicit call or warning-sign comment. Separately, the reported Hct of 20.0% would itself be a critical low if it were real, yet it is not flagged."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1486,
+      "output_tokens": 1410,
+      "cost_usd": 0.017072
+    },
+    {
+      "report_id": "H-021",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "- Classic seminoma, 38 mm, confined to the testis (pT2).",
+          "section": "Diagnosis",
+          "category": "H3",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "A seminoma confined to the testis, with no LVI, no rete testis invasion and no epididymal or tunica involvement, is pT1 (pT1b for a 38 mm tumour, which is 3 cm or larger), not pT2. pT2 requires LVI or invasion of hilar soft tissue, epididymis or tunica vaginalis. Nothing in the gross or microscopic description supports pT2."
+        },
+        {
+          "quoted_sentence": "pT: pT2",
+          "section": "Synoptic summary",
+          "category": "H3",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "The synoptic pT2 contradicts the findings of a tumour confined to the testis, absent LVI and no rete invasion. The correct category is pT1b under AJCC 8th edition."
+        },
+        {
+          "quoted_sentence": "Representative sections are taken from the tumour, the tumour-parenchyma interface, the rete testis region, the epididymis and the spermatic cord margin.",
+          "section": "Gross description",
+          "category": "H5",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The epididymis was sampled, but the microscopic description and diagnosis never state whether it is involved. This finding is needed for pT assignment."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1426,
+      "output_tokens": 942,
+      "cost_usd": 0.012272
+    },
+    {
+      "report_id": "H-021",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "- Classic seminoma, 38 mm, confined to the testis (pT2).",
+          "section": "Diagnosis",
+          "category": "H3",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "A seminoma confined to the testis with no lymphovascular invasion, no rete testis invasion and no epididymal, hilar soft tissue or tunica vaginalis involvement is pT1 (pT1b at 38 mm, since it is 3 cm or larger). pT2 requires LVI or invasion beyond the parenchyma, which the report explicitly excludes."
+        },
+        {
+          "quoted_sentence": "pT: pT2",
+          "section": "Synoptic summary",
+          "category": "H3",
+          "severity": "critical",
+          "confidence": 0.8,
+          "rationale": "The synoptic pT2 contradicts its own entries (LVI absent, tumour confined to the testis, no rete testis invasion). Under AJCC 8th edition this should be pT1b."
+        },
+        {
+          "quoted_sentence": "Representative sections are taken from the tumour, the tumour-parenchyma interface, the rete testis region, the epididymis and the spermatic cord margin.",
+          "section": "Gross description",
+          "category": "H5",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The epididymis was sampled, but the microscopic description and diagnosis do not state whether it is involved. Epididymal invasion would affect pT, so the omission leaves the staging unsupported."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1426,
+      "output_tokens": 909,
+      "cost_usd": 0.011942
+    },
+    {
+      "report_id": "H-021",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "- Classic seminoma, 38 mm, confined to the testis (pT2).",
+          "section": "Diagnosis",
+          "category": "H3",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "The tumour is confined to the testis, with no lymphovascular invasion, rete testis invasion or epididymal involvement. That is pT1 (pT1b for a seminoma of 3 cm or more), not pT2, which requires LVI or invasion of the hilar soft tissue, epididymis or tunica vaginalis."
+        },
+        {
+          "quoted_sentence": "pT: pT2",
+          "section": "Synoptic summary",
+          "category": "H3",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "The synoptic pT2 contradicts the reported findings of 38 mm, confined to the testis, no LVI and no rete invasion. The correct category is pT1b."
+        },
+        {
+          "quoted_sentence": "Representative sections are taken from the tumour, the tumour-parenchyma interface, the rete testis region, the epididymis and the spermatic cord margin.",
+          "section": "Gross description",
+          "category": "H5",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The epididymis was sampled, but the microscopic description and diagnosis never state its status (involved or uninvolved). Epididymal involvement would affect pT, so this element is missing."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1426,
+      "output_tokens": 914,
+      "cost_usd": 0.011992
+    },
+    {
+      "report_id": "H-022",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Metastatic carcinoma is identified in 8 of 17 regional lymph nodes.",
+          "section": "Microscopic description",
+          "category": "H4",
+          "severity": "major",
+          "confidence": 0.88,
+          "rationale": "The microscopic count of 8 positive nodes contradicts the Diagnosis and Synoptic count of 3/17. If 8 is correct, the nodal category would be pN2 (4 or more nodes) and the stage group would be III, not IIB. This needs reconciling against the slides."
+        },
+        {
+          "quoted_sentence": "Histologic grade: G2, poorly differentiated",
+          "section": "Synoptic summary",
+          "category": "H2",
+          "severity": "major",
+          "confidence": 0.85,
+          "rationale": "G2 means moderately differentiated, but the synoptic adds 'poorly differentiated'. The Microscopic description and Diagnosis both state moderately differentiated, so the grade wording is internally contradictory."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1551,
+      "output_tokens": 1096,
+      "cost_usd": 0.014062
+    },
+    {
+      "report_id": "H-022",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Metastatic carcinoma is identified in 8 of 17 regional lymph nodes.",
+          "section": "Microscopic description",
+          "category": "H4",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The microscopic text reports 8 positive nodes, but the diagnosis and synoptic both report 3/17. The positive node count must be reconciled."
+        },
+        {
+          "quoted_sentence": "Histologic grade: G2, poorly differentiated",
+          "section": "Synoptic summary",
+          "category": "H2",
+          "severity": "major",
+          "confidence": 0.85,
+          "rationale": "G2 corresponds to moderately differentiated. The synoptic says 'poorly differentiated', which contradicts the microscopic description and the diagnosis (moderately differentiated). The label and the grade code are internally inconsistent."
+        },
+        {
+          "quoted_sentence": "Metastatic carcinoma in 3 of 17 regional lymph nodes (pN1).",
+          "section": "Diagnosis",
+          "category": "H3",
+          "severity": "critical",
+          "confidence": 0.3,
+          "rationale": "If the microscopic count of 8 positive nodes is correct, the category would be pN2 (4 or more nodes) and the stage group would be III, not IIB. The pN1 and IIB assignment holds only if 3 is the correct count, which is why the node discrepancy matters clinically."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1551,
+      "output_tokens": 1174,
+      "cost_usd": 0.014842
+    },
+    {
+      "report_id": "H-022",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Metastatic carcinoma is identified in 8 of 17 regional lymph nodes.",
+          "section": "Microscopic description",
+          "category": "H4",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The microscopic text gives 8 positive nodes, but the Diagnosis and Synoptic summary both give 3/17. If 8 is correct, the nodal category would be pN2 (4 or more nodes) and the stage group would change from IIB to III, so the true count must be confirmed."
+        },
+        {
+          "quoted_sentence": "Histologic grade: G2, poorly differentiated",
+          "section": "Synoptic summary",
+          "category": "H2",
+          "severity": "major",
+          "confidence": 0.85,
+          "rationale": "G2 means moderately differentiated, which is what the microscopic description and Diagnosis state. The descriptor 'poorly differentiated' corresponds to G3, so the synoptic grade contradicts itself and the rest of the report."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1551,
+      "output_tokens": 989,
+      "cost_usd": 0.012992
+    },
+    {
+      "report_id": "H-023",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1530,
+      "output_tokens": 221,
+      "cost_usd": 0.00527
+    },
+    {
+      "report_id": "H-023",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1530,
+      "output_tokens": 277,
+      "cost_usd": 0.00583
+    },
+    {
+      "report_id": "H-023",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1530,
+      "output_tokens": 303,
+      "cost_usd": 0.00609
+    }
+  ],
+  "totals": {
+    "units": 12,
+    "valid": 12,
+    "invalid": 0,
+    "pending": 0,
+    "calls": 12,
+    "input_tokens": 17979,
+    "output_tokens": 11342,
+    "cost_usd": 0.149378,
+    "models_returned": [
+      "claude-sonnet-5-5"
+    ]
+  }
+}

@@ -1,0 +1,248 @@
+{
+  "dataset": "dev",
+  "runs": [
+    "20261112-133401-dev-plain",
+    "20261112-133439-dev-structured"
+  ],
+  "category_map": {
+    "status": "missing",
+    "version": null,
+    "sha256": null
+  },
+  "categories": [
+    {
+      "category": "c1",
+      "count": {
+        "plain": 0,
+        "structured": 4
+      },
+      "mapped": true,
+      "maps_to": "C1"
+    },
+    {
+      "category": "c2",
+      "count": {
+        "plain": 0,
+        "structured": 3
+      },
+      "mapped": true,
+      "maps_to": "C2"
+    },
+    {
+      "category": "c3",
+      "count": {
+        "plain": 0,
+        "structured": 3
+      },
+      "mapped": true,
+      "maps_to": "C3"
+    },
+    {
+      "category": "discrepancy between values and interpretation",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "flag/reference range",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "h2",
+      "count": {
+        "plain": 0,
+        "structured": 3
+      },
+      "mapped": true,
+      "maps_to": "H2"
+    },
+    {
+      "category": "h3",
+      "count": {
+        "plain": 0,
+        "structured": 7
+      },
+      "mapped": true,
+      "maps_to": "H3"
+    },
+    {
+      "category": "h4",
+      "count": {
+        "plain": 0,
+        "structured": 3
+      },
+      "mapped": true,
+      "maps_to": "H4"
+    },
+    {
+      "category": "h5",
+      "count": {
+        "plain": 0,
+        "structured": 3
+      },
+      "mapped": true,
+      "maps_to": "H5"
+    },
+    {
+      "category": "incomplete clinical information",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "incomplete description",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "incorrect critical value assessment",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "internal inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "internal inconsistency (grade",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "internal inconsistency (lymph node count",
+      "count": {
+        "plain": 3,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "internal inconsistency (tumour grade",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "missed critical value",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "omission",
+      "count": {
+        "plain": 2,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "omission of relevant data",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "omission of required data",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "omitted finding / inaccurate characterisation",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "staging error",
+      "count": {
+        "plain": 6,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "transcription/internal inconsistency",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "unsupported interpretation",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "value inconsistent with indices / transcription error",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    },
+    {
+      "category": "value inconsistent with other data / transcription error",
+      "count": {
+        "plain": 1,
+        "structured": 0
+      },
+      "mapped": false,
+      "maps_to": null
+    }
+  ]
+}
