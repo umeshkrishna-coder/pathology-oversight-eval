@@ -1083,6 +1083,12 @@ TEMPLATE_HEADER = """\
 # - Quoted sentence: quote if given; in Synoptic summary the whole changed line; otherwise
 #   the replace text, which then needs at least five words. Number change: the rendered
 #   Values line. Omission: the anchor.
+# - Other places (decision 56): an [error] may name up to three other places in the report,
+#   each a group of lines after the entry's other keys:
+#     also_section: <section>, then also_quote: <text left as it is, once in that section>
+#     also_section: <section>, then also_find + also_replace (changed with the same error;
+#                         the place's quote is the whole line holding the replacement)
+#     also_analyte: <analyte> (CBC only, alone: that analyte's rendered Values line)
 # - Entries apply in sheet order, fixes first, then errors (error ids E1, E2, ... in order).
 """
 

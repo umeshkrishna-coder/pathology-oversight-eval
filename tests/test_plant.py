@@ -1656,3 +1656,25 @@ def test_other_places_build_deterministically_and_leave_the_drafts_alone(tree, c
         "   other place 1: Gross description | firm lesion 18 mm across\n"
         f"   other place 2: Diagnosis | {DIAG_LINE}\n"
     ) in review
+
+
+# EVAL-11 N (owner decision, 2026-11-12): the template header that `plant --init` writes lists
+# the other-place lines of decision 56.
+
+
+def test_the_template_header_lists_the_other_place_lines():
+    header = plant.TEMPLATE_HEADER
+    for key in ("also_section", "also_quote", "also_find", "also_replace", "also_analyte"):
+        assert f"{key}" in header, key
+    lines = [line for line in header.splitlines() if "also_" in line]
+    assert all(line.startswith("#") for line in lines)  # comments only: the sheet stays empty
+    assert "up to three" in header
+
+
+def test_the_template_with_other_place_lines_still_checks_as_the_empty_template(tree, capsys):
+    assert cli.main(["plant", "--init"]) == 0
+    capsys.readouterr()
+    assert cli.main(["plant", "--check"]) == 1
+    out = capsys.readouterr().out
+    assert not any(line.startswith("sheet ") for line in out.splitlines())
+    assert "unknown key" not in out

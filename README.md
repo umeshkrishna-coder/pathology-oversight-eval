@@ -175,7 +175,7 @@ also_analyte: Hb
 The user message is the same in both conditions: the report's sections in stored order, each as `## {section name}` followed by its text, separated by one blank line. Nothing else from the report file is sent (no id, split, modality, errors, provenance or flags).
 
 - **plain:** the system message is `prompts/plain.md`, one prompt for both modalities. It never mentions the taxonomy: the isolation check refuses a type id, a type name, a type definition or a severity definition in it.
-- **structured:** the system message is the owner's text for the report's modality (`prompts/structured_histopathology.md`, the PathQC text, or `prompts/structured_cbc.md`, the CBC checklist), a blank line, `## Error taxonomy` with the severity definitions and that modality's error types only, a blank line, then `prompts/structured_output.md`.
+- **structured:** the system message is the owner's review instruction for the report's modality (`prompts/structured_histopathology.md` or `prompts/structured_cbc.md`: short instructions the owner wrote for this pilot, decision 57), a blank line, `## Error taxonomy` with the severity definitions and that modality's error types only, a blank line, then `prompts/structured_output.md`.
 
 `prompts/manifest.json` lists the four prompt files with `status` `proposed` or `approved`.
 
@@ -183,7 +183,7 @@ In both messages the isolation check also refuses the report id, the fields `is_
 
 ## Freeze (owner steps)
 
-1. Paste the PathQC text into `prompts/structured_histopathology.md` and the CBC checklist into `prompts/structured_cbc.md`, replacing the `<<OWNER TEXT REQUIRED>>` line.
+1. Write the owner's review instruction for each modality into `prompts/structured_histopathology.md` and `prompts/structured_cbc.md`, replacing the `<<OWNER TEXT REQUIRED>>` line.
 2. Set all four entries in `prompts/manifest.json` to `"approved"`.
 3. Set `status` in `data/taxonomy.json` to `"final"`.
 4. `uv run pathqc-eval freeze`. It refuses, listing every unmet condition, unless: the taxonomy is final; all four manifest entries are approved; no prompt file still holds the placeholder; `validate data/reports --expect 34 --expect-clean 9 --expect-dev 4` passes; every report has `provenance.verified` true with a `verified_at` date; and the isolation check passes for every report in both conditions. It does not overwrite an existing lock unless given `--replace`.
