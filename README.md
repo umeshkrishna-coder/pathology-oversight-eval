@@ -1,5 +1,27 @@
 # pathology-oversight-eval
 
+## For readers from outside
+
+**The question.** Does a short structured review checklist with an error list help Claude (claude-sonnet-5-5) catch errors planted in pathology reports, compared with a plain "find every error" instruction? 30 synthetic reports (22 with 39 planted errors, 8 clean controls), each read 3 times under each prompt.
+
+| Result (30 scored reports) | Plain prompt | Structured prompt | Structured minus plain (95% interval, paired bootstrap) |
+|---|---|---|---|
+| Planted errors found (overall recall) | 36/39 = 92.3% | 38/39 = 97.4% | +5.1 pp (+0.0 pp to +12.8 pp) |
+| False alarms per report (all 30) | 1.38 | 0.43 | -0.94 (-1.33 to -0.62) |
+| Clean controls passed by majority | 2/8 = 25.0% | 8/8 = 100.0% | +75.0 pp (+40.0 pp to +100.0 pp) |
+
+- The write-up, with method and limits: [WRITEUP.md](WRITEUP.md)
+- Every scored table: [results/scored/summary.md](results/scored/summary.md)
+- What was planted, report by report: [data/specs/planting.md](data/specs/planting.md)
+- The prompts the model was given: [prompts/](prompts/)
+- Every decision and the task log: [handoff.md](handoff.md)
+
+**Checking the results without an API key.** `uv sync`, then `uv run pytest` (the test suite) and `uv run pathqc-eval freeze --check` (the reports, prompts and taxonomy still match the lock taken before the scored run). Then read results/scored/summary.md against results/scored/score.json, which holds every finding and its outcome. Do not run `score` to check: it would rewrite the committed results with a new scorer commit.
+
+All reports are synthetic: no real patient data is anywhere in this repository. What the pilot cannot claim is set out under "Limits" in [WRITEUP.md](WRITEUP.md).
+
+## About the repository
+
 A small research pilot: how well Claude detects deliberately planted errors in synthetic histopathology reports and CBC interpretations, scored against pathologist-verified ground truth. The output is a one-page write-up for the owner's Anthropic Research Residency application. Every design decision, the error taxonomy and the working rules live in [handoff.md](handoff.md).
 
 ## Commands
