@@ -1,0 +1,17 @@
+{
+  "run_id": "20261112-153532-scored-structured",
+  "dataset": "scored",
+  "condition": "structured",
+  "model": "claude-sonnet-5-5",
+  "sampling": "default",
+  "effort": "default",
+  "max_tokens": 16000,
+  "repeats": 3,
+  "dataset_hash": "caf11ddc290b592a46de915d73d5ab2673cfbccf58ff576e1806404852431f2a",
+  "prompt_hash": "d908dc3c42a8de8bd82a958fc2c6e19592e820281eaae8725b3ad83bdb5b67f5",
+  "taxonomy_hash": "616f5eb4e0d359d9c49f5d4692033b9d3eb6bf7ddc5e727d356b53643c408335",
+  "created_at": "2026-11-12T15:35:32.271094Z",
+  "cost_gate_usd": 2.5,
+  "sdk_version": "2.4.0",
+  "lock_created_at": "2026-11-12T15:21:36Z"
+}

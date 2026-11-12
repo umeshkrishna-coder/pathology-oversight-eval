@@ -1,0 +1,3288 @@
+{
+  "run_id": "20261112-153246-scored-plain",
+  "dataset": "scored",
+  "condition": "plain",
+  "units": [
+    {
+      "report_id": "C-001",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Severe normocytic normochromic anaemia is present, with haemoglobin 6.2 g/dL, haematocrit 22.1% and red cell count 3.56 x10^12/L.",
+          "section": "Interpretation",
+          "category": "Incorrect red cell classification",
+          "severity": "major",
+          "confidence": 0.97,
+          "rationale": "MCV 62.1 fL and MCH 17.4 pg and MCHC 28.1 g/dL are all low, so the anaemia is microcytic hypochromic, not normocytic normochromic. This also contradicts the next sentence, which cites the low MCV and MCH."
+        },
+        {
+          "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The report contains no clinical history or request details that mention menorrhagia, so this statement is not supported by the data shown."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1105,
+      "output_tokens": 834,
+      "cost_usd": 0.01055
+    },
+    {
+      "report_id": "C-001",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Severe normocytic normochromic anaemia is present, with haemoglobin 6.2 g/dL, haematocrit 22.1% and red cell count 3.56 x10^12/L.",
+          "section": "Interpretation",
+          "category": "Incorrect red cell classification",
+          "severity": "major",
+          "confidence": 0.97,
+          "rationale": "MCV 62.1 fL and MCHC 28.1 g/dL are both low, so the anaemia is microcytic hypochromic, not normocytic normochromic. The sentence also contradicts the next sentence, which cites the low MCV and MCH."
+        },
+        {
+          "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "minor",
+          "confidence": 0.4,
+          "rationale": "The report gives no clinical history, so the menorrhagia is not supported by anything shown. The conclusion that blood loss is the most likely cause rests on it."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1105,
+      "output_tokens": 776,
+      "cost_usd": 0.00997
+    },
+    {
+      "report_id": "C-001",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Severe normocytic normochromic anaemia is present, with haemoglobin 6.2 g/dL, haematocrit 22.1% and red cell count 3.56 x10^12/L.",
+          "section": "Interpretation",
+          "category": "Incorrect red cell morphology classification",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "MCV 62.1 fL and MCH 17.4 pg and MCHC 28.1 g/dL are all low, so the anaemia is microcytic hypochromic, not normocytic normochromic. The sentence also contradicts the next sentence, which cites the low MCV and MCH."
+        },
+        {
+          "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "minor",
+          "confidence": 0.4,
+          "rationale": "The report gives no clinical history, so the menorrhagia cannot be verified from the data. The conclusion that blood loss is the most likely cause rests on that unverified statement."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1105,
+      "output_tokens": 783,
+      "cost_usd": 0.01004
+    },
+    {
+      "report_id": "C-002",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Neutrophils %: 22.0 % (ref 40.0–80.0)",
+          "section": "Values",
+          "category": "Differential does not add up / inconsistent value",
+          "severity": "major",
+          "confidence": 0.7,
+          "rationale": "The differential percentages sum to 110% (22+82+4+1+1). The absolute neutrophil count of 5.76 corresponds to 12% of 48.00, not 22% (which would give 10.56), so the percentage is probably a transcription error."
+        },
+        {
+          "quoted_sentence": "Platelet count is markedly reduced.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The platelet count is 152 x10^9/L, which is within the reference range (150–410) and not markedly reduced. At most it is low-normal."
+        },
+        {
+          "quoted_sentence": "In a 58-year-old man with small cervical lymph nodes, this pattern is suggestive of chronic lymphocytic leukaemia, but it requires confirmation.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The patient's age and the lymph node findings do not appear anywhere in the report data, so the clinical details cannot be verified from the report."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1117,
+      "output_tokens": 960,
+      "cost_usd": 0.011834
+    },
+    {
+      "report_id": "C-002",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Neutrophils %: 22.0 % (ref 40.0–80.0)",
+          "section": "Values",
+          "category": "Internal inconsistency in differential",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "The differential percentages sum to 110%. The absolute neutrophil count of 5.76 x10^9/L is 12% of a WBC of 48.00, not 22%, so the neutrophil percentage is wrong. Correcting it to 12% would make the differential sum to 100%."
+        },
+        {
+          "quoted_sentence": "Platelet count is markedly reduced.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The platelet count is 152 x10^9/L, which is within the reference range of 150–410. It is not reduced, and certainly not markedly."
+        },
+        {
+          "quoted_sentence": "In a 58-year-old man with small cervical lymph nodes, this pattern is suggestive of chronic lymphocytic leukaemia, but it requires confirmation.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The report gives no patient age, sex or lymph node findings. The interpretation cites clinical details that cannot be verified from the report."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1117,
+      "output_tokens": 1029,
+      "cost_usd": 0.012524
+    },
+    {
+      "report_id": "C-002",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Neutrophils %: 22.0 % (ref 40.0–80.0)",
+          "section": "Values",
+          "category": "Internal inconsistency in differential",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "The differential percentages sum to 110%. The absolute neutrophil count of 5.76 of a WBC of 48.00 corresponds to 12%, not 22%, so the percentage is wrong."
+        },
+        {
+          "quoted_sentence": "Platelet count is markedly reduced.",
+          "section": "Interpretation",
+          "category": "Contradicts reported data",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The platelet count of 152 x10^9/L is within the reference range (150–410). It is not reduced, let alone markedly."
+        },
+        {
+          "quoted_sentence": "In a 58-year-old man with small cervical lymph nodes, this pattern is suggestive of chronic lymphocytic leukaemia, but it requires confirmation.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The report gives no age, sex or lymph node findings, so these details cannot be verified from the data and may have been introduced without a source."
+        },
+        {
+          "quoted_sentence": "Basophils absolute: 0.48 x10^9/L (ref 0.02–0.10)",
+          "section": "Values",
+          "category": "Abnormal value not flagged or addressed",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The absolute basophil count is nearly five times the upper reference limit, yet it is not commented on in the interpretation. It is arithmetically consistent with 1% of the WBC, so the issue is a missing comment rather than a wrong value."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1117,
+      "output_tokens": 1165,
+      "cost_usd": 0.013884
+    },
+    {
+      "report_id": "C-003",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Platelet count is severely reduced at 12 x10^9/L, with a raised mean platelet volume of 11.8 fL, indicating increased platelet turnover or peripheral destruction rather than a primary marrow failure pattern.",
+          "section": "Interpretation",
+          "category": "Value discrepancy / transcription error",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "The Values section gives platelets as 120 x10^9/L, which is mild thrombocytopenia, not 12 x10^9/L. The interpretation describes severe thrombocytopenia that the measured value does not support."
+        },
+        {
+          "quoted_sentence": "CRITICAL VALUE: Platelet count 12 x10^9/L. This result is flagged as critical.",
+          "section": "Comment/recommendation",
+          "category": "Value discrepancy / inappropriate critical flag",
+          "severity": "critical",
+          "confidence": 0.88,
+          "rationale": "The reported platelet count is 120 x10^9/L, so the 12 x10^9/L critical-value call and the urgent clinician notification do not match the data. Either the value or the comment is wrong."
+        },
+        {
+          "quoted_sentence": "The isolated nature of the thrombocytopenia, together with the reported petechiae and gum bleeding, is consistent with an immune or consumptive process, although clinical correlation is required.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "No clinical history of petechiae or gum bleeding is given anywhere in the report. The statement also overstates the significance of a platelet count of 120."
+        },
+        {
+          "quoted_sentence": "Bleeding risk is significant at this level, and the findings should be interpreted alongside the clinical history and a repeat count.",
+          "section": "Interpretation",
+          "category": "Overstated clinical significance",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "A platelet count of 120 x10^9/L, the value in the Values section, does not carry significant bleeding risk. The statement fits only the erroneous 12 x10^9/L figure."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1240,
+      "output_tokens": 1230,
+      "cost_usd": 0.01478
+    },
+    {
+      "report_id": "C-003",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Platelet count is severely reduced at 12 x10^9/L, with a raised mean platelet volume of 11.8 fL, indicating increased platelet turnover or peripheral destruction rather than a primary marrow failure pattern.",
+          "section": "Interpretation",
+          "category": "Value mismatch / wrong magnitude",
+          "severity": "critical",
+          "confidence": 0.93,
+          "rationale": "The Values section gives platelets as 120 x10^9/L, which is mildly reduced, not 12 and not severe. The interpretation misquotes the value by a factor of ten and overstates the severity."
+        },
+        {
+          "quoted_sentence": "CRITICAL VALUE: Platelet count 12 x10^9/L.",
+          "section": "Comment/recommendation",
+          "category": "Value mismatch / false critical flag",
+          "severity": "critical",
+          "confidence": 0.93,
+          "rationale": "The measured platelet count is 120 x10^9/L, which does not meet a critical threshold. The critical flag and urgent notification are based on a transcription error."
+        },
+        {
+          "quoted_sentence": "The isolated nature of the thrombocytopenia, together with the reported petechiae and gum bleeding, is consistent with an immune or consumptive process, although clinical correlation is required.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "No clinical history of petechiae or gum bleeding is given in the report. Such bleeding would also be unexpected at a platelet count of 120, so the statement looks like it was written for a count of 12."
+        },
+        {
+          "quoted_sentence": "Bleeding risk is significant at this level, and the findings should be interpreted alongside the clinical history and a repeat count.",
+          "section": "Interpretation",
+          "category": "Overstated clinical significance",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "A platelet count of 120 x10^9/L carries no significant spontaneous bleeding risk. The statement follows from the incorrect value of 12."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1240,
+      "output_tokens": 1194,
+      "cost_usd": 0.01442
+    },
+    {
+      "report_id": "C-003",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Platelet count is severely reduced at 12 x10^9/L, with a raised mean platelet volume of 11.8 fL, indicating increased platelet turnover or peripheral destruction rather than a primary marrow failure pattern.",
+          "section": "Interpretation",
+          "category": "Value discrepancy with results table",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "The Values section reports platelets as 120 x10^9/L, which is only mildly reduced, but the interpretation cites 12 x10^9/L and calls it severe. One of the two figures is wrong, and the narrative does not match the reported result."
+        },
+        {
+          "quoted_sentence": "CRITICAL VALUE: Platelet count 12 x10^9/L. This result is flagged as critical.",
+          "section": "Comment/recommendation",
+          "category": "Value discrepancy / inappropriate critical flag",
+          "severity": "critical",
+          "confidence": 0.88,
+          "rationale": "The reported platelet count is 120 x10^9/L, which is not a critical value. The critical alert and the urgent clinician notification are based on a number that contradicts the results table."
+        },
+        {
+          "quoted_sentence": "The isolated nature of the thrombocytopenia, together with the reported petechiae and gum bleeding, is consistent with an immune or consumptive process, although clinical correlation is required.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "No clinical history of petechiae or gum bleeding appears in the report. The bleeding findings are unsupported, and they are inconsistent with a platelet count of 120."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1240,
+      "output_tokens": 1044,
+      "cost_usd": 0.01292
+    },
+    {
+      "report_id": "C-004",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "MCH: 29.0 pg (ref 27.0–32.0)",
+          "section": "Values",
+          "category": "Internal inconsistency in calculated index",
+          "severity": "major",
+          "confidence": 0.85,
+          "rationale": "MCH is Hb/RBC = 7.8/2.00 × 10 = 39.0 pg, not 29.0 pg. The reported value is inconsistent with Hb and RBC, and the true value would be raised, consistent with macrocytosis."
+        },
+        {
+          "quoted_sentence": "The MCHC is within the normal range, and the RDW is normal, with no anisocytosis.",
+          "section": "Interpretation",
+          "category": "Contradicts reported value",
+          "severity": "major",
+          "confidence": 0.92,
+          "rationale": "RDW is 18.5% (ref 11.6–14.0), which is raised and indicates anisocytosis. Calling it normal contradicts the data."
+        },
+        {
+          "quoted_sentence": "A normal white cell count and platelet count accompany the anaemia, a pattern that, together with the strict vegetarian diet, fatigue, paraesthesia and glossitis, is suggestive of vitamin B12 deficiency.",
+          "section": "Interpretation",
+          "category": "Contradicts reported value",
+          "severity": "major",
+          "confidence": 0.92,
+          "rationale": "WBC is 3.20 (low), with neutrophils low, and platelets are 110 (low). This is pancytopenia, not normal counts. The cytopenias also strengthen the case for B12 or folate deficiency and the need for further work-up."
+        },
+        {
+          "quoted_sentence": "together with the strict vegetarian diet, fatigue, paraesthesia and glossitis, is suggestive of vitamin B12 deficiency",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The report contains no clinical history (diet, symptoms) supporting these statements, so they appear unsourced."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1110,
+      "output_tokens": 1143,
+      "cost_usd": 0.01365
+    },
+    {
+      "report_id": "C-004",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "MCH: 29.0 pg (ref 27.0–32.0)",
+          "section": "Values",
+          "category": "Internal inconsistency / calculation error",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "MCH should equal Hb/RBC, which is 7.8/2.00 × 10 = 39.0 pg. The reported 29.0 pg is wrong, and the true value is high, which fits the macrocytosis."
+        },
+        {
+          "quoted_sentence": "The MCHC is within the normal range, and the RDW is normal, with no anisocytosis.",
+          "section": "Interpretation",
+          "category": "Contradiction with data",
+          "severity": "major",
+          "confidence": 0.92,
+          "rationale": "RDW is 18.5% against a reference of 11.6–14.0, so it is raised. This indicates marked anisocytosis, and the statement contradicts the Values section."
+        },
+        {
+          "quoted_sentence": "A normal white cell count and platelet count accompany the anaemia, a pattern that, together with the strict vegetarian diet, fatigue, paraesthesia and glossitis, is suggestive of vitamin B12 deficiency.",
+          "section": "Interpretation",
+          "category": "Contradiction with data / missed pancytopenia",
+          "severity": "major",
+          "confidence": 0.93,
+          "rationale": "WBC is 3.20 (low), neutrophils are 1.76 (low) and platelets are 110 (low). Together with the anaemia this is pancytopenia, not normal counts. The interpretation therefore misses a significant finding."
+        },
+        {
+          "quoted_sentence": "A normal white cell count and platelet count accompany the anaemia, a pattern that, together with the strict vegetarian diet, fatigue, paraesthesia and glossitis, is suggestive of vitamin B12 deficiency.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The report gives no clinical history, so the diet and symptoms cited cannot be verified from what is provided."
+        },
+        {
+          "quoted_sentence": "The findings may also reflect folate deficiency or another cause of ineffective erythropoiesis, and there is no critical value on this report.",
+          "section": "Interpretation",
+          "category": "Questionable statement",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "Hb of 7.8 g/dL with pancytopenia is a marked abnormality. The assurance that nothing is critical, together with the missed pancytopenia, understates the severity. Other causes such as marrow disorders also deserve mention."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1110,
+      "output_tokens": 1293,
+      "cost_usd": 0.01515
+    },
+    {
+      "report_id": "C-004",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "MCH: 29.0 pg (ref 27.0–32.0)",
+          "section": "Values",
+          "category": "calculation inconsistency / transcription error",
+          "severity": "major",
+          "confidence": 0.85,
+          "rationale": "MCH = Hb/RBC = 7.8/2.00 × 10 = 39.0 pg, not 29.0. This is consistent with the macrocytosis (MCV 118) and should be flagged high, not reported as normal."
+        },
+        {
+          "quoted_sentence": "The MCHC is within the normal range, and the RDW is normal, with no anisocytosis.",
+          "section": "Interpretation",
+          "category": "contradiction with data",
+          "severity": "major",
+          "confidence": 0.92,
+          "rationale": "RDW is 18.5% (ref 11.6–14.0), which is raised and indicates anisocytosis. Calling it normal contradicts the reported value."
+        },
+        {
+          "quoted_sentence": "A normal white cell count and platelet count accompany the anaemia, a pattern that, together with the strict vegetarian diet, fatigue, paraesthesia and glossitis, is suggestive of vitamin B12 deficiency.",
+          "section": "Interpretation",
+          "category": "contradiction with data / missed pancytopenia",
+          "severity": "critical",
+          "confidence": 0.93,
+          "rationale": "WBC is 3.20 (low), the absolute neutrophil count is 1.76 (low) and platelets are 110 (low). This is pancytopenia, not normal counts, and it affects the differential diagnosis (e.g. marrow failure or myelodysplasia) and the urgency of follow-up."
+        },
+        {
+          "quoted_sentence": "The findings may also reflect folate deficiency or another cause of ineffective erythropoiesis, and there is no critical value on this report.",
+          "section": "Interpretation",
+          "category": "incomplete interpretation / unsupported statement",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The report says nothing about the pancytopenia and neutropenia. It also adds no recommendation such as a blood film review, reticulocyte count, or marrow assessment for the multilineage cytopenia."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1110,
+      "output_tokens": 1205,
+      "cost_usd": 0.01427
+    },
+    {
+      "report_id": "C-005",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "This is mild neutropenia.",
+          "section": "Interpretation",
+          "category": "Severity misclassification",
+          "severity": "critical",
+          "confidence": 0.96,
+          "rationale": "An absolute neutrophil count of about 0.2 x10^9/L is severe neutropenia (below 0.5), not mild. It carries a high risk of serious infection and normally needs urgent communication."
+        },
+        {
+          "quoted_sentence": "The findings are in keeping with chemotherapy-induced myelosuppression in a patient who is ten days after a cycle of treatment for breast cancer.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "The report contains no clinical details about chemotherapy, timing or breast cancer. This history appears to be assumed or fabricated, and the cause is stated more firmly than the data support."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1109,
+      "output_tokens": 788,
+      "cost_usd": 0.010098
+    },
+    {
+      "report_id": "C-005",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "This is mild neutropenia.",
+          "section": "Interpretation",
+          "category": "Severity misclassification",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "An absolute neutrophil count of 0.2 x10^9/L is severe neutropenia (below 0.5), not mild. Calling it mild understates the risk of life-threatening infection and could delay urgent action."
+        },
+        {
+          "quoted_sentence": "The findings are in keeping with chemotherapy-induced myelosuppression in a patient who is ten days after a cycle of treatment for breast cancer.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The report gives no clinical history, diagnosis or treatment timing, so the breast cancer and the 'ten days after a cycle' statement cannot be verified against the data presented."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1109,
+      "output_tokens": 838,
+      "cost_usd": 0.010598
+    },
+    {
+      "report_id": "C-005",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "This is mild neutropenia.",
+          "section": "Interpretation",
+          "category": "Severity misclassification",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "An absolute neutrophil count of 0.2 x10^9/L is severe neutropenia (below 0.5), not mild. Calling it mild understates a high infection risk that needs urgent attention."
+        },
+        {
+          "quoted_sentence": "The findings are in keeping with chemotherapy-induced myelosuppression in a patient who is ten days after a cycle of treatment for breast cancer.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "minor",
+          "confidence": 0.35,
+          "rationale": "The report contains no clinical history, diagnosis or treatment timing. The breast cancer, the chemotherapy and the ten-day interval are not supported by the data shown."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1109,
+      "output_tokens": 830,
+      "cost_usd": 0.010518
+    },
+    {
+      "report_id": "C-006",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Neutrophils absolute: 6.00 x10^9/L (ref 2.00–7.00)",
+          "section": "Values",
+          "category": "calculation inconsistency",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "86% of a WBC of 18.60 x10^9/L is about 16.0 x10^9/L, not 6.00. The absolute differential counts sum to about 8.6, not 18.6. The reported value falsely looks normal and hides a marked absolute neutrophilia."
+        },
+        {
+          "quoted_sentence": "Haemoglobin is reduced with low red cell indices, indicating a microcytic anaemia.",
+          "section": "Interpretation",
+          "category": "interpretation contradicts data",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "Hb is 14.5 g/dL, MCV 87.8 fL, MCH 29.6 pg and MCHC 33.7 g/dL, all within reference ranges. There is no anaemia and no microcytosis."
+        },
+        {
+          "quoted_sentence": "The platelet count is raised, in keeping with a reactive thrombocytosis.",
+          "section": "Interpretation",
+          "category": "interpretation contradicts data",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "Platelets are 245 x10^9/L, within the reference range of 150–410. There is no thrombocytosis."
+        },
+        {
+          "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+          "section": "Values",
+          "category": "out-of-range value not flagged or addressed",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The absolute basophil count of 0.19 is above the stated upper limit of 0.10. It is not flagged or commented on, and it is probably an artefact of the 1% differential on a high WBC."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1052,
+      "output_tokens": 1113,
+      "cost_usd": 0.013234
+    },
+    {
+      "report_id": "C-006",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Neutrophils absolute: 6.00 x10^9/L (ref 2.00–7.00)",
+          "section": "Values",
+          "category": "calculation inconsistency",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "86% of a WBC of 18.60 x10^9/L is about 16.0 x10^9/L, not 6.00. The reported value falls within the reference range and contradicts the neutrophilia described in the interpretation."
+        },
+        {
+          "quoted_sentence": "Haemoglobin is reduced with low red cell indices, indicating a microcytic anaemia.",
+          "section": "Interpretation",
+          "category": "interpretation contradicts data",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "Hb is 14.5 g/dL, and MCV, MCH and MCHC are all within range. There is no anaemia and no microcytosis."
+        },
+        {
+          "quoted_sentence": "The platelet count is raised, in keeping with a reactive thrombocytosis.",
+          "section": "Interpretation",
+          "category": "interpretation contradicts data",
+          "severity": "major",
+          "confidence": 0.96,
+          "rationale": "Platelets are 245 x10^9/L, within the reference range of 150–410. There is no thrombocytosis."
+        },
+        {
+          "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+          "section": "Values",
+          "category": "out-of-range value not flagged",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The absolute basophil count exceeds the upper reference limit of 0.10. It is arithmetically consistent with 1% of the WBC, but it is not commented on in the interpretation."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1052,
+      "output_tokens": 1094,
+      "cost_usd": 0.013044
+    },
+    {
+      "report_id": "C-006",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Neutrophils absolute: 6.00 x10^9/L (ref 2.00–7.00)",
+          "section": "Values",
+          "category": "calculation inconsistency",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "86% of a WBC of 18.60 x10^9/L is about 16.0 x10^9/L, not 6.00. The reported value falls within the reference range and hides a marked absolute neutrophilia."
+        },
+        {
+          "quoted_sentence": "Haemoglobin is reduced with low red cell indices, indicating a microcytic anaemia.",
+          "section": "Interpretation",
+          "category": "interpretation contradicts data",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "Hb 14.5 g/dL, MCV 87.8 fL, MCH 29.6 pg and MCHC 33.7 g/dL are all within reference ranges. There is no anaemia and no microcytosis."
+        },
+        {
+          "quoted_sentence": "The platelet count is raised, in keeping with a reactive thrombocytosis.",
+          "section": "Interpretation",
+          "category": "interpretation contradicts data",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "Platelets 245 x10^9/L are within the reference range of 150–410, so there is no thrombocytosis."
+        },
+        {
+          "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+          "section": "Values",
+          "category": "abnormal value not flagged / inconsistent reference",
+          "severity": "minor",
+          "confidence": 0.35,
+          "rationale": "The absolute basophil count of 0.19 exceeds the stated upper limit of 0.10, yet the interpretation does not address it. It is also high relative to a basophil fraction of 1%, so either the reference range or the value looks wrong."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1052,
+      "output_tokens": 1153,
+      "cost_usd": 0.013634
+    },
+    {
+      "report_id": "C-007",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The red-cell indices are reduced, consistent with a microcytic and hypochromic red-cell population.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "MCV 89.7 fL, MCH 30.0 pg and MCHC 33.4 g/dL are all within reference range, so the red cells are normocytic and normochromic, not microcytic and hypochromic."
+        },
+        {
+          "quoted_sentence": "Mild leucocytosis with neutrophil predominance and thrombocytosis, together with headache, plethoric facies and pruritus after bathing, raise suspicion of a myeloproliferative neoplasm such as polycythaemia vera, although secondary causes of erythrocytosis must be excluded.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "major",
+          "confidence": 0.92,
+          "rationale": "The platelet count is 250 x10^9/L, within the reference range (150–410), so there is no thrombocytosis."
+        },
+        {
+          "quoted_sentence": "Mild leucocytosis with neutrophil predominance and thrombocytosis, together with headache, plethoric facies and pruritus after bathing, raise suspicion of a myeloproliferative neoplasm such as polycythaemia vera, although secondary causes of erythrocytosis must be excluded.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical information",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Headache, plethoric facies and pruritus after bathing are cited as clinical findings, but no clinical history is given in the report."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1188,
+      "output_tokens": 1009,
+      "cost_usd": 0.012466
+    },
+    {
+      "report_id": "C-007",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The red-cell indices are reduced, consistent with a microcytic and hypochromic red-cell population.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "MCV 89.7 fL, MCH 30.0 pg and MCHC 33.4 g/dL are all within reference range, so the red cells are normocytic and normochromic, not microcytic and hypochromic."
+        },
+        {
+          "quoted_sentence": "Mild leucocytosis with neutrophil predominance and thrombocytosis, together with headache, plethoric facies and pruritus after bathing, raise suspicion of a myeloproliferative neoplasm such as polycythaemia vera, although secondary causes of erythrocytosis must be excluded.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "major",
+          "confidence": 0.92,
+          "rationale": "The platelet count is 250 x10^9/L, within reference range (150–410), so thrombocytosis is not present."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1188,
+      "output_tokens": 837,
+      "cost_usd": 0.010746
+    },
+    {
+      "report_id": "C-007",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The red-cell indices are reduced, consistent with a microcytic and hypochromic red-cell population.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "MCV 89.7 fL, MCH 30.0 pg and MCHC 33.4 g/dL are all within reference ranges, so the red cells are normocytic and normochromic, not microcytic and hypochromic."
+        },
+        {
+          "quoted_sentence": "Mild leucocytosis with neutrophil predominance and thrombocytosis, together with headache, plethoric facies and pruritus after bathing, raise suspicion of a myeloproliferative neoplasm such as polycythaemia vera, although secondary causes of erythrocytosis must be excluded.",
+          "section": "Interpretation",
+          "category": "Interpretation contradicts data",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "Platelets are 250 x10^9/L, within the reference range (150–410), so there is no thrombocytosis."
+        },
+        {
+          "quoted_sentence": "Basophils absolute: 0.12 x10^9/L (ref 0.02–0.10)",
+          "section": "Values",
+          "category": "Unflagged abnormal value / not addressed",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The absolute basophil count is above the reference range but is not commented on, although basophilia would be relevant in a suspected myeloproliferative neoplasm."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1188,
+      "output_tokens": 1010,
+      "cost_usd": 0.012476
+    },
+    {
+      "report_id": "C-008",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "These findings indicate a normal blood count, with no evidence of anaemia, infection, inflammation or thrombocytopenia.",
+          "section": "Interpretation",
+          "category": "Overstated conclusion",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "A normal full blood count does not exclude infection or inflammation, and these cannot be ruled out from this result alone. The statement goes beyond what the data support."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1035,
+      "output_tokens": 560,
+      "cost_usd": 0.00767
+    },
+    {
+      "report_id": "C-008",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "These findings indicate a normal blood count, with no evidence of anaemia, infection, inflammation or thrombocytopenia.",
+          "section": "Interpretation",
+          "category": "Overreaching conclusion",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "A normal full blood count cannot exclude infection or inflammation, since many such conditions leave the count normal. Stating there is no evidence of them goes beyond what the data can support."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1035,
+      "output_tokens": 703,
+      "cost_usd": 0.0091
+    },
+    {
+      "report_id": "C-008",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "These findings indicate a normal blood count, with no evidence of anaemia, infection, inflammation or thrombocytopenia.",
+          "section": "Interpretation",
+          "category": "overreaching interpretation",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "A normal full blood count cannot exclude infection or inflammation, so the statement goes beyond what the data support. All the numeric values are internally consistent and within range."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1035,
+      "output_tokens": 655,
+      "cost_usd": 0.00862
+    },
+    {
+      "report_id": "C-009",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Mild eosinophilia in this setting is most consistent with the patient's seasonal allergic rhinitis, but it should be correlated with the allergy history and medication history.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical claim",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The report gives no clinical history, so seasonal allergic rhinitis is asserted without support. The sentence then asks for allergy history to be correlated, which contradicts the premise. The eosinophilia has a broad differential, including parasites and drugs."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1112,
+      "output_tokens": 699,
+      "cost_usd": 0.009214
+    },
+    {
+      "report_id": "C-009",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Mild eosinophilia in this setting is most consistent with the patient's seasonal allergic rhinitis, but it should be correlated with the allergy history and medication history.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The report gives no clinical history or indication, so the patient's seasonal allergic rhinitis is not documented anywhere in it. Naming it as the most likely cause is an unsupported attribution. The same sentence also tells the reader to check the allergy history, which implies that history is not known."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1112,
+      "output_tokens": 676,
+      "cost_usd": 0.008984
+    },
+    {
+      "report_id": "C-009",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Mild eosinophilia in this setting is most consistent with the patient's seasonal allergic rhinitis, but it should be correlated with the allergy history and medication history.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical claim",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The report gives no clinical history or indication of seasonal allergic rhinitis. The interpretation assumes a diagnosis that is not documented, and it contradicts itself by also asking for the allergy history to be checked."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1112,
+      "output_tokens": 616,
+      "cost_usd": 0.008384
+    },
+    {
+      "report_id": "C-010",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "This combination of low MCV, low MCH and a raised red cell count, with a normal RDW and a long-standing history of mild anaemia, is a pattern suggestive of beta-thalassaemia trait rather than iron deficiency.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "minor",
+          "confidence": 0.55,
+          "rationale": "The report gives no clinical history, and no previous results are shown. The 'long-standing history of mild anaemia' is not supported by the data and cannot be used as evidence for the pattern."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1102,
+      "output_tokens": 727,
+      "cost_usd": 0.009474
+    },
+    {
+      "report_id": "C-010",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "This combination of low MCV, low MCH and a raised red cell count, with a normal RDW and a long-standing history of mild anaemia, is a pattern suggestive of beta-thalassaemia trait rather than iron deficiency.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The report gives no clinical history or prior results, so a 'long-standing history of mild anaemia' is not supported by the data. The interpretation relies on it to favour thalassaemia trait over iron deficiency."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1102,
+      "output_tokens": 723,
+      "cost_usd": 0.009434
+    },
+    {
+      "report_id": "C-010",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "This combination of low MCV, low MCH and a raised red cell count, with a normal RDW and a long-standing history of mild anaemia, is a pattern suggestive of beta-thalassaemia trait rather than iron deficiency.",
+          "section": "Interpretation",
+          "category": "Unsupported clinical history",
+          "severity": null,
+          "confidence": 0.6,
+          "rationale": "The report contains no clinical history or previous results, so a 'long-standing history of mild anaemia' is not supported by the data given. The thalassaemia-trait pattern is already supported by the indices (low MCV and MCH, raised RBC, normal RDW), so this phrase adds an unverified claim."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1102,
+      "output_tokens": 746,
+      "cost_usd": 0.009664
+    },
+    {
+      "report_id": "H-001",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour size: 25 mm in greatest dimension",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (tumour size)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The synoptic gives 25 mm, but the gross description and diagnosis both state 32 mm. This discrepancy could affect T category."
+        },
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 4/14",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (node count)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The microscopic description and diagnosis report 3 of 14 positive nodes, but the synoptic reports 4/14."
+        },
+        {
+          "quoted_sentence": "pT: pT1c",
+          "section": "Synoptic summary",
+          "category": "Staging inconsistency",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The diagnosis gives pT2, which is correct for a 32 mm tumour (>20 mm to 50 mm). pT1c (>10 to 20 mm) is incorrect and does not match even the 25 mm synoptic size."
+        },
+        {
+          "quoted_sentence": "Received fresh, orientated and inked.",
+          "section": "Specimen",
+          "category": "Specimen handling inconsistency",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "The specimen is said to be received fresh and already inked, which is unusual since inking is generally done in the laboratory. This is a low-confidence concern."
+        },
+        {
+          "quoted_sentence": "The tumour is Nottingham grade 2.",
+          "section": "Microscopic description",
+          "category": "Grade vs description",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The description of solid sheets of pleomorphic cells might suggest a higher grade, and no component scores (tubule formation, nuclear pleomorphism, mitoses) are given to support grade 2."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1115,
+      "output_tokens": 639,
+      "cost_usd": 0.00862
+    },
+    {
+      "report_id": "H-001",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour size: 25 mm in greatest dimension",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (tumour size)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The synoptic gives 25 mm, but the gross description and diagnosis both state 32 mm."
+        },
+        {
+          "quoted_sentence": "pT: pT1c",
+          "section": "Synoptic summary",
+          "category": "Staging inconsistency",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "A 32 mm tumour is pT2 (>20 to 50 mm), as stated in the diagnosis. pT1c (>10 to 20 mm) is wrong, and it is also inconsistent with the 25 mm size listed in the same synopsis."
+        },
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 4/14",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (lymph node count)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The microscopic description and diagnosis report 3 of 14 positive nodes, not 4/14."
+        },
+        {
+          "quoted_sentence": "Received fresh, orientated and inked.",
+          "section": "Specimen",
+          "category": "Possible inconsistency",
+          "severity": "minor",
+          "confidence": 0.1,
+          "rationale": "A specimen received fresh and already inked is unusual, since inking is normally done in the laboratory. This is probably not a real error."
+        },
+        {
+          "quoted_sentence": "The tumour is Nottingham grade 2.",
+          "section": "Microscopic description",
+          "category": "Incomplete grading components",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "The grade is given without its tubule formation, nuclear pleomorphism and mitotic count components. The description also says 'pleomorphic' with solid sheets, which would fit grade 3 better."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1115,
+      "output_tokens": 620,
+      "cost_usd": 0.00843
+    },
+    {
+      "report_id": "H-001",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour size: 25 mm in greatest dimension",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (tumour size)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The synoptic lists 25 mm, but the gross description and diagnosis both give 32 mm. The discrepancy affects T category."
+        },
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 4/14",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (lymph node count)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The microscopic description and diagnosis report 3 of 14 positive nodes, not 4. Four positive nodes would change the pN category to pN2a."
+        },
+        {
+          "quoted_sentence": "pT: pT1c",
+          "section": "Synoptic summary",
+          "category": "Staging error / inconsistency",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "A 32 mm tumour is pT2, as stated in the Diagnosis. pT1c applies only to tumours of 10-20 mm, and it also contradicts the synoptic's own 25 mm size, which would likewise be pT2."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1115,
+      "output_tokens": 404,
+      "cost_usd": 0.00627
+    },
+    {
+      "report_id": "H-002",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Fifteen lymph nodes are identified in the mesentery, ranging from 3 mm to 15 mm.",
+          "section": "Gross description",
+          "category": "lymph node count discrepancy",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The gross description records 15 lymph nodes, but the microscopic description, diagnosis and synoptic summary all report 18 nodes examined."
+        },
+        {
+          "quoted_sentence": "pN: pN1a",
+          "section": "Synoptic summary",
+          "category": "internal inconsistency in staging",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "The synoptic gives pN1a, but the diagnosis and comment give pN1b. Under AJCC 8th edition, 2 positive nodes is pN1b (2-3 nodes), and pN1a is 1 node."
+        },
+        {
+          "quoted_sentence": "pT3 pN1b corresponds to AJCC 8th edition stage group IIIB for carcinoma of the caecum.",
+          "section": "Comment",
+          "category": "incorrect stage grouping",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "AJCC 8th edition gives T3 N1 M0 as stage IIIB, so this is arguably correct. However, the stage group is assigned without any M category, and the report never states the clinical metastatic status."
+        },
+        {
+          "quoted_sentence": "Metastatic status was not assessed on this specimen.",
+          "section": "Comment",
+          "category": "unclear or incomplete staging statement",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The sentence is correct that pM cannot be assigned from the specimen, but it conflicts with giving a definitive stage group. The stage should be provisional or conditional on clinical M0."
+        },
+        {
+          "quoted_sentence": "The serosal surface over the tumour appears intact, with no adherent tissue.",
+          "section": "Gross description",
+          "category": "specimen handling/omission",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "There is no description of the distance from the tumour to the margins, the tumour's relationship to the ileocaecal valve, or the appendix, and the specimen is described as 'fresh and fixed', which is ambiguous."
+        },
+        {
+          "quoted_sentence": "Specimen received fresh and fixed in 10% neutral buffered formalin.",
+          "section": "Specimen",
+          "category": "ambiguous specimen handling",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The statement that the specimen was received 'fresh and fixed' is contradictory, since a specimen is either received fresh or already fixed."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1165,
+      "output_tokens": 853,
+      "cost_usd": 0.01086
+    },
+    {
+      "report_id": "H-002",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Fifteen lymph nodes are identified in the mesentery, ranging from 3 mm to 15 mm.",
+          "section": "Gross description",
+          "category": "lymph node count discrepancy",
+          "severity": "major",
+          "confidence": 0.7,
+          "rationale": "Gross description identifies 15 lymph nodes, but microscopy, diagnosis and synoptic report 18 nodes examined; the counts are inconsistent."
+        },
+        {
+          "quoted_sentence": "pN: pN1a",
+          "section": "Synoptic summary",
+          "category": "internal inconsistency in staging",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "The synoptic pN1a conflicts with the diagnosis pN1b. Two positive nodes correspond to pN1a (1 node) vs pN1b (2-3 nodes), so pN1b is correct and the synoptic is wrong."
+        },
+        {
+          "quoted_sentence": "pT3 pN1b corresponds to AJCC 8th edition stage group IIIB for carcinoma of the caecum.",
+          "section": "Comment",
+          "category": "incorrect stage grouping",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "AJCC 8th T3 N1 M0 is stage IIIB, which is correct in itself, but the stage is assigned without M status, and M is stated as not assessed; the stage group should be provisional or cannot be fully assigned. The comment is internally awkward."
+        },
+        {
+          "quoted_sentence": "Metastatic status was not assessed on this specimen.",
+          "section": "Comment",
+          "category": "ambiguous/incorrect wording",
+          "severity": "minor",
+          "confidence": 0.35,
+          "rationale": "Stage group IIIB requires M0 (pM is not assigned from a resection alone); the statement conflicts with assigning a definitive stage group and is oddly worded."
+        },
+        {
+          "quoted_sentence": "The serosal surface over the tumour appears intact, with no adherent tissue.",
+          "section": "Gross description",
+          "category": "internal inconsistency",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "Gross statement of intact serosa is not reconciled with an invasive tumour into pericolic fat; minor, but the serosal assessment lacks histologic sampling detail."
+        },
+        {
+          "quoted_sentence": "Appendix not identified as separate.",
+          "section": "Specimen",
+          "category": "specimen description inconsistency",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "A caecal right hemicolectomy normally includes an appendix; its absence is not explained (e.g., prior appendicectomy) and is not further addressed."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1165,
+      "output_tokens": 856,
+      "cost_usd": 0.01089
+    },
+    {
+      "report_id": "H-002",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Fifteen lymph nodes are identified in the mesentery, ranging from 3 mm to 15 mm.",
+          "section": "Gross description",
+          "category": "lymph node count discrepancy",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The gross description identifies 15 lymph nodes, but the microscopic description, diagnosis and synoptic summary all report 18 nodes examined."
+        },
+        {
+          "quoted_sentence": "pN: pN1a",
+          "section": "Synoptic summary",
+          "category": "internal inconsistency in staging",
+          "severity": "major",
+          "confidence": 0.7,
+          "rationale": "The synoptic gives pN1a, but the diagnosis gives pN1b. Two positive nodes is pN1a under AJCC (1 node = N1a, 2-3 nodes = N1b), so the pN1b stated in the diagnosis is the inconsistent one; either way, the two sections disagree."
+        },
+        {
+          "quoted_sentence": "Metastatic adenocarcinoma in 2 of 18 regional lymph nodes (pN1b).",
+          "section": "Diagnosis",
+          "category": "staging error",
+          "severity": "major",
+          "confidence": 0.55,
+          "rationale": "By AJCC 8th edition, 2 positive nodes falls in N1b (2-3 nodes), so pN1b is correct. This conflicts with the synoptic's pN1a, so the discrepancy needs reconciling."
+        },
+        {
+          "quoted_sentence": "pT3 pN1b corresponds to AJCC 8th edition stage group IIIB for carcinoma of the caecum.",
+          "section": "Comment",
+          "category": "incorrect stage group",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "AJCC 8th edition gives T3 N1 (N1a/N1b) as stage IIIB, so this may be fine. However, the synoptic pN1a conflicts and the stage depends on the final N category; with M status not assessed the stage group should be stated as provisional."
+        },
+        {
+          "quoted_sentence": "Metastatic status was not assessed on this specimen.",
+          "section": "Comment",
+          "category": "ambiguous or misplaced statement",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Assigning a stage group while saying metastatic status was not assessed is inconsistent; pM is not reported in the synoptic, and the statement should be clarified (e.g., pM not applicable or clinical M status unknown)."
+        },
+        {
+          "quoted_sentence": "The serosal surface over the tumour appears intact, with no adherent tissue.",
+          "section": "Gross description",
+          "category": "specimen/site inconsistency",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The caecum is largely covered by peritoneum and a tumour invading pericolic fat would be expected to show some gross serosal or mesenteric involvement; it is a minor point, but also relevant to the lack of a stated distance to the margin."
+        },
+        {
+          "quoted_sentence": "Specimen received fresh and fixed in 10% neutral buffered formalin.",
+          "section": "Specimen",
+          "category": "contradictory specimen handling",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "A specimen cannot be both received fresh and received fixed; the state on receipt is ambiguous."
+        },
+        {
+          "quoted_sentence": "Appendix not identified as separate.",
+          "section": "Specimen",
+          "category": "incomplete documentation",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The appendix is not accounted for in the gross description or elsewhere in the report, leaving its status unclear for a caecal tumour."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1165,
+      "output_tokens": 1177,
+      "cost_usd": 0.0141
+    },
+    {
+      "report_id": "H-003",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Circumferential resection margin involved; distal margin 25 mm (clear)",
+          "section": "Synoptic summary",
+          "category": "internal contradiction",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The synoptic summary states the circumferential resection margin is involved, but the gross description (4 mm clearance), microscopic description, diagnosis and comment all report it as clear."
+        },
+        {
+          "quoted_sentence": "The pathological stage is I (pT2 pN0) according to the AJCC 8th edition.",
+          "section": "Comment",
+          "category": "staging terminology",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "pT2 pN0 corresponds to stage I, so this is probably correct. The M category is stated as not assessed, which is acceptable, so this is low-confidence only."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1156,
+      "output_tokens": 295,
+      "cost_usd": 0.005262
+    },
+    {
+      "report_id": "H-003",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Circumferential resection margin involved; distal margin 25 mm (clear)",
+          "section": "Synoptic summary",
+          "category": "internal inconsistency",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The synoptic summary says the circumferential margin is involved. The gross description, microscopic description, diagnosis and comment all say it is clear, with tumour 4 mm from the margin."
+        },
+        {
+          "quoted_sentence": "Tumour lies 4 mm from the circumferential resection margin.",
+          "section": "Microscopic description",
+          "category": "anatomic inconsistency",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "A tumour confined to the muscularis propria with no perirectal fat extension and a 4 mm CRM is plausible but borderline. The report should state whether the CRM is clear by the usual 1 mm threshold, which is acceptable here."
+        },
+        {
+          "quoted_sentence": "A firm, ulcerated tumour is present on the anterior wall, measuring 30 mm in greatest dimension.",
+          "section": "Gross description",
+          "category": "missing information",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The clinical details say the tumour is in the upper rectum, but the gross description does not give the distance from the anterior peritoneal reflection or the relationship to it. This is relevant to rectal staging and CRM assessment."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1156,
+      "output_tokens": 467,
+      "cost_usd": 0.006982
+    },
+    {
+      "report_id": "H-003",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Circumferential resection margin involved; distal margin 25 mm (clear)",
+          "section": "Synoptic summary",
+          "category": "internal inconsistency (margin status)",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The synoptic summary says the circumferential resection margin is involved. The gross description (4 mm), microscopic description, diagnosis and comment all report it as clear, with tumour 4 mm from the margin."
+        },
+        {
+          "quoted_sentence": "A firm, ulcerated tumour is present on the anterior wall, measuring 30 mm in greatest dimension.",
+          "section": "Gross description",
+          "category": "possible omission/inconsistency in tumour location",
+          "severity": "minor",
+          "confidence": 0.1,
+          "rationale": "The clinical details describe an upper rectal tumour, but the specimen's relation to the peritoneal reflection is not stated. This is a weak concern and probably not an error."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1156,
+      "output_tokens": 319,
+      "cost_usd": 0.005502
+    },
+    {
+      "report_id": "H-004",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Specimen received fresh and opened along the greater curvature after fixation in neutral buffered formalin.",
+          "section": "Specimen",
+          "category": "internal contradiction (specimen handling)",
+          "severity": "minor",
+          "confidence": 0.45,
+          "rationale": "The specimen is described as received fresh but opened after formalin fixation. The gross description also refers to a formalin-fixed lymph node package, so the handling statement is inconsistent."
+        },
+        {
+          "quoted_sentence": "Histologic grade: G3 (poorly differentiated)",
+          "section": "Synoptic summary",
+          "category": "discrepancy between sections (grade)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The microscopic description and diagnosis both give G2, moderately differentiated. The synoptic summary gives G3, poorly differentiated."
+        },
+        {
+          "quoted_sentence": "Assuming M0 on clinical assessment, this corresponds to pathological prognostic stage IIB under the AJCC 8th edition staging system for gastric carcinoma.",
+          "section": "Comment",
+          "category": "staging error",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "Under AJCC 8th edition pathological prognostic staging for gastric carcinoma, pT3 pN2 M0 is stage IIIA, not IIB. Stage IIB corresponds to combinations such as pT3 N1."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1207,
+      "output_tokens": 1166,
+      "cost_usd": 0.014074
+    },
+    {
+      "report_id": "H-004",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Histologic grade: G3 (poorly differentiated)",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (tumour grade)",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "The microscopic description and diagnosis both give moderately differentiated (G2). The synoptic summary gives G3 (poorly differentiated)."
+        },
+        {
+          "quoted_sentence": "Assuming M0 on clinical assessment, this corresponds to pathological prognostic stage IIB under the AJCC 8th edition staging system for gastric carcinoma.",
+          "section": "Comment",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "Under AJCC 8th edition, pathological pT3 pN2 M0 gastric carcinoma is stage IIIA, not IIB. IIB would correspond to pT3 N1."
+        },
+        {
+          "quoted_sentence": "Specimen received fresh and opened along the greater curvature after fixation in neutral buffered formalin.",
+          "section": "Specimen",
+          "category": "Internal inconsistency (specimen handling)",
+          "severity": "minor",
+          "confidence": 0.35,
+          "rationale": "The specimen is described as received fresh but also as opened after formalin fixation. The gross description also refers to a formalin-fixed lymph node package, so the handling is unclear."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1207,
+      "output_tokens": 1136,
+      "cost_usd": 0.013774
+    },
+    {
+      "report_id": "H-004",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Histologic grade: G3 (poorly differentiated)",
+          "section": "Synoptic summary",
+          "category": "internal inconsistency (grade)",
+          "severity": "major",
+          "confidence": 0.93,
+          "rationale": "The microscopic description and the diagnosis both give moderately differentiated (G2), but the synoptic summary says G3 (poorly differentiated)."
+        },
+        {
+          "quoted_sentence": "Assuming M0 on clinical assessment, this corresponds to pathological prognostic stage IIB under the AJCC 8th edition staging system for gastric carcinoma.",
+          "section": "Comment",
+          "category": "staging error",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "Under AJCC 8th edition pathological prognostic staging, pT3 pN2 M0 is stage IIIA. Stage IIB is incorrect."
+        },
+        {
+          "quoted_sentence": "Specimen received fresh and opened along the greater curvature after fixation in neutral buffered formalin.",
+          "section": "Specimen",
+          "category": "internal inconsistency (specimen handling)",
+          "severity": "minor",
+          "confidence": 0.5,
+          "rationale": "The specimen is described as received fresh but also as opened after formalin fixation. The gross description also refers to a formalin-fixed lymph node package, so the handling is unclear."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1207,
+      "output_tokens": 1105,
+      "cost_usd": 0.013464
+    },
+    {
+      "report_id": "H-005",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Perineural invasion: Not identified",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (synoptic vs. microscopic/diagnosis)",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "The microscopic description, diagnosis and comment all state that perineural invasion is present, but the synoptic summary says it is not identified. This affects adjuvant therapy decisions."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1226,
+      "output_tokens": 755,
+      "cost_usd": 0.010002
+    },
+    {
+      "report_id": "H-005",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Perineural invasion: Not identified",
+          "section": "Synoptic summary",
+          "category": "internal contradiction",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "The microscopic description, diagnosis and comment all state that perineural invasion is present. The synoptic summary says it is not identified, which could wrongly affect adjuvant treatment decisions."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1226,
+      "output_tokens": 619,
+      "cost_usd": 0.008642
+    },
+    {
+      "report_id": "H-005",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Perineural invasion: Not identified",
+          "section": "Synoptic summary",
+          "category": "internal inconsistency",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "The microscopic description, diagnosis and comment all state that perineural invasion is present. The synoptic summary says it is not identified. Perineural invasion affects adjuvant treatment decisions."
+        },
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 1/24",
+          "section": "Synoptic summary",
+          "category": "omission in synoptic",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "The synoptic omits depth of invasion and extranodal extension, which are needed to support pT and pN. The values elsewhere are consistent, so this is only a completeness concern."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1226,
+      "output_tokens": 894,
+      "cost_usd": 0.011392
+    },
+    {
+      "report_id": "H-006",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "A firm, ill-defined, grey-white nodule measuring 2.4 cm in greatest dimension is present in the upper pole of the left lobe, 5 mm from the posterior surface.",
+          "section": "Gross description",
+          "category": "laterality inconsistency",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "The gross description places the tumour in the left lobe, whereas the microscopic description, diagnosis and margin statement place it in the right lobe. Clinical details say the nodule is in the right lobe, so the gross laterality appears to be wrong."
+        },
+        {
+          "quoted_sentence": "Papillary thyroid carcinoma, tall cell subtype, 24 mm, right lobe, confined to the thyroid without extrathyroidal extension (pT2).",
+          "section": "Diagnosis",
+          "category": "histologic subtype discrepancy",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "The diagnosis gives tall cell subtype, but the microscopic description and the comment both say classic papillary carcinoma. No tall cell features are described."
+        },
+        {
+          "quoted_sentence": "Right thyroid lobe with isthmus, total thyroidectomy and central compartment neck dissection:",
+          "section": "Diagnosis",
+          "category": "specimen description inconsistency",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "The diagnosis heading lists only the right lobe with isthmus, but a total thyroidectomy including the left lobe was performed and submitted."
+        },
+        {
+          "quoted_sentence": "Pathological stage (AJCC 8th edition, patient under 55 years): pT2 pN1a, stage I. The M category is not assessed on this specimen; stage I assumes M0.",
+          "section": "Diagnosis",
+          "category": "staging",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "In AJCC 8th edition, for patients under 55 stage is I with M0 and II with M1. The wording that stage I assumes M0 is acceptable, but reporting a stage while M is unassessed is slightly irregular."
+        },
+        {
+          "quoted_sentence": "The entire central compartment tissue is submitted in cassettes A to D. Representative sections of tumour and all lymph nodes are submitted.",
+          "section": "Gross description",
+          "category": "internal inconsistency in sampling",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The description says both that the entire central compartment tissue is submitted and that representative sections are submitted. It also does not account for the cassette allocation of the thyroid tumour sections."
+        },
+        {
+          "quoted_sentence": "Surgical margins are free of tumour; the closest margin is 5 mm (posterior, right lobe).",
+          "section": "Microscopic description",
+          "category": "margin inconsistency",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The closest margin of 5 mm matches the gross distance from the posterior surface, which was recorded for the left lobe. This reinforces the laterality discrepancy."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1490,
+      "output_tokens": 987,
+      "cost_usd": 0.01285
+    },
+    {
+      "report_id": "H-006",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Papillary thyroid carcinoma, tall cell subtype, 24 mm, right lobe, confined to the thyroid without extrathyroidal extension (pT2).",
+          "section": "Diagnosis",
+          "category": "Histologic subtype inconsistency",
+          "severity": "major",
+          "confidence": 0.7,
+          "rationale": "The microscopic description and the comment both say classic papillary carcinoma, but the diagnosis gives tall cell subtype, which is not described or supported anywhere else."
+        },
+        {
+          "quoted_sentence": "Papillary thyroid carcinoma, tall cell subtype, 24 mm, right lobe, confined to the thyroid without extrathyroidal extension (pT2).",
+          "section": "Diagnosis",
+          "category": "Laterality discrepancy",
+          "severity": "critical",
+          "confidence": 0.8,
+          "rationale": "The gross description places the tumour in the upper pole of the left lobe, but the diagnosis says right lobe."
+        },
+        {
+          "quoted_sentence": "Surgical margins are free of tumour; the closest margin is 5 mm (posterior, right lobe).",
+          "section": "Microscopic description",
+          "category": "Laterality discrepancy",
+          "severity": "major",
+          "confidence": 0.55,
+          "rationale": "The tumour is in the left lobe, 5 mm from the posterior surface, so the closest margin should be the left lobe, not the right."
+        },
+        {
+          "quoted_sentence": "Right thyroid lobe with isthmus, total thyroidectomy and central compartment neck dissection:",
+          "section": "Diagnosis",
+          "category": "Specimen description inconsistency",
+          "severity": "minor",
+          "confidence": 0.5,
+          "rationale": "The specimen is a total thyroidectomy with both lobes and the isthmus, so labelling it as right lobe with isthmus is inaccurate."
+        },
+        {
+          "quoted_sentence": "Central compartment tissue contains six lymph nodes, the largest 9 mm, one of which is firm and white.",
+          "section": "Gross description",
+          "category": "Internal inconsistency in node size",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "The largest node is 9 mm, and the metastatic deposit is 6 mm, which is plausible, but the clinical details and grossly firm white node are not clearly reconciled. There is also a mismatch between tissue submission statements."
+        },
+        {
+          "quoted_sentence": "Right lobe measures 5.8 x 3.4 x 2.6 cm; left lobe measures 4.6 x 2.5 x 1.9 cm.",
+          "section": "Gross description",
+          "category": "Possible dimension or laterality error",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The right lobe is much larger than the left and the tumour is in the left lobe, so the lobe measurements may be transposed, though this cannot be confirmed."
+        },
+        {
+          "quoted_sentence": "Pathological stage (AJCC 8th edition, patient under 55 years): pT2 pN1a, stage I.",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "A 24 mm tumour confined to the thyroid is pT2, and in a patient under 55 any N category with M0 is stage I, so the stage is correct. However, the statement that M is not assessed while assigning stage I is awkward."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Not applicable",
+          "section": "Synoptic summary",
+          "category": "Synoptic omission",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The synoptic lacks extrathyroidal extension and subtype fields, and the subtype conflicts with the microscopic description."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1490,
+      "output_tokens": 1199,
+      "cost_usd": 0.01497
+    },
+    {
+      "report_id": "H-006",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "A firm, ill-defined, grey-white nodule measuring 2.4 cm in greatest dimension is present in the upper pole of the left lobe, 5 mm from the posterior surface.",
+          "section": "Gross description",
+          "category": "laterality inconsistency",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "The gross description places the tumour in the left lobe, but the microscopic description, diagnosis and synoptic place it in the right lobe (closest margin 'posterior, right lobe'). The laterality discrepancy is a serious error."
+        },
+        {
+          "quoted_sentence": "Papillary thyroid carcinoma, tall cell subtype, 24 mm, right lobe, confined to the thyroid without extrathyroidal extension (pT2).",
+          "section": "Diagnosis",
+          "category": "subtype inconsistency",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "The microscopic description and comment describe classic papillary thyroid carcinoma, with no tall cell features, yet the diagnosis states tall cell subtype."
+        },
+        {
+          "quoted_sentence": "Right thyroid lobe with isthmus, total thyroidectomy and central compartment neck dissection:",
+          "section": "Diagnosis",
+          "category": "specimen description inconsistency",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "The heading names only the right lobe with isthmus, although a total thyroidectomy (both lobes) was performed."
+        },
+        {
+          "quoted_sentence": "Pathological stage (AJCC 8th edition, patient under 55 years): pT2 pN1a, stage I. The M category is not assessed on this specimen; stage I assumes M0.",
+          "section": "Diagnosis",
+          "category": "staging error",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Under AJCC 8th edition, patients under 55 are stage I with any T and any N if M0, so the stage is correct; however, stating that stage I 'assumes M0' is non-standard wording."
+        },
+        {
+          "quoted_sentence": "The entire central compartment tissue is submitted in cassettes A to D. Representative sections of tumour and all lymph nodes are submitted.",
+          "section": "Gross description",
+          "category": "sampling inconsistency",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The text says the entire central compartment tissue is submitted and also that representative sections are submitted. The sampling statement is internally inconsistent, and the thyroid cassettes are not accounted for."
+        },
+        {
+          "quoted_sentence": "Surgical margins are free of tumour; the closest margin is 5 mm (posterior, right lobe).",
+          "section": "Microscopic description",
+          "category": "laterality inconsistency",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "The margin is attributed to the right lobe, but the gross description locates the tumour 5 mm from the posterior surface of the left lobe, so the laterality conflicts."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1490,
+      "output_tokens": 968,
+      "cost_usd": 0.01266
+    },
+    {
+      "report_id": "H-007",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Right kidney, radical nephrectomy: clear cell renal cell carcinoma, WHO/ISUP grade 2, 65 mm, confined to the kidney without invasion of renal sinus or perinephric fat (pT1b).",
+          "section": "Diagnosis",
+          "category": "laterality mismatch",
+          "severity": "critical",
+          "confidence": 0.96,
+          "rationale": "The clinical details and specimen line describe a left radical nephrectomy, but the diagnosis names the right kidney. This is a wrong-side error."
+        },
+        {
+          "quoted_sentence": "Perineural invasion: Not applicable",
+          "section": "Synoptic summary",
+          "category": "inappropriate synoptic item",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "Perineural invasion is not a standard renal cell carcinoma synoptic element. Listing it as 'Not applicable' is odd. Elsewhere in the report, lymphovascular invasion is the element that is addressed."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1147,
+      "output_tokens": 786,
+      "cost_usd": 0.010154
+    },
+    {
+      "report_id": "H-007",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Right kidney, radical nephrectomy: clear cell renal cell carcinoma, WHO/ISUP grade 2, 65 mm, confined to the kidney without invasion of renal sinus or perinephric fat (pT1b).",
+          "section": "Diagnosis",
+          "category": "laterality error",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The clinical details, specimen and gross description all describe a left radical nephrectomy, but the diagnosis says right kidney. This is a wrong-side error."
+        },
+        {
+          "quoted_sentence": "Perineural invasion: Not applicable",
+          "section": "Synoptic summary",
+          "category": "questionable synoptic item",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "Perineural invasion is not assessed anywhere in the microscopic description, so 'Not applicable' is inconsistent. Lymphovascular invasion, which was assessed, is missing from the synoptic summary."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1147,
+      "output_tokens": 772,
+      "cost_usd": 0.010014
+    },
+    {
+      "report_id": "H-007",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Right kidney, radical nephrectomy: clear cell renal cell carcinoma, WHO/ISUP grade 2, 65 mm, confined to the kidney without invasion of renal sinus or perinephric fat (pT1b).",
+          "section": "Diagnosis",
+          "category": "laterality discrepancy",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "The diagnosis says right kidney, but the clinical details and specimen both describe a left radical nephrectomy. This is a wrong-side error."
+        },
+        {
+          "quoted_sentence": "Perineural invasion: Not applicable",
+          "section": "Synoptic summary",
+          "category": "questionable synoptic item",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "Perineural invasion is not assessed anywhere in the microscopic description. Marking it 'not applicable' rather than 'not identified' or 'not assessed' is inconsistent, though it is not a clear error."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1147,
+      "output_tokens": 835,
+      "cost_usd": 0.010644
+    },
+    {
+      "report_id": "H-008",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "All 10 pelvic lymph nodes are free of metastatic carcinoma.",
+          "section": "Microscopic description",
+          "category": "Internal inconsistency (lymph node count)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The gross description and the diagnosis/synoptic both give 12 lymph nodes, but the microscopic description says 10. The node count is inconsistent across sections."
+        },
+        {
+          "quoted_sentence": "Pathological stage IA according to AJCC 8th edition.",
+          "section": "Diagnosis",
+          "category": "Staging system / edition inconsistency",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Endometrial carcinoma is commonly staged using FIGO 2009/2018 with AJCC. Under AJCC 8th, pT1a with pN0 gives IA, and this stage is consistent. The staging statement could mislead if the edition or FIGO versus AJCC is not clear. Low confidence."
+        },
+        {
+          "quoted_sentence": "Margins: Vaginal cuff free of tumour",
+          "section": "Synoptic summary",
+          "category": "Unsupported finding / specimen mismatch",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "No vaginal cuff is described in the specimen, gross, or microscopic sections, which list only the uterus with cervix, tubes, ovaries and nodes. The margin statement has no supporting description."
+        },
+        {
+          "quoted_sentence": "The myometrium measures 20 mm in thickness at the point of deepest invasion, where the tumour extends 8 mm into the myometrium.",
+          "section": "Gross description",
+          "category": "Calculation / classification check",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "8/20 is 40 percent, which is under 50 percent, so this is consistent. Flagged only at low confidence because gross depth is stated without a microscopic correlate."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1316,
+      "output_tokens": 632,
+      "cost_usd": 0.008952
+    },
+    {
+      "report_id": "H-008",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "All 10 pelvic lymph nodes are free of metastatic carcinoma.",
+          "section": "Microscopic description",
+          "category": "lymph node count discrepancy",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The gross description and the diagnosis and synoptic sections report 12 nodes, but the microscopic description says 10. The node count is internally inconsistent."
+        },
+        {
+          "quoted_sentence": "Pathological stage IA according to AJCC 8th edition.",
+          "section": "Diagnosis",
+          "category": "staging inconsistency",
+          "severity": "major",
+          "confidence": 0.45,
+          "rationale": "With pT1a and pN0 the stage is IA, but in AJCC 8th edition pT1a is tumour limited to the endometrium or invading less than half of the myometrium, and the stage grouping is consistent. The use of the FIGO grade and the staging system together is acceptable, so this finding is low confidence. The main concern is that the depth of invasion of 8 of 20 mm is 40 percent, which fits pT1a."
+        },
+        {
+          "quoted_sentence": "Margins: Vaginal cuff free of tumour",
+          "section": "Synoptic summary",
+          "category": "unsupported statement",
+          "severity": "minor",
+          "confidence": 0.4,
+          "rationale": "Neither the gross nor the microscopic description mentions a vaginal cuff or margin assessment. The statement is not supported by the report body."
+        },
+        {
+          "quoted_sentence": "The myometrium measures 20 mm in thickness at the point of deepest invasion, where the tumour extends 8 mm into the myometrium.",
+          "section": "Gross description",
+          "category": "unsupported gross statement",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "Depth of invasion is typically determined microscopically rather than grossly. The gross description gives a precise measurement that may be unsupported."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1316,
+      "output_tokens": 615,
+      "cost_usd": 0.008782
+    },
+    {
+      "report_id": "H-008",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "All 10 pelvic lymph nodes are free of metastatic carcinoma.",
+          "section": "Microscopic description",
+          "category": "Internal inconsistency (lymph node count)",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "The gross description and the diagnosis/synoptic report 12 lymph nodes, but the microscopic description says 10. The node count is inconsistent across sections."
+        },
+        {
+          "quoted_sentence": "Solid growth comprises less than 5 percent of the tumour, consistent with FIGO grade 1.",
+          "section": "Microscopic description",
+          "category": "Grading criteria",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "FIGO grade 1 requires ≤5% solid growth, so this is consistent. It is flagged only as low-probability for the threshold wording."
+        },
+        {
+          "quoted_sentence": "Pathological stage IA according to AJCC 8th edition.",
+          "section": "Diagnosis",
+          "category": "Staging inconsistency",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "AJCC 8th edition pT1a is invasion of less than half of the myometrium, which gives stage IA. Stating AJCC alone, without the FIGO stage, is mildly inconsistent with the FIGO grading used elsewhere. It is also not clearly an error and the confidence is low."
+        },
+        {
+          "quoted_sentence": "Margins: Vaginal cuff free of tumour",
+          "section": "Synoptic summary",
+          "category": "Unsupported statement / missing data",
+          "severity": "major",
+          "confidence": 0.55,
+          "rationale": "The specimen is a hysterectomy with cervix but no vaginal cuff is described in the specimen, gross or microscopic sections. The margin statement is unsupported."
+        },
+        {
+          "quoted_sentence": "The myometrium measures 20 mm in thickness at the point of deepest invasion, where the tumour extends 8 mm into the myometrium.",
+          "section": "Gross description",
+          "category": "Missing data",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "Gross description lacks sampling or cervix or serosa details. This is a minor and uncertain issue."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1316,
+      "output_tokens": 715,
+      "cost_usd": 0.009782
+    },
+    {
+      "report_id": "H-009",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Parametrial margin involved; vaginal cuff clear",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (margins)",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "The microscopic description and diagnosis state that the parametrial and vaginal margins are free of tumour/clear, but the synoptic summary reports the parametrial margin as involved."
+        },
+        {
+          "quoted_sentence": "pN: pN0",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (nodal stage)",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "Two of 20 nodes contain metastasis, and the diagnosis gives pN1, so pN0 is incorrect."
+        },
+        {
+          "quoted_sentence": "Confined to the cervix (pT1b1).",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "A 32 mm tumour with 11 mm invasion is pT1b2 (>20 mm and ≤40 mm) under AJCC 8th and FIGO, not pT1b1 (≤20 mm). The 'confined to the cervix' statement also sits awkwardly with nodal metastasis."
+        },
+        {
+          "quoted_sentence": "pT: pT1b1",
+          "section": "Synoptic summary",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "A tumour of 32 mm in greatest dimension corresponds to pT1b2, not pT1b1."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1122,
+      "output_tokens": 521,
+      "cost_usd": 0.007454
+    },
+    {
+      "report_id": "H-009",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Parametrial margin involved; vaginal cuff clear",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (margins)",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "The microscopic description and diagnosis state that the parametrial and vaginal cuff margins are free of tumour or clear, but the synoptic summary reports parametrial involvement."
+        },
+        {
+          "quoted_sentence": "pN: pN0",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (nodal stage)",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "Two of 20 nodes contain metastatic carcinoma, and the diagnosis states pN1. pN0 contradicts the nodal findings."
+        },
+        {
+          "quoted_sentence": "Confined to the cervix (pT1b1).",
+          "section": "Diagnosis",
+          "category": "Staging error (tumour size)",
+          "severity": "major",
+          "confidence": 0.7,
+          "rationale": "A 32 mm tumour is greater than 2 cm and no more than 4 cm, which is pT1b2, not pT1b1 (≤2 cm). The pT category does not match the stated size."
+        },
+        {
+          "quoted_sentence": "pT: pT1b1",
+          "section": "Synoptic summary",
+          "category": "Staging error (tumour size)",
+          "severity": "major",
+          "confidence": 0.7,
+          "rationale": "A 32 mm tumour corresponds to pT1b2, not pT1b1, so the pT category is inconsistent with the measured size."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1122,
+      "output_tokens": 515,
+      "cost_usd": 0.007394
+    },
+    {
+      "report_id": "H-009",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Parametrial margin involved; vaginal cuff clear",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (margins)",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "The microscopic description and diagnosis state that the parametrial and vaginal margins are free of tumour or clear, but the synoptic summary reports the parametrial margin as involved."
+        },
+        {
+          "quoted_sentence": "pN: pN0",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (nodal stage)",
+          "severity": "critical",
+          "confidence": 0.95,
+          "rationale": "Two of 20 nodes contain metastasis and the diagnosis says pN1, so pN0 in the synoptic summary is wrong."
+        },
+        {
+          "quoted_sentence": "Confined to the cervix (pT1b1).",
+          "section": "Diagnosis",
+          "category": "Staging error (pT category)",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "A 32 mm tumour is greater than 2 cm and no more than 4 cm, which corresponds to pT1b2 in AJCC 8th and FIGO 2018, not pT1b1 (>5 mm and ≤2 cm). Under the 2018 system, nodal metastasis would also be a stage IIIC1 factor."
+        },
+        {
+          "quoted_sentence": "pT: pT1b1",
+          "section": "Synoptic summary",
+          "category": "Staging error (pT category)",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "A tumour of 32 mm is pT1b2 under AJCC 8th edition, not pT1b1."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1122,
+      "output_tokens": 547,
+      "cost_usd": 0.007714
+    },
+    {
+      "report_id": "H-010",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Pathological stage group IB (AJCC 8th edition).",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.9,
+          "rationale": "Under AJCC 8th edition, pT1c pN0 (with M0) is stage IA3, not IB. The stage group contradicts the stated pT and pN."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1147,
+      "output_tokens": 677,
+      "cost_usd": 0.009064
+    },
+    {
+      "report_id": "H-010",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Pathological stage group IB (AJCC 8th edition).",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.88,
+          "rationale": "In AJCC 8th edition, pT1c pN0 (with M0) is stage IA3, not IB. The stage group contradicts the reported pT and pN categories."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1147,
+      "output_tokens": 803,
+      "cost_usd": 0.010324
+    },
+    {
+      "report_id": "H-010",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Pathological stage group IB (AJCC 8th edition).",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.88,
+          "rationale": "Under AJCC 8th edition, pT1c pN0 (M0) corresponds to stage IA3, not IB. The stage group contradicts the stated pT and pN categories."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1147,
+      "output_tokens": 729,
+      "cost_usd": 0.009584
+    },
+    {
+      "report_id": "H-011",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "CD20: negative. PAX5: negative. CD3: positive.",
+          "section": "Immunohistochemistry",
+          "category": "Internal inconsistency / immunophenotype does not support diagnosis",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "Negative CD20 and PAX5 with positive CD3 indicates a T-cell phenotype and does not support a diagnosis of diffuse large B-cell lymphoma. The B-cell markers would need to be positive for this diagnosis."
+        },
+        {
+          "quoted_sentence": "Diffuse large B-cell lymphoma, non-germinal centre B-cell-like phenotype (Hans algorithm).",
+          "section": "Diagnosis",
+          "category": "Diagnosis contradicts IHC findings",
+          "severity": "critical",
+          "confidence": 0.9,
+          "rationale": "By the Hans algorithm, CD10 positive means germinal centre B-cell-like, regardless of BCL6 or MUM1. The IHC (CD10+, BCL6+, MUM1-) gives a GCB phenotype, not non-GCB."
+        },
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 1/1",
+          "section": "Synoptic summary",
+          "category": "Inappropriate synoptic field",
+          "severity": "minor",
+          "confidence": 0.4,
+          "rationale": "Positive/total node counts are a carcinoma staging element and are not meaningful for lymphoma, which the report itself treats as not staged by pT/pN. The entry is inconsistent with the other fields."
+        },
+        {
+          "quoted_sentence": "Staging edition: AJCC 8th edition",
+          "section": "Synoptic summary",
+          "category": "Inappropriate staging system",
+          "severity": "minor",
+          "confidence": 0.5,
+          "rationale": "AJCC TNM edition is not applicable to lymphoma, which is staged by Ann Arbor/Lugano. The comment itself states that pT and pN are not used."
+        },
+        {
+          "quoted_sentence": "Given the high Ki-67 proliferation index and BCL2 expression, MYC and BCL2 fluorescence in situ hybridisation is recommended to exclude a double-hit lymphoma, which may influence management.",
+          "section": "Comment",
+          "category": "Incomplete recommendation",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Double-hit testing should include BCL6 rearrangement (and MYC IHC) and is typically recommended for GCB-type DLBCL. The comment is also inconsistent with the stated non-GCB diagnosis, where double-hit lymphoma is mainly GCB-type."
+        },
+        {
+          "quoted_sentence": "received fresh and submitted in formalin",
+          "section": "Specimen",
+          "category": "Ambiguous specimen handling",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "A lymph node biopsy for lymphoma should have fresh tissue for flow cytometry or cytogenetics, but none is reported. The statement is contradictory about the handling and no ancillary studies are listed."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1124,
+      "output_tokens": 998,
+      "cost_usd": 0.012228
+    },
+    {
+      "report_id": "H-011",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "CD20: negative. PAX5: negative. CD3: positive.",
+          "section": "Immunohistochemistry",
+          "category": "Internal inconsistency / immunophenotype does not support diagnosis",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "Negative CD20 and PAX5 with positive CD3 indicates a T-cell phenotype, not a B-cell lymphoma, so the IHC does not support a diagnosis of diffuse large B-cell lymphoma."
+        },
+        {
+          "quoted_sentence": "Diffuse large B-cell lymphoma, non-germinal centre B-cell-like phenotype (Hans algorithm).",
+          "section": "Diagnosis",
+          "category": "Diagnosis inconsistent with IHC / incorrect cell-of-origin subtype",
+          "severity": "critical",
+          "confidence": 0.8,
+          "rationale": "CD10 and BCL6 positive with MUM1 negative gives a germinal centre B-cell-like phenotype by Hans, not non-GCB. The B-cell lineage is also unsupported by negative CD20/PAX5."
+        },
+        {
+          "quoted_sentence": "Ovoid fibro-adipose tissue containing a single lymph node measuring 30 x 20 x 15 mm.",
+          "section": "Gross description",
+          "category": "Specimen handling inconsistency",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The specimen is described as fresh and submitted in formalin, and the gross does not mention sampling or how many blocks were taken. This is likely minor and may reflect a template issue."
+        },
+        {
+          "quoted_sentence": "Staging edition: AJCC 8th edition",
+          "section": "Synoptic summary",
+          "category": "Inappropriate staging system",
+          "severity": "minor",
+          "confidence": 0.5,
+          "rationale": "Lymphomas are staged by Ann Arbor/Lugano, not AJCC TNM, so listing an AJCC edition and pT/pN fields is inappropriate for this synoptic."
+        },
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 1/1",
+          "section": "Synoptic summary",
+          "category": "Inappropriate synoptic field",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Solid-tumour nodal count fields do not apply to a lymphoma excision of a single node, and the entry is misleading given the diagnostic inconsistency."
+        },
+        {
+          "quoted_sentence": "Given the high Ki-67 proliferation index and BCL2 expression, MYC and BCL2 fluorescence in situ hybridisation is recommended to exclude a double-hit lymphoma, which may influence management.",
+          "section": "Comment",
+          "category": "Questionable recommendation",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "FISH for double-hit lymphoma is recommended for DLBCL, particularly GCB phenotype, regardless of Ki-67. The rationale is acceptable, but the recommendation depends on the diagnosis, which is inconsistent with the IHC."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1124,
+      "output_tokens": 1003,
+      "cost_usd": 0.012278
+    },
+    {
+      "report_id": "H-011",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "CD20: negative. PAX5: negative. CD3: positive.",
+          "section": "Immunohistochemistry",
+          "category": "Internal inconsistency / immunophenotype does not support diagnosis",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "Negative CD20 and PAX5 with positive CD3 indicates a T-cell phenotype, which contradicts a diagnosis of diffuse large B-cell lymphoma. The B-cell markers should be positive."
+        },
+        {
+          "quoted_sentence": "Diffuse large B-cell lymphoma, non-germinal centre B-cell-like phenotype (Hans algorithm).",
+          "section": "Diagnosis",
+          "category": "Subtype classification inconsistent with IHC",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "CD10 positive and BCL6 positive with MUM1 negative gives a germinal centre B-cell-like phenotype by Hans algorithm (CD10+), not non-GCB. The diagnosis contradicts the reported IHC."
+        },
+        {
+          "quoted_sentence": "Residual reactive follicles are not identified. Scattered tingible body macrophages are present. Small reactive T-cells are sparse.",
+          "section": "Microscopic description",
+          "category": "Minor/possible internal inconsistency",
+          "severity": "minor",
+          "confidence": 0.1,
+          "rationale": "Tingible body macrophages are consistent with high proliferation, so this is likely fine; low-confidence note only."
+        },
+        {
+          "quoted_sentence": "Staging edition: AJCC 8th edition",
+          "section": "Synoptic summary",
+          "category": "Inappropriate staging system",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "Lymphomas are staged by Ann Arbor/Lugano, not AJCC TNM, so citing an AJCC edition is inappropriate and inconsistent with the Comment."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Not applicable",
+          "section": "Synoptic summary",
+          "category": "Template carry-over / irrelevant fields",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Solid-tumour fields such as margins, lymphovascular and perineural invasion, and pT/pN do not apply to nodal lymphoma, and a 'Lymph nodes positive/total' entry is of doubtful relevance."
+        },
+        {
+          "quoted_sentence": "Left cervical lymph node, excision biopsy, received fresh and submitted in formalin.",
+          "section": "Specimen",
+          "category": "Specimen handling inconsistency / missing fresh-tissue studies",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The specimen was received fresh yet no flow cytometry or cytogenetics was taken, and the fixation details are unclear. Handling is ambiguous for a lymphoma work-up."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1124,
+      "output_tokens": 943,
+      "cost_usd": 0.011678
+    },
+    {
+      "report_id": "H-012",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Peripheral 4 mm clear; deep margin involved",
+          "section": "Synoptic summary",
+          "category": "Internal contradiction (margin status)",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "The synoptic summary says the deep margin is involved. The microscopic description and diagnosis both say it is clear at 3 mm, so the margin status is misreported."
+        },
+        {
+          "quoted_sentence": "Peripheral margin of 4 mm of apparently normal skin on the lesion's margin.",
+          "section": "Gross description",
+          "category": "Measurement inconsistency",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The ellipse is 18 mm wide and the lesion is 14 mm, which leaves only about 2 mm of skin on each side. A uniform 4 mm peripheral margin cannot be right across the width, so the gross and microscopic margin statements are inconsistent."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1245,
+      "output_tokens": 876,
+      "cost_usd": 0.01125
+    },
+    {
+      "report_id": "H-012",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Peripheral 4 mm clear; deep margin involved",
+          "section": "Synoptic summary",
+          "category": "Internal contradiction / margin status",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "The synoptic summary says the deep margin is involved. The microscopic description and diagnosis both say it is clear at 3 mm, and an involved deep margin would change management."
+        },
+        {
+          "quoted_sentence": "Peripheral margin of 4 mm of apparently normal skin on the lesion's margin.",
+          "section": "Gross description",
+          "category": "Measurement inconsistency",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The ellipse is 18 mm wide and the lesion is 14 mm, which leaves about 2 mm of skin on each side of a centred lesion. A 4 mm peripheral margin is therefore not clearly consistent with these dimensions."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1245,
+      "output_tokens": 970,
+      "cost_usd": 0.01219
+    },
+    {
+      "report_id": "H-012",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Margins: Peripheral 4 mm clear; deep margin involved",
+          "section": "Synoptic summary",
+          "category": "Internal contradiction (margin status)",
+          "severity": "critical",
+          "confidence": 0.97,
+          "rationale": "The synoptic summary says the deep margin is involved. The microscopic description and diagnosis both say the deep margin is clear at 3 mm. Margin status affects management, so this must be reconciled."
+        },
+        {
+          "quoted_sentence": "Peripheral margin of 4 mm of apparently normal skin on the lesion's margin.",
+          "section": "Gross description",
+          "category": "Measurement inconsistency",
+          "severity": "minor",
+          "confidence": 0.35,
+          "rationale": "The ellipse is 18 mm wide and the lesion is 14 mm, which leaves about 2 mm of skin on each side, not 4 mm. The 4 mm peripheral margin repeated in the microscopic description and synoptic summary does not fit these dimensions."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1245,
+      "output_tokens": 910,
+      "cost_usd": 0.01159
+    },
+    {
+      "report_id": "H-013",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "No gland formation or mucin is seen, and the tumour cells show keratinisation and intercellular bridges.",
+          "section": "Microscopic description",
+          "category": "Internal contradiction (histology vs diagnosis)",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "Keratinisation and intercellular bridges indicate squamous differentiation, and no glands or mucin are seen. This contradicts the diagnosis of adenocarcinoma and is inconsistent with the TTF-1/napsin A adenocarcinoma profile."
+        },
+        {
+          "quoted_sentence": "Liver, ultrasound-guided core biopsy: metastatic poorly differentiated adenocarcinoma infiltrating liver parenchyma. The immunophenotype supports a pulmonary primary.",
+          "section": "Diagnosis",
+          "category": "Diagnosis not supported by microscopic description",
+          "severity": "critical",
+          "confidence": 0.8,
+          "rationale": "The diagnosis of adenocarcinoma is not supported by the described morphology (squamous features, no glands or mucin). The diagnosis should be reconciled with the microscopy."
+        },
+        {
+          "quoted_sentence": "If a lung primary is confirmed, the multiple hepatic metastases would correspond to M1c and stage IVB under AJCC 8th edition.",
+          "section": "Comment",
+          "category": "Staging error",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Multiple extrathoracic metastases in a single organ or multiple organs are M1c and stage IVB in AJCC 8th edition, so this is probably correct. The statement is speculative given that no primary is identified."
+        },
+        {
+          "quoted_sentence": "Staging edition: AJCC 8th edition",
+          "section": "Synoptic summary",
+          "category": "Inappropriate synoptic content",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "A synoptic with tumour-size, margin and pT/pN fields is not applicable to a metastatic core biopsy with an unknown primary. Listing a staging edition is misleading, and the tumour-size entry of 'Not applicable' is also questionable."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Poorly differentiated (G3)",
+          "section": "Synoptic summary",
+          "category": "Grade inconsistent with histology",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "Grading is applied to a metastasis of unknown primary and is inconsistent with the keratinising squamous morphology described."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1165,
+      "output_tokens": 829,
+      "cost_usd": 0.01062
+    },
+    {
+      "report_id": "H-013",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "No gland formation or mucin is seen, and the tumour cells show keratinisation and intercellular bridges.",
+          "section": "Microscopic description",
+          "category": "Internal contradiction (histology vs diagnosis)",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "Keratinisation and intercellular bridges indicate squamous differentiation, and gland formation and mucin are absent. This contradicts the diagnosis of adenocarcinoma and the TTF-1/napsin A adenocarcinoma-type profile."
+        },
+        {
+          "quoted_sentence": "Liver, ultrasound-guided core biopsy: metastatic poorly differentiated adenocarcinoma infiltrating liver parenchyma.",
+          "section": "Diagnosis",
+          "category": "Diagnosis not supported by microscopy",
+          "severity": "critical",
+          "confidence": 0.8,
+          "rationale": "The described morphology (keratinisation, intercellular bridges, no glands or mucin) indicates squamous cell carcinoma, not adenocarcinoma. The diagnosis does not match the microscopic findings."
+        },
+        {
+          "quoted_sentence": "If a lung primary is confirmed, the multiple hepatic metastases would correspond to M1c and stage IVB under AJCC 8th edition.",
+          "section": "Comment",
+          "category": "Staging error",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "In AJCC 8th lung staging, multiple extrathoracic metastases in one or more organs is M1c and stage IVB, so this is probably correct. However, it is speculative to stage on a biopsy with no confirmed primary."
+        },
+        {
+          "quoted_sentence": "Staging edition: AJCC 8th edition",
+          "section": "Synoptic summary",
+          "category": "Inappropriate synoptic content",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "A staging edition is stated although pT and pN are not applicable and the primary is unconfirmed. This makes the synoptic internally inconsistent with a metastatic biopsy."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Poorly differentiated (G3)",
+          "section": "Synoptic summary",
+          "category": "Synoptic item not applicable",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The synoptic uses a tumour-site-specific grading for a metastasis of unconfirmed origin on a core biopsy. Grade is only loosely applicable here."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1165,
+      "output_tokens": 811,
+      "cost_usd": 0.01044
+    },
+    {
+      "report_id": "H-013",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "No gland formation or mucin is seen, and the tumour cells show keratinisation and intercellular bridges.",
+          "section": "Microscopic description",
+          "category": "Internal inconsistency (histology vs diagnosis)",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "Keratinisation and intercellular bridges indicate squamous differentiation, with no gland formation or mucin, which contradicts the diagnosis of adenocarcinoma. The TTF-1/napsin A positive profile fits adenocarcinoma, so the microscopic description and diagnosis are discordant."
+        },
+        {
+          "quoted_sentence": "Liver, ultrasound-guided core biopsy: metastatic poorly differentiated adenocarcinoma infiltrating liver parenchyma.",
+          "section": "Diagnosis",
+          "category": "Diagnosis not supported by microscopy",
+          "severity": "critical",
+          "confidence": 0.8,
+          "rationale": "The microscopic description documents squamous features (keratinisation, intercellular bridges) and no glandular differentiation, so 'adenocarcinoma' is not supported by the described morphology."
+        },
+        {
+          "quoted_sentence": "The immunophenotype supports a pulmonary primary.",
+          "section": "Diagnosis",
+          "category": "Overstated or unqualified conclusion",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The diagnosis states the pulmonary origin without the caveat given in the Comment that the primary is not confirmed. TTF-1 is also not entirely specific, and the morphology is discordant with the IHC."
+        },
+        {
+          "quoted_sentence": "If a lung primary is confirmed, the multiple hepatic metastases would correspond to M1c and stage IVB under AJCC 8th edition.",
+          "section": "Comment",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "In AJCC 8th edition lung cancer, multiple extrathoracic metastases in one or more organs are M1c, which is stage IVB. However, the tumour is not confirmed to be lung, and the statement is based on multiple lesions in a single organ, which could be M1b (single metastasis) versus M1c. Overall the staging statement is speculative and needs careful wording."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Poorly differentiated (G3)",
+          "section": "Synoptic summary",
+          "category": "Synoptic inappropriate for metastatic biopsy",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "A synoptic with AJCC staging fields is not appropriate for a metastatic core biopsy with unknown primary, and a grade-based G3 in this context is of limited meaning."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1165,
+      "output_tokens": 894,
+      "cost_usd": 0.01127
+    },
+    {
+      "report_id": "H-014",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour cells are negative for CD117 and DOG1 and are positive for CD34.",
+          "section": "Immunohistochemistry",
+          "category": "Diagnosis not supported by immunohistochemistry",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "A GIST diagnosis requires CD117 and/or DOG1 positivity. Negative CD117 and DOG1 with diffuse desmin and SMA positivity point to a smooth muscle tumour (leiomyoma/leiomyosarcoma), so the diagnosis is not supported by the stains."
+        },
+        {
+          "quoted_sentence": "Gastrointestinal stromal tumour (GIST), spindle cell type, 55 mm, mitotic count 3 per 5 mm2.",
+          "section": "Diagnosis",
+          "category": "Diagnosis inconsistent with IHC",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "The diagnosis of GIST contradicts the negative CD117 and DOG1 and the myogenic (desmin/SMA positive) profile."
+        },
+        {
+          "quoted_sentence": "Stomach, gastric antrum, laparoscopic wedge resection:",
+          "section": "Diagnosis",
+          "category": "Site discrepancy",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "The clinical details describe a mass of the gastric body, but the diagnosis states the antrum."
+        },
+        {
+          "quoted_sentence": "pT3 (AJCC 8th edition).",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "For gastric GIST in AJCC 8, a tumour more than 5 cm and up to 10 cm is pT3, which matches the 55 mm size. However, the diagnosis is not a valid GIST, so staging is questionable. The comment's stated rationale of 'irrespective of serosal status' is also dubious."
+        },
+        {
+          "quoted_sentence": "Using Miettinen criteria, a gastric tumour of 5.1 to 10 cm with 5 or fewer mitoses per 50 high-power fields (equivalent to 5 mm2) is classified as low risk.",
+          "section": "Comment",
+          "category": "Incorrect risk classification",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "By Miettinen criteria, a gastric GIST of 5.1–10 cm with ≤5 mitoses per 50 HPF is low risk (about 3.6%), which is correct. Yet it conflicts with the advice for adjuvant therapy discussion, and the wording is internally inconsistent."
+        },
+        {
+          "quoted_sentence": "Multidisciplinary discussion is advised regarding adjuvant therapy.",
+          "section": "Comment",
+          "category": "Inconsistent recommendation",
+          "severity": "minor",
+          "confidence": 0.4,
+          "rationale": "Adjuvant therapy is not typically considered for a low-risk GIST, and the tumour is not supported as a GIST by IHC."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Not applicable",
+          "section": "Synoptic summary",
+          "category": "Synoptic inconsistency",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "Mitotic-based grade (low grade) is defined for GIST and was reported in the microscopic description, so 'Not applicable' is inconsistent."
+        },
+        {
+          "quoted_sentence": "Sections taken from the tumour, the closest margin and the serosal surface.",
+          "section": "Gross description",
+          "category": "Margin description inconsistency",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The tumour is submucosal in a wedge resection and the margin is described as 'all margins clear' without specifying the margin types. This is a minor reporting issue."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1259,
+      "output_tokens": 1243,
+      "cost_usd": 0.014948
+    },
+    {
+      "report_id": "H-014",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour cells are negative for CD117 and DOG1 and are positive for CD34. Desmin and smooth muscle actin are diffusely positive; S100 is negative.",
+          "section": "Immunohistochemistry",
+          "category": "Diagnosis not supported by data",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "A GIST diagnosis requires CD117 and/or DOG1 positivity. The reported profile (CD117/DOG1 negative, desmin and SMA diffusely positive) points to a smooth muscle tumour such as leiomyoma or leiomyosarcoma, not GIST."
+        },
+        {
+          "quoted_sentence": "Stomach, gastric antrum, laparoscopic wedge resection:",
+          "section": "Diagnosis",
+          "category": "Site discrepancy",
+          "severity": "major",
+          "confidence": 0.8,
+          "rationale": "The clinical details describe the mass in the gastric body, but the diagnosis states the antrum."
+        },
+        {
+          "quoted_sentence": "Using Miettinen criteria, a gastric tumour of 5.1 to 10 cm with 5 or fewer mitoses per 50 high-power fields (equivalent to 5 mm2) is classified as low risk.",
+          "section": "Comment",
+          "category": "Incorrect risk stratification",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "By Miettinen criteria, a gastric GIST of 5.1 to 10 cm with 5 or fewer mitoses per 50 HPF is low risk (group 3a), which is correct as stated. However, the comment advises discussion of adjuvant therapy, which is inconsistent with a low-risk classification, and the risk category is not stated in the diagnosis."
+        },
+        {
+          "quoted_sentence": "pT3 (AJCC 8th edition).",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.5,
+          "rationale": "For gastric GIST in AJCC 8th edition, T3 is >5 cm to ≤10 cm, so a 55 mm tumour is pT3 by size. The staging is applied to a tumour whose GIST diagnosis is unsupported, and the comment's reasoning is internally inconsistent with advising adjuvant therapy."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Not applicable",
+          "section": "Synoptic summary",
+          "category": "Synoptic inconsistency",
+          "severity": "minor",
+          "confidence": 0.35,
+          "rationale": "GIST is graded by mitotic rate (low grade for ≤5 per 5 mm2), so 'not applicable' is inconsistent with the reported mitotic count."
+        },
+        {
+          "quoted_sentence": "Multidisciplinary discussion is advised regarding adjuvant therapy.",
+          "section": "Comment",
+          "category": "Inconsistent recommendation",
+          "severity": "minor",
+          "confidence": 0.35,
+          "rationale": "The tumour is described as low risk with negative margins, so recommending adjuvant therapy discussion is not supported by the stated risk category."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1259,
+      "output_tokens": 1003,
+      "cost_usd": 0.012548
+    },
+    {
+      "report_id": "H-014",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Tumour cells are negative for CD117 and DOG1 and are positive for CD34.",
+          "section": "Immunohistochemistry",
+          "category": "Diagnosis not supported by data",
+          "severity": "critical",
+          "confidence": 0.85,
+          "rationale": "A GIST diagnosis requires CD117 and/or DOG1 positivity. The tumour is negative for both, and with diffuse desmin and SMA positivity the profile points to a smooth muscle tumour, so the diagnosis is unsupported."
+        },
+        {
+          "quoted_sentence": "Desmin and smooth muscle actin are diffusely positive; S100 is negative.",
+          "section": "Immunohistochemistry",
+          "category": "Internal inconsistency",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "Diffuse desmin and SMA positivity indicates smooth muscle differentiation, which is inconsistent with the GIST diagnosis. The report does not address this conflict."
+        },
+        {
+          "quoted_sentence": "Stomach, gastric antrum, laparoscopic wedge resection:",
+          "section": "Diagnosis",
+          "category": "Site discrepancy",
+          "severity": "major",
+          "confidence": 0.7,
+          "rationale": "The clinical details describe a mass in the gastric body, but the diagnosis states the antrum. The site is inconsistent."
+        },
+        {
+          "quoted_sentence": "Gastrointestinal stromal tumour (GIST), spindle cell type, 55 mm, mitotic count 3 per 5 mm2.",
+          "section": "Diagnosis",
+          "category": "Diagnosis contradicts IHC",
+          "severity": "critical",
+          "confidence": 0.8,
+          "rationale": "GIST is diagnosed despite negative CD117 and DOG1, and despite positive desmin and SMA."
+        },
+        {
+          "quoted_sentence": "pT3 (AJCC 8th edition).",
+          "section": "Diagnosis",
+          "category": "Staging error",
+          "severity": "major",
+          "confidence": 0.65,
+          "rationale": "In AJCC 8th edition, gastric GIST over 5 cm and up to 10 cm is pT3, so the size-based T category is correct. However, the comment's claim that pT3 applies irrespective of serosal status, and the risk statement, rest on the unsupported GIST diagnosis. The staging is therefore not valid if the tumour is not a GIST."
+        },
+        {
+          "quoted_sentence": "Using Miettinen criteria, a gastric tumour of 5.1 to 10 cm with 5 or fewer mitoses per 50 high-power fields (equivalent to 5 mm2) is classified as low risk.",
+          "section": "Comment",
+          "category": "Incorrect risk classification",
+          "severity": "major",
+          "confidence": 0.6,
+          "rationale": "By Miettinen criteria, a gastric GIST of 5.1 to 10 cm with 5 or fewer mitoses per 50 HPF is low risk (group 3a), which is nominally right. This is inconsistent with advising adjuvant therapy discussion, and the risk stratification is moot without a confirmed GIST."
+        },
+        {
+          "quoted_sentence": "Multidisciplinary discussion is advised regarding adjuvant therapy.",
+          "section": "Comment",
+          "category": "Inconsistent recommendation",
+          "severity": "minor",
+          "confidence": 0.4,
+          "rationale": "Adjuvant therapy discussion does not follow from a low-risk classification, and the tumour is not an immunophenotypically confirmed GIST."
+        },
+        {
+          "quoted_sentence": "Histologic grade: Not applicable",
+          "section": "Synoptic summary",
+          "category": "Synoptic inconsistency",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "GIST is graded by mitotic rate (low grade here), so 'Not applicable' is questionable, particularly since the report gives a mitotic count."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1259,
+      "output_tokens": 1252,
+      "cost_usd": 0.015038
+    },
+    {
+      "report_id": "H-015",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 0/3 (sentinel)",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (node count)",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "Two sentinel lymph nodes were submitted (B1 and B2) and the Diagnosis reports 0/2. The synoptic total of 3 does not match."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1310,
+      "output_tokens": 752,
+      "cost_usd": 0.01014
+    },
+    {
+      "report_id": "H-015",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 0/3 (sentinel)",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency in node count",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "The specimen list, gross description and diagnosis all describe two sentinel lymph nodes (0/2). The synoptic summary gives a total of 3."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1310,
+      "output_tokens": 653,
+      "cost_usd": 0.00915
+    },
+    {
+      "report_id": "H-015",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Lymph nodes (positive/total): 0/3 (sentinel)",
+          "section": "Synoptic summary",
+          "category": "Internal inconsistency (node count)",
+          "severity": "major",
+          "confidence": 0.95,
+          "rationale": "Two sentinel lymph nodes (B1 and B2) were received, and the Diagnosis gives 0/2. The synoptic total of 3 does not match."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1310,
+      "output_tokens": 739,
+      "cost_usd": 0.01001
+    },
+    {
+      "report_id": "H-016",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1260,
+      "output_tokens": 622,
+      "cost_usd": 0.00874
+    },
+    {
+      "report_id": "H-016",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Sections show an infiltrative acinar adenocarcinoma composed of small, crowded glands, with fused and poorly formed glands representing Gleason pattern 4 admixed with pattern 3.",
+          "section": "Microscopic description",
+          "category": "Gleason pattern wording inconsistent with score",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "Describing pattern 4 as admixed with pattern 3 suggests pattern 4 is the dominant component, which would give 4+3=7 (Grade Group 3). The report scores 3+4=7 (Grade Group 2), so the wording and the score do not clearly agree."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1260,
+      "output_tokens": 831,
+      "cost_usd": 0.01083
+    },
+    {
+      "report_id": "H-016",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1260,
+      "output_tokens": 712,
+      "cost_usd": 0.00964
+    },
+    {
+      "report_id": "H-017",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 980,
+      "output_tokens": 471,
+      "cost_usd": 0.00667
+    },
+    {
+      "report_id": "H-017",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 980,
+      "output_tokens": 465,
+      "cost_usd": 0.00661
+    },
+    {
+      "report_id": "H-017",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 980,
+      "output_tokens": 490,
+      "cost_usd": 0.00686
+    },
+    {
+      "report_id": "H-018",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The left ovary shows no malignancy. The omentum contains no tumour.",
+          "section": "Microscopic description",
+          "category": "Omission / incomplete sampling description",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The microscopic description never mentions the fallopian tubes, and the diagnosis reports them as free of malignancy. Tubal involvement and STIC need to be assessed and stated, because they affect pT1a and the primary site."
+        },
+        {
+          "quoted_sentence": "Left ovary and fallopian tubes: no malignancy.",
+          "section": "Diagnosis",
+          "category": "Wording inconsistency",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "There is only one left fallopian tube, so 'tubes' in the plural is wrong. The right-sided line 'Right ovary and fallopian tube, bilateral salpingo-oophorectomy' also mixes a laterality with the bilateral procedure name."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1479,
+      "output_tokens": 1194,
+      "cost_usd": 0.014898
+    },
+    {
+      "report_id": "H-018",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The left ovary shows no malignancy.",
+          "section": "Microscopic description",
+          "category": "Omission: fallopian tubes not described microscopically",
+          "severity": "minor",
+          "confidence": 0.3,
+          "rationale": "The microscopic section never mentions the fallopian tubes, yet the diagnosis reports the left tube as negative and attributes the right tube to the carcinoma. For a high-grade serous carcinoma, the tubes should be sampled and assessed for STIC or tubal involvement, and this is not documented."
+        },
+        {
+          "quoted_sentence": "Left ovary and fallopian tubes: no malignancy.",
+          "section": "Diagnosis",
+          "category": "Inconsistent specimen labelling",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "The diagnosis refers to 'fallopian tubes' (plural) for the left side, which has only one tube. The right-sided line also mixes 'Right ovary and fallopian tube' with 'bilateral salpingo-oophorectomy', so laterality is described inconsistently."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1479,
+      "output_tokens": 1233,
+      "cost_usd": 0.015288
+    },
+    {
+      "report_id": "H-018",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The fallopian tubes are unremarkable.",
+          "section": "Gross description",
+          "category": "Omission / incomplete tubal examination",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "For a high-grade serous carcinoma, the fallopian tubes should be examined microscopically for STIC or tubal involvement (SEE-FIM). The microscopic description never mentions the tubes, yet the diagnosis lists them as part of the right ovary and tube diagnosis."
+        },
+        {
+          "quoted_sentence": "Left ovary and fallopian tubes: no malignancy.",
+          "section": "Diagnosis",
+          "category": "Inconsistent laterality / wording",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The line refers to the left ovary but uses the plural 'fallopian tubes'. The left side has only one tube, and the right tube is separately listed in the preceding line."
+        },
+        {
+          "quoted_sentence": "Perineural invasion: Not identified",
+          "section": "Synoptic summary",
+          "category": "Synoptic item not supported by the body of the report",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "The microscopic description never mentions perineural invasion, so this synoptic entry has no supporting assessment."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1479,
+      "output_tokens": 1258,
+      "cost_usd": 0.015538
+    },
+    {
+      "report_id": "H-019",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Gallbladder with attached hepatic wedge and cystic duct margin, received fresh in formalin.",
+          "section": "Specimen",
+          "category": "internal contradiction in specimen handling",
+          "severity": "minor",
+          "confidence": 0.4,
+          "rationale": "A specimen cannot be both received fresh (unfixed) and in formalin. The fixation status of the specimen is unclear."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1291,
+      "output_tokens": 779,
+      "cost_usd": 0.010372
+    },
+    {
+      "report_id": "H-019",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Gallbladder with attached hepatic wedge and cystic duct margin, received fresh in formalin.",
+          "section": "Specimen",
+          "category": "internal contradiction (specimen state)",
+          "severity": "minor",
+          "confidence": 0.5,
+          "rationale": "A specimen cannot be both received fresh (unfixed) and in formalin (fixed). The wording is contradictory and obscures how the specimen was received."
+        },
+        {
+          "quoted_sentence": "AJCC 8th edition stage IIA (pT2a pN0 M not assessed in this specimen).",
+          "section": "Diagnosis",
+          "category": "staging with incomplete M category",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "A definitive stage group is given although M status is stated as not assessed. The stage should be qualified as provisional, or stated as based on pT and pN only."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1291,
+      "output_tokens": 1010,
+      "cost_usd": 0.012682
+    },
+    {
+      "report_id": "H-019",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Gallbladder with attached hepatic wedge and cystic duct margin, received fresh in formalin.",
+          "section": "Specimen",
+          "category": "Internal contradiction in specimen handling",
+          "severity": "minor",
+          "confidence": 0.45,
+          "rationale": "A specimen cannot be received both fresh and in formalin. The fixation state is contradictory and should be stated as one or the other."
+        },
+        {
+          "quoted_sentence": "AJCC 8th edition stage IIA (pT2a pN0 M not assessed in this specimen).",
+          "section": "Diagnosis",
+          "category": "Staging with unassessed M category",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "A final stage group is given even though M status is stated as not assessed. Pathological stage IIA assumes M0, so this should be qualified or presented as provisional."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1291,
+      "output_tokens": 993,
+      "cost_usd": 0.012512
+    },
+    {
+      "report_id": "H-020",
+      "repeat": 1,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "The M category is not assessed on this specimen.",
+          "section": "Comment",
+          "category": "Staging inconsistency",
+          "severity": "minor",
+          "confidence": 0.25,
+          "rationale": "A pathological stage group (IIIB) is assigned while M is called not assessed. AJCC stage grouping needs an M category, normally clinical M0, so the comment should say how M was derived."
+        },
+        {
+          "quoted_sentence": "Ivor Lewis oesophagectomy specimen comprising oesophagus with attached gastric conduit and mediastinal and abdominal lymph nodes, received fresh and fixed in formalin.",
+          "section": "Specimen",
+          "category": "Ambiguous specimen handling",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "The specimen is described as both fresh and fixed in formalin. The state at receipt is ambiguous and the wording looks contradictory."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1170,
+      "output_tokens": 1307,
+      "cost_usd": 0.01541
+    },
+    {
+      "report_id": "H-020",
+      "repeat": 2,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1170,
+      "output_tokens": 1035,
+      "cost_usd": 0.01269
+    },
+    {
+      "report_id": "H-020",
+      "repeat": 3,
+      "status": "valid",
+      "attempts": 1,
+      "findings": [
+        {
+          "quoted_sentence": "Ivor Lewis oesophagectomy specimen comprising oesophagus with attached gastric conduit and mediastinal and abdominal lymph nodes, received fresh and fixed in formalin.",
+          "section": "Specimen",
+          "category": "Internal inconsistency / wording",
+          "severity": "minor",
+          "confidence": 0.2,
+          "rationale": "The specimen is described as both 'fresh' and 'fixed in formalin'. Also, the resected specimen includes proximal stomach, not a formed 'conduit'. The state of receipt is unclear."
+        },
+        {
+          "quoted_sentence": "Pathological stage group IIIB (AJCC 8th edition, squamous cell carcinoma, pT3 pN1). The M category is not assessed on this specimen.",
+          "section": "Comment",
+          "category": "Staging completeness",
+          "severity": "minor",
+          "confidence": 0.15,
+          "rationale": "A pathological stage group is assigned without an M category (cM0 would be assumed). The comment should state that M0 is assumed, or the stage should be given as provisional."
+        }
+      ],
+      "dropped_count": 0,
+      "model_returned": "claude-sonnet-5-5",
+      "input_tokens": 1170,
+      "output_tokens": 1198,
+      "cost_usd": 0.01432
+    }
+  ],
+  "totals": {
+    "units": 90,
+    "valid": 90,
+    "invalid": 0,
+    "pending": 0,
+    "calls": 90,
+    "input_tokens": 106632,
+    "output_tokens": 77513,
+    "cost_usd": 0.988394,
+    "models_returned": [
+      "claude-sonnet-5-5"
+    ]
+  }
+}

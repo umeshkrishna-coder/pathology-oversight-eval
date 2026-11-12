@@ -1,7 +1,7 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-12 by agent (EVAL-15)
-Heads and counts: head 16f3ce3, tests 1018, API spend to date $0.356378
-(Head is the commit the last task started from, since a commit cannot name itself; spend from the logs: drafting $0.052492 in data/drafts/_calls.jsonl, smoke test $0.040390, dev run $0.263496: plain $0.114118, structured $0.149378.)
+Last updated: 2026-11-12 by agent (EVAL-16)
+Heads and counts: head 3328717, tests 1018, API spend to date $2.394846
+(Head is the commit the last task started from, since a commit cannot name itself; spend from the logs: drafting $0.052492 in data/drafts/_calls.jsonl, smoke test $0.040390, dev run $0.263496: plain $0.114118, structured $0.149378; scored run $2.038468: plain $0.988394, structured $1.050074.)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · REPORTED (stated, not checked) · NOT TESTED · PENDING (not yet done)
 
 ## Purpose
@@ -12,7 +12,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (OWNER VERIFIED unless marked PENDING; 1–28 on 2026-11-04, 29–46 on 2026-11-10, 47–57 on 2026-11-11, 58–74 on 2026-11-12)
+## Decisions (OWNER VERIFIED unless marked PENDING; 1–28 on 2026-11-04, 29–46 on 2026-11-10, 47–57 on 2026-11-11, 58–75 on 2026-11-12)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model. (Amended by 64.)
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -87,6 +87,7 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 72. prompts/structured_cbc.md (OWNER VERIFIED, 2026-11-12): the slip `rbs's` becomes `RBC's`; nothing else in the owner's text changes. The dev run of 2026-11-12 used the old spelling; the write-up says so in one line.
 73. Scored-run limit (OWNER VERIFIED, 2026-11-12; closes the open decision on the gate): a cost gate of $2.50 for each condition, $5.00 in all. It is used by the scored-run prompt.
 74. The freeze (OWNER VERIFIED, 2026-11-12): the owner typed `freeze approved` in the EVAL-15 session, and `pathqc-eval freeze` wrote data/prompts.lock.json at 2026-11-12T15:21:36Z on the tree of commit 16f3ce3: taxonomy version 1.0, dataset hash caf11ddc290b592a46de915d73d5ab2673cfbccf58ff576e1806404852431f2a, 34 reports, and the hashes of data/taxonomy.json, the four prompt files and prompts/manifest.json (each equal to the orchestrator's list computed at 16f3ce3). From now on any change to data/taxonomy.json, the four prompt files, prompts/manifest.json or a file under data/reports/ breaks `freeze --check`, and replacing the lock needs the owner's typed word again.
+75. The scored run (OWNER VERIFIED, 2026-11-12): the owner typed `scored run approved` in the EVAL-16 session. Plain run 20261112-153246-scored-plain and structured run 20261112-153532-scored-structured, claude-sonnet-5-5 (the only model string returned), gate $2.50 each, default 4 workers: in each run 90 of 90 units valid, 0 invalid, 0 pending; 90 attempts, all attempt 1 and stop reason end_turn; no transport failure. Measured cost: plain $0.988394 (106,632 input + 77,513 output tokens; $0.010982 a call), structured $1.050074 (135,582 input + 77,891 output tokens; $0.011667 a call); $2.038468 in all. `freeze --check` passed before and after. `adjudicate prepare --dataset scored` prepared 25 items (results/scored/adjudication/adjudication_sheet.md); adjudication_hidden.json stays gitignored until the reveal (decision 48).
 
 ## Error taxonomy (OWNER VERIFIED, final, version 1.0, 2026-11-10)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -122,7 +123,8 @@ Severity: critical = would change patient management; major = would need an amen
 - AGENT VERIFIED — Dev split scored by place (EVAL-12, 2026-11-12; no API call): `adjudicate prepare --dataset dev` found 0 review items (the four dev reports have no omission error and no finding fell in a review band), so `score --dataset dev` gave final scores in results/dev/score.json and summary.md: recall 4/4 in both conditions; false alarms per report (all) 0.92 plain, 0.58 structured; specificity 1/1 in both; type agreement (structured) 15/19; 19 distinct plain labels. No category map is needed any more (decision 61). results/dev/category_strings.json is still the EVAL-11 listing (with its old mapped and maps_to fields); a new `map-list` would rewrite it without them.
 - AGENT VERIFIED — Measured cost per call (EVAL-11 dev run, 2026-11-12, claude-sonnet-5-5, 12 calls per condition, every unit valid on attempt 1): plain 1,167.0 input + 717.6 output tokens, $0.009510 a call; structured 1,498.2 input + 945.2 output tokens, $0.012448 a call. Projected scored run (90 units per condition): plain $0.86, structured $1.12, $1.98 in all at these averages; $2.96 with 50% added for longer planted reports, more findings and attempt 2 calls. Suggested gate then: $2.00 per condition ($4.00 in all); the owner set $2.50 per condition, $5.00 in all (decision 73). The gate is a true ceiling: a call starts only if spend so far plus the reservations in flight plus its own (about $0.17 each) stay within it, so near the end calls run one at a time; $2.00 leaves room for the projected spend plus 50% plus four reservations in each condition. The dev run's peak of spend plus reservations was $0.73 (plain) and $0.95 (structured) against $1.00, reconstructed from calls.jsonl [INFERRED from start times and durations].
 - REPORTED — `plant --check` notices (planted types differ from the spec's planned types; the owner's choice, decision 24): 18 reports, listed in the EVAL-13 report (H-001, H-003, H-004, H-005, H-008, H-010 to H-015, H-021, H-022, C-001, C-003, C-005, C-007, C-011).
-- PENDING — Next: the scored run, on the owner's typed word `scored run approved` in a session; gate $2.50 per condition, $5.00 in all (decision 73). The gate is a true ceiling (decision 53): each call reserves its maximum, about $0.17, so near the end calls run one at a time.
+- DONE — The scored run (decision 75, EVAL-16): both conditions complete, 90 of 90 units valid each, $2.038468 in all, under the $2.50 gate of each run (the reconstructed peak of spend plus reservations was $2.04 plain and $1.93 structured).
+- PENDING — Next: the owner's blind adjudication of the 25 items in results/scored/adjudication/adjudication_sheet.md (a verdict and a reason for each; then `uv run pathqc-eval adjudicate apply --dataset scored`). Until it is done, do not open runs/*-scored-*/results.json or calls.jsonl, do not run `map-list` on the scored runs, and do not open adjudication_hidden.json. Then the final scoring: `score --dataset scored` (there is no provisional scoring of the scored split, decision 49); that task commits adjudication_hidden.json.
 - REPORTED — For the write-up: "candidate errors were drafted by an AI assistant; the pathologist selected, edited and verified every one", with the limitation that errors drafted by a Claude model may be unusually easy or hard for a Claude model to find (decision 64); and one line that the dev run used the CBC instruction before the `RBC's` correction (decision 72).
 - PENDING — The task that does the final scoring of the scored split commits results/scored/adjudication/adjudication_hidden.json, which stays gitignored until then (decision 48).
 
@@ -155,6 +157,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-13 | 2026-11-12 | Owner's errors entered; reports built | DONE | AGENT VERIFIED |
 | EVAL-14 | 2026-11-12 | Owner's verification; last corrections | DONE | AGENT VERIFIED |
 | EVAL-15 | 2026-11-12 | Freeze | DONE | AGENT VERIFIED |
+| EVAL-16 | 2026-11-12 | Scored run, both conditions | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

@@ -1,0 +1,281 @@
+{
+  "prepared_at": "2026-11-12T15:38:53Z",
+  "completed_at": null,
+  "items": [
+    {
+      "item_id": "A001",
+      "report_id": "H-007",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Perineural invasion: Not applicable",
+      "rationale": "Perineural invasion is not assessed anywhere in the microscopic description, so 'Not applicable' is inconsistent. Lymphovascular invasion, which was assessed, is missing from the synoptic summary.",
+      "candidate_error_id": "H-007-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A002",
+      "report_id": "C-006",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count of 0.19 exceeds the stated upper limit of 0.10, yet the interpretation does not address it. It is also high relative to a basophil fraction of 1%, so either the reference range or the value looks wrong.",
+      "candidate_error_id": "C-006-E3",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A003",
+      "report_id": "C-005",
+      "section": "Interpretation",
+      "quoted_sentence": "Platelets are mildly reduced at 95 x10^9/L, also most likely treatment-related.",
+      "rationale": "A platelet count of 95 x10^9/L is below 100 and is often graded as moderate rather than mild thrombocytopenia. The grading is borderline, and the treatment-related attribution is reasonable.",
+      "candidate_error_id": "C-005-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A004",
+      "report_id": "C-005",
+      "section": "Interpretation",
+      "quoted_sentence": "Total white cell count is markedly reduced at 0.9 x10^9/L, with neutrophils forming 22% of the differential, giving an absolute neutrophil count of about 0.2 x10^9/L.",
+      "rationale": "A WBC of 0.9 x10^9/L with an ANC of 0.2 x10^9/L is a critical value in a patient on chemotherapy. The report has no critical flag, no urgent communication and no recommendation such as neutropenic precautions, fever assessment or oncology contact. It labels the neutropenia as mild instead.",
+      "candidate_error_id": "C-005-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A005",
+      "report_id": "C-005",
+      "section": "Interpretation",
+      "quoted_sentence": "The findings are in keeping with chemotherapy-induced myelosuppression in a patient who is ten days after a cycle of treatment for breast cancer.",
+      "rationale": "The report gives no clinical history, diagnosis or treatment timing, so the breast cancer and the 'ten days after a cycle' statement cannot be verified against the data presented.",
+      "candidate_error_id": "C-005-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A006",
+      "report_id": "C-001",
+      "section": "Interpretation",
+      "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+      "rationale": "The report gives no clinical history, so the menorrhagia is not supported by anything shown. The conclusion that blood loss is the most likely cause rests on it.",
+      "candidate_error_id": "C-001-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A007",
+      "report_id": "C-005",
+      "section": "Interpretation",
+      "quoted_sentence": "Total white cell count is markedly reduced at 0.9 x10^9/L, with neutrophils forming 22% of the differential, giving an absolute neutrophil count of about 0.2 x10^9/L.",
+      "rationale": "WBC 0.9 and ANC 0.2 x10^9/L are critical values in a patient on chemotherapy. The report has no critical-value flag, urgent notification or recommendation (e.g. neutropenic precautions, fever assessment, clinician contact), and the 'mild' wording could delay action.",
+      "candidate_error_id": "C-005-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A008",
+      "report_id": "H-007",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Perineural invasion: Not applicable",
+      "rationale": "The synoptic has no lymphovascular invasion field, although LVI is reported as not identified in the microscopic description and diagnosis. The synoptic is therefore incomplete.",
+      "candidate_error_id": "H-007-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A009",
+      "report_id": "C-001",
+      "section": "Interpretation",
+      "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+      "rationale": "The report contains no clinical history or request details that mention menorrhagia, so this statement is not supported by the data shown.",
+      "candidate_error_id": "C-001-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A010",
+      "report_id": "C-005",
+      "section": "Interpretation",
+      "quoted_sentence": "The findings are in keeping with chemotherapy-induced myelosuppression in a patient who is ten days after a cycle of treatment for breast cancer.",
+      "rationale": "The report contains no clinical details about chemotherapy, timing or breast cancer. This history appears to be assumed or fabricated, and the cause is stated more firmly than the data support.",
+      "candidate_error_id": "C-005-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A011",
+      "report_id": "C-001",
+      "section": "Interpretation",
+      "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+      "rationale": "The report gives no clinical history, so the menorrhagia cannot be verified from the data. The conclusion that blood loss is the most likely cause rests on that unverified statement.",
+      "candidate_error_id": "C-001-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A012",
+      "report_id": "H-007",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Perineural invasion: Not applicable",
+      "rationale": "Perineural invasion is not assessed anywhere in the microscopic description. Marking it 'not applicable' rather than 'not identified' or 'not assessed' is inconsistent, though it is not a clear error.",
+      "candidate_error_id": "H-007-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A013",
+      "report_id": "C-001",
+      "section": "Interpretation",
+      "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+      "rationale": "Hb 6.2 g/dL is below the usual critical threshold of about 7 g/dL. The report has no critical-value flag, no urgent notification to the clinician and no advice about clinical assessment or transfusion. It recommends only routine confirmatory tests.",
+      "candidate_error_id": "C-001-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A014",
+      "report_id": "C-006",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count of 0.19 is above the stated upper limit of 0.10. It is not flagged or commented on, and it is probably an artefact of the 1% differential on a high WBC.",
+      "candidate_error_id": "C-006-E2",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A015",
+      "report_id": "C-006",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count of 0.19 exceeds the stated upper limit of 0.10, yet the interpretation does not address it. It is also high relative to a basophil fraction of 1%, so either the reference range or the value looks wrong.",
+      "candidate_error_id": "C-006-E2",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A016",
+      "report_id": "C-002",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.48 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count is nearly five times the upper reference limit, yet it is not commented on in the interpretation. It is arithmetically consistent with 1% of the WBC, so the issue is a missing comment rather than a wrong value.",
+      "candidate_error_id": "C-002-E2",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A017",
+      "report_id": "C-006",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count exceeds the upper reference limit of 0.10. It is arithmetically consistent with 1% of the WBC, but it is not commented on in the interpretation.",
+      "candidate_error_id": "C-006-E2",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A018",
+      "report_id": "C-007",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.12 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count is above the reference range but is not commented on, although basophilia would be relevant in a suspected myeloproliferative neoplasm.",
+      "candidate_error_id": "C-007-E2",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A019",
+      "report_id": "C-005",
+      "section": "Interpretation",
+      "quoted_sentence": "Total white cell count is markedly reduced at 0.9 x10^9/L, with neutrophils forming 22% of the differential, giving an absolute neutrophil count of about 0.2 x10^9/L.",
+      "rationale": "A WBC of 0.9 and an ANC of 0.2 in a patient ten days after chemotherapy is a critical finding, with a high risk of neutropenic sepsis. The report has no critical-value flag, no urgent communication and no recommendation for clinical action.",
+      "candidate_error_id": "C-005-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A020",
+      "report_id": "C-002",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.48 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count is nearly five times the upper reference limit, yet it is not commented on in the interpretation. It is arithmetically consistent with 1% of the WBC, so the issue is a missing comment rather than a wrong value.",
+      "candidate_error_id": "C-002-E1",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A021",
+      "report_id": "C-006",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count of 0.19 is above the stated upper limit of 0.10. It is not flagged or commented on, and it is probably an artefact of the 1% differential on a high WBC.",
+      "candidate_error_id": "C-006-E3",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A022",
+      "report_id": "H-007",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Perineural invasion: Not applicable",
+      "rationale": "Perineural invasion is not a standard renal cell carcinoma synoptic element. Listing it as 'Not applicable' is odd. Elsewhere in the report, lymphovascular invasion is the element that is addressed.",
+      "candidate_error_id": "H-007-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A023",
+      "report_id": "C-006",
+      "section": "Values",
+      "quoted_sentence": "Basophils absolute: 0.19 x10^9/L (ref 0.02–0.10)",
+      "rationale": "The absolute basophil count exceeds the upper reference limit of 0.10. It is arithmetically consistent with 1% of the WBC, but it is not commented on in the interpretation.",
+      "candidate_error_id": "C-006-E3",
+      "review_reason": "borderline_overlap",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A024",
+      "report_id": "C-001",
+      "section": "Interpretation",
+      "quoted_sentence": "The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis.",
+      "rationale": "Hb 6.2 g/dL is below the commonly used critical threshold of about 7 g/dL. The report gives no critical-value flag, urgent notification or advice on clinical assessment or transfusion, and only recommends routine confirmatory tests.",
+      "candidate_error_id": "C-001-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    },
+    {
+      "item_id": "A025",
+      "report_id": "C-005",
+      "section": "Interpretation",
+      "quoted_sentence": "The findings are in keeping with chemotherapy-induced myelosuppression in a patient who is ten days after a cycle of treatment for breast cancer.",
+      "rationale": "The report contains no clinical history, diagnosis or treatment timing. The breast cancer, the chemotherapy and the ten-day interval are not supported by the data shown.",
+      "candidate_error_id": "C-005-E2",
+      "review_reason": "omission_candidate",
+      "verdict": null,
+      "verdict_reason": null
+    }
+  ]
+}
