@@ -1,0 +1,51 @@
+{
+  "id": "H-008",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Uterus, total hysterectomy with bilateral salpingo-oophorectomy and pelvic lymphadenectomy",
+  "sections": {
+    "Clinical details": "A 59-year-old postmenopausal woman presented with postmenopausal bleeding. She underwent total abdominal hysterectomy, bilateral salpingo-oophorectomy and pelvic lymphadenectomy.",
+    "Specimen": "Uterus with cervix, bilateral fallopian tubes and ovaries, and pelvic lymph nodes, submitted in separate containers.",
+    "Gross description": "The uterus weighs 180 g and measures 90 x 60 x 45 mm. The endometrial cavity contains a fleshy, friable tumour measuring 35 mm in greatest dimension. The myometrium measures 20 mm in thickness at the point of deepest invasion, where the tumour extends 8 mm into the myometrium. The cervix is unremarkable. The ovaries and fallopian tubes are unremarkable. Twelve pelvic lymph nodes are identified, each measuring 5 to 15 mm, and are submitted entirely.",
+    "Microscopic description": "The tumour is an endometrioid adenocarcinoma with glandular architecture. Solid growth comprises less than 5 percent of the tumour, consistent with FIGO grade 1. The tumour invades 8 mm into a myometrium that is 20 mm thick, representing approximately 40 percent of myometrial thickness. Cervical stromal involvement is not identified. Lymphovascular invasion is not identified. Perineural invasion is not identified. The ovaries and fallopian tubes are free of tumour. All 10 pelvic lymph nodes are free of metastatic carcinoma.",
+    "Diagnosis": "Total abdominal hysterectomy, bilateral salpingo-oophorectomy and pelvic lymphadenectomy:\n- Endometrioid adenocarcinoma, FIGO grade 1, measuring 35 mm.\n- Tumour invading less than half of the myometrium (8 of 20 mm), with no cervical stromal involvement (pT1a).\n- Zero of 12 pelvic lymph nodes involved (pN0).\n- Adnexa uninvolved.\n- Pathological stage IA according to AJCC 8th edition.",
+    "Synoptic summary": "Tumour size: 35 mm\nHistologic grade: FIGO grade 1 endometrioid adenocarcinoma\nMargins: Vaginal cuff free of tumour\nLymphovascular invasion: Not identified\nPerineural invasion: Not identified\nLymph nodes (positive/total): 0/12\npT: pT1a\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "Depth of myometrial invasion is 8 mm of a 20 mm myometrium, approximately 40 percent, which falls below the 50 percent threshold for pT1b. Low-grade endometrioid histology with no lymphovascular invasion and negative nodes indicates an early-stage tumour. Clinical correlation with adjuvant treatment planning is recommended at the multidisciplinary meeting."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-008-E1",
+      "type": "H4",
+      "section": "Microscopic description",
+      "quoted_sentence": "All 10 pelvic lymph nodes are free of metastatic carcinoma.",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The microscopy counts 10 pelvic lymph nodes; the gross description, the diagnosis and the synoptic summary count 12.",
+      "rationale": "The node count in the text must agree with the synoptic count.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Gross description",
+          "quoted_sentence": "Twelve pelvic lymph nodes are identified, each measuring 5 to 15 mm, and are submitted entirely."
+        },
+        {
+          "section": "Synoptic summary",
+          "quoted_sentence": "Lymph nodes (positive/total): 0/12"
+        },
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "- Zero of 12 pelvic lymph nodes involved (pN0)."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

@@ -1,0 +1,51 @@
+{
+  "id": "H-015",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Breast, right wide local excision with sentinel lymph node biopsy",
+  "sections": {
+    "Clinical details": "63-year-old woman with a screen-detected lesion of the right breast.\nProcedure: right wide local excision with sentinel lymph node biopsy.",
+    "Specimen": "A. Right breast, wide local excision.\nB. Sentinel lymph nodes, two, submitted separately as B1 and B2.",
+    "Gross description": "A. Wide local excision specimen of breast tissue measuring 85 x 60 x 35 mm, orientated with sutures and inked. Sectioning reveals an ill-defined, firm, pale grey-white lesion measuring 18 mm in greatest dimension. The closest margin is superior, 3 mm from the edge of the lesion. Inferior margin 9 mm, medial 12 mm, lateral 14 mm, deep 6 mm. Representative sections are taken from the lesion and each margin.\nB. Two lymph nodes, measuring 9 mm and 7 mm, grey-pink and rubbery. Each is bisected and entirely submitted in B1 and B2 respectively.",
+    "Microscopic description": "A. Sections show invasive carcinoma composed of discohesive cells arranged in single files and small clusters within a fibrous stroma. The cells have moderately pleomorphic nuclei and show a targetoid pattern around ducts. Nottingham histological grade 2, score 6 (tubule formation 3, nuclear pleomorphism 2, mitotic count 1). No lymphovascular invasion is identified. No perineural invasion is seen. All margins are free of invasive carcinoma.\nB. Both sentinel lymph nodes are free of metastatic carcinoma on haematoxylin and eosin sections.",
+    "Immunohistochemistry": "Oestrogen receptor: positive, Allred score 8.\nProgesterone receptor: positive, Allred score 6.\nHER2: score 1+, negative.\nE-cadherin: negative in tumour cells, with positive internal control in normal breast epithelium.",
+    "Diagnosis": "A. Right breast, wide local excision: invasive lobular carcinoma, classic type, Nottingham grade 2, 18 mm. Margins clear, closest superior margin 3 mm. Lymphovascular invasion absent.\nB. Sentinel lymph nodes (2): no metastatic carcinoma (0/2).\nOestrogen receptor positive (Allred 8), progesterone receptor positive (Allred 6), HER2 negative (score 1+).\nPathological staging: pT1c pN0(sn), pathological prognostic stage IA.",
+    "Synoptic summary": "Tumour size: 18 mm\nHistologic grade: Nottingham grade 2 (score 6)\nMargins: Clear; closest margin superior, 3 mm\nLymphovascular invasion: Absent\nPerineural invasion: Not identified\nLymph nodes (positive/total): 0/3 (sentinel)\npT: pT1c\npN: pN0(sn)\nStaging edition: AJCC 8th edition"
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-015-E1",
+      "type": "H4",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Lymph nodes (positive/total): 0/3 (sentinel)",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The synoptic summary counts three sentinel lymph nodes; the gross description, the microscopy and the diagnosis count two.",
+      "rationale": "The node count in the synoptic summary must agree with the text.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Gross description",
+          "quoted_sentence": "B. Two lymph nodes, measuring 9 mm and 7 mm, grey-pink and rubbery."
+        },
+        {
+          "section": "Microscopic description",
+          "quoted_sentence": "B. Both sentinel lymph nodes are free of metastatic carcinoma on haematoxylin and eosin sections."
+        },
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "B. Sentinel lymph nodes (2): no metastatic carcinoma (0/2)."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

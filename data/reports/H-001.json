@@ -1,0 +1,89 @@
+{
+  "id": "H-001",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Breast, left modified radical mastectomy with axillary dissection",
+  "sections": {
+    "Clinical details": "A 52-year-old woman presented with a palpable lump in the left breast. Core biopsy showed carcinoma. She underwent left modified radical mastectomy with level I and II axillary dissection.",
+    "Specimen": "Left breast, modified radical mastectomy with axillary lymph nodes (levels I and II). Received fresh, orientated and inked.",
+    "Gross description": "Left mastectomy specimen with a firm, ill-defined, grey-white tumour in the upper outer quadrant measuring 32 mm in greatest dimension. The closest margin is the deep margin, 6 mm from the tumour. The remaining margins are more than 10 mm from the tumour. Fourteen lymph nodes are identified in the axillary specimen and sampled entirely.",
+    "Microscopic description": "Sections show invasive carcinoma of no special type with nests, cords and solid sheets of pleomorphic tumour cells. The tumour is Nottingham grade 2. Lymphovascular invasion is present. Perineural invasion is not identified. All margins are free of invasive carcinoma. Three of 14 axillary lymph nodes contain metastatic carcinoma. Extranodal extension is not identified.",
+    "Diagnosis": "Left breast, modified radical mastectomy and axillary dissection:\n1. Invasive carcinoma of no special type, Nottingham grade 2, 32 mm in greatest dimension, with lymphovascular invasion. All margins free; closest margin deep, 6 mm.\n2. Metastatic carcinoma in 3 of 14 axillary lymph nodes, without extranodal extension.\npT2 pN1a (AJCC 8th edition). Pathological prognostic stage cannot be assigned until oestrogen receptor, progesterone receptor and HER2 status are available.",
+    "Synoptic summary": "Tumour size: 25 mm in greatest dimension\nHistologic grade: Nottingham grade 2\nMargins: All free; closest margin deep, 6 mm\nLymphovascular invasion: Present\nPerineural invasion: Not identified\nLymph nodes (positive/total): 4/14\npT: pT1c\npN: pN1a\nStaging edition: AJCC 8th edition",
+    "Comment": "Oestrogen receptor, progesterone receptor and HER2 status should be requested on the invasive component to complete pathological prognostic staging and to guide systemic therapy."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-001-E1",
+      "type": "H3",
+      "section": "Synoptic summary",
+      "quoted_sentence": "pT: pT1c",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "pT1c is given for a tumour of 32 mm; pT1c is for tumours of more than 10 mm and up to 20 mm.",
+      "rationale": "The pT category must follow the tumour size; a tumour of this size is pT2.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "pT2 pN1a (AJCC 8th edition)."
+        }
+      ]
+    },
+    {
+      "error_id": "H-001-E2",
+      "type": "H1",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Tumour size: 25 mm in greatest dimension",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The synoptic summary gives the tumour size as 25 mm; the gross description and the diagnosis give 32 mm.",
+      "rationale": "The tumour size must be the same in every section of the report.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Gross description",
+          "quoted_sentence": "Left mastectomy specimen with a firm, ill-defined, grey-white tumour in the upper outer quadrant measuring 32 mm in greatest dimension."
+        },
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "1. Invasive carcinoma of no special type, Nottingham grade 2, 32 mm in greatest dimension, with lymphovascular invasion."
+        }
+      ]
+    },
+    {
+      "error_id": "H-001-E3",
+      "type": "H4",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Lymph nodes (positive/total): 4/14",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The synoptic summary gives 4 of 14 positive lymph nodes; the microscopy and the diagnosis give 3 of 14.",
+      "rationale": "The node count must agree across sections; four positive nodes would also not fit pN1a.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Microscopic description",
+          "quoted_sentence": "Three of 14 axillary lymph nodes contain metastatic carcinoma."
+        },
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "2. Metastatic carcinoma in 3 of 14 axillary lymph nodes, without extranodal extension."
+        },
+        {
+          "section": "Synoptic summary",
+          "quoted_sentence": "pN: pN1a"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

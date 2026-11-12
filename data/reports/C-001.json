@@ -1,0 +1,179 @@
+{
+  "id": "C-001",
+  "modality": "cbc",
+  "split": "scored",
+  "scenario": "Severe iron deficiency anaemia",
+  "sections": {
+    "Values": "Hb: 6.2 g/dL (ref 12.0–15.0)\nRBC: 3.56 x10^12/L (ref 3.80–4.80)\nHct: 22.1 % (ref 36.0–46.0)\nMCV: 62.1 fL (ref 83.0–101.0)\nMCH: 17.4 pg (ref 27.0–32.0)\nMCHC: 28.1 g/dL (ref 31.5–34.5)\nRDW: 21.4 % (ref 11.6–14.0)\nWBC: 6.80 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 58.0 % (ref 40.0–80.0)\nNeutrophils absolute: 3.94 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 32.0 % (ref 20.0–40.0)\nLymphocytes absolute: 2.18 x10^9/L (ref 1.00–3.00)\nMonocytes %: 6.0 % (ref 2.0–10.0)\nMonocytes absolute: 0.41 x10^9/L (ref 0.20–1.00)\nEosinophils %: 3.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.20 x10^9/L (ref 0.02–0.50)\nBasophils %: 1.0 % (ref 0.0–2.0)\nBasophils absolute: 0.07 x10^9/L (ref 0.02–0.10)\nPlatelets: 480 x10^9/L (ref 150–410)\nMPV: 9.8 fL (ref 7.5–11.5)",
+    "Interpretation": "Severe normocytic normochromic anaemia is present, with haemoglobin 6.2 g/dL, haematocrit 22.1% and red cell count 3.56 x10^12/L. The low mean cell volume and mean cell haemoglobin, together with the raised red cell distribution width, indicate marked anisocytosis and a pattern consistent with iron deficiency. A reactive thrombocytosis at 480 x10^9/L is in keeping with iron deficiency and ongoing blood loss. The white cell count and differential are within normal limits. The history of menorrhagia makes chronic blood loss the most likely cause, and iron studies and a reticulocyte count are recommended to confirm the diagnosis."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 6.2,
+      "unit": "g/dL",
+      "ref_low": 12.0,
+      "ref_high": 15.0
+    },
+    "RBC": {
+      "value": 3.56,
+      "unit": "x10^12/L",
+      "ref_low": 3.8,
+      "ref_high": 4.8
+    },
+    "Hct": {
+      "value": 22.1,
+      "unit": "%",
+      "ref_low": 36.0,
+      "ref_high": 46.0
+    },
+    "MCV": {
+      "value": 62.1,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 17.4,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 28.1,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 21.4,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 6.8,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 58.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 3.94,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 32.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 2.18,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 6.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 0.41,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 3.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.2,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.07,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 480.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 9.8,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "C-001-E1",
+      "type": "C1",
+      "section": "Interpretation",
+      "quoted_sentence": "Severe normocytic normochromic anaemia is present, with haemoglobin 6.2 g/dL, haematocrit 22.1% and red cell count 3.56 x10^12/L.",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The interpretation calls the anaemia normocytic and normochromic; MCV is 62.1 fL and MCH is 17.4 pg, both low.",
+      "rationale": "The interpretation must agree with the red cell indices.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Values",
+          "quoted_sentence": "MCV: 62.1 fL (ref 83.0–101.0)"
+        },
+        {
+          "section": "Values",
+          "quoted_sentence": "MCH: 17.4 pg (ref 27.0–32.0)"
+        },
+        {
+          "section": "Interpretation",
+          "quoted_sentence": "The low mean cell volume and mean cell haemoglobin, together with the raised red cell distribution width, indicate marked anisocytosis and a pattern consistent with iron deficiency."
+        }
+      ]
+    },
+    {
+      "error_id": "C-001-E2",
+      "type": "C3",
+      "section": "Values",
+      "quoted_sentence": "Hb: 6.2 g/dL (ref 12.0–15.0)",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The haemoglobin of 6.2 g/dL is a critical value, and the report carries no critical-value flag, comment or recommendation.",
+      "rationale": "A critical value needs a flag and a recommendation for urgent review.",
+      "kind": "omission"
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

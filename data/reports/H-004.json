@@ -1,0 +1,72 @@
+{
+  "id": "H-004",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Stomach, distal gastrectomy with D2 lymphadenectomy",
+  "sections": {
+    "Clinical details": "61-year-old man. Ulcerating antral mass of the stomach. Distal gastrectomy with D2 lymphadenectomy.",
+    "Specimen": "Stomach, distal gastrectomy with D2 lymph node dissection. Specimen received fresh and opened along the greater curvature after fixation in neutral buffered formalin.",
+    "Gross description": "Distal gastrectomy specimen with attached omentum and a formalin-fixed lymph node package. A central ulcerating tumour is present in the antrum, measuring 50 mm in greatest dimension. The tumour infiltrates the gastric wall, and the serosal surface is intact over the mass. The proximal margin is 30 mm from the tumour edge, and the distal and circumferential margins are grossly clear. Twenty-two lymph nodes are identified and submitted for histology.",
+    "Microscopic description": "Sections show an intestinal-type adenocarcinoma with gland formation and moderate cytological atypia, classified as moderately differentiated. The tumour invades through the muscularis propria into the subserosal connective tissue but does not penetrate the visceral peritoneum. Lymphovascular invasion and perineural invasion are both present. The proximal and distal resection margins are free of tumour. Metastatic carcinoma is present in 5 of 22 lymph nodes examined.",
+    "Diagnosis": "Distal gastrectomy with D2 lymphadenectomy:\n- Intestinal-type adenocarcinoma of the antrum, moderately differentiated (G2), 50 mm, invading subserosal connective tissue without penetration of the visceral peritoneum (pT3).\n- Metastatic carcinoma in 5 of 22 regional lymph nodes (pN2).\n- Resection margins free of tumour; closest margin proximal, 30 mm.\n- Lymphovascular invasion present.\n- Perineural invasion present.",
+    "Synoptic summary": "Tumour size: 50 mm\nHistologic grade: G3 (poorly differentiated)\nMargins: Free; closest margin proximal, 30 mm\nLymphovascular invasion: Present\nPerineural invasion: Present\nLymph nodes (positive/total): 5/22\npT: pT3\npN: pN2\nStaging edition: AJCC 8th edition",
+    "Comment": "The pathological stage is pT3 pN2. Assuming M0 on clinical assessment, this corresponds to pathological prognostic stage IIB under the AJCC 8th edition staging system for gastric carcinoma. Distant metastasis cannot be assessed on this specimen. Adequate D2 nodal clearance is supported by the examination of 22 lymph nodes."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-004-E1",
+      "type": "H2",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Histologic grade: G3 (poorly differentiated)",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The synoptic summary grades the tumour G3, poorly differentiated; the microscopy describes gland formation and a moderately differentiated tumour.",
+      "rationale": "The stated grade must be supported by the microscopic description.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Microscopic description",
+          "quoted_sentence": "Sections show an intestinal-type adenocarcinoma with gland formation and moderate cytological atypia, classified as moderately differentiated."
+        },
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "- Intestinal-type adenocarcinoma of the antrum, moderately differentiated (G2), 50 mm, invading subserosal connective tissue without penetration of the visceral peritoneum (pT3)."
+        }
+      ]
+    },
+    {
+      "error_id": "H-004-E2",
+      "type": "H3",
+      "section": "Comment",
+      "quoted_sentence": "Assuming M0 on clinical assessment, this corresponds to pathological prognostic stage IIB under the AJCC 8th edition staging system for gastric carcinoma.",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The comment gives stage IIB for pT3 pN2; pT3 pN2 M0 is stage IIIA in AJCC 8th edition gastric staging.",
+      "rationale": "The stage group must follow the pT and pN categories.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Comment",
+          "quoted_sentence": "The pathological stage is pT3 pN2."
+        },
+        {
+          "section": "Synoptic summary",
+          "quoted_sentence": "pT: pT3"
+        },
+        {
+          "section": "Synoptic summary",
+          "quoted_sentence": "pN: pN2"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

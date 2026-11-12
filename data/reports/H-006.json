@@ -1,0 +1,72 @@
+{
+  "id": "H-006",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Thyroid, total thyroidectomy with central compartment dissection",
+  "sections": {
+    "Clinical details": "38-year-old female. Right thyroid nodule with fine-needle aspiration reported as Bethesda category VI (malignant). Total thyroidectomy with central compartment (level VI) neck dissection performed.",
+    "Specimen": "Total thyroidectomy with central compartment neck dissection, received fresh and then fixed in formalin. Container labelled as thyroid gland with attached central neck tissue. Right lobe, left lobe, isthmus and central compartment soft tissue submitted.",
+    "Gross description": "Thyroid gland with isthmus, combined weight 38 g. Right lobe measures 5.8 x 3.4 x 2.6 cm; left lobe measures 4.6 x 2.5 x 1.9 cm. A firm, ill-defined, grey-white nodule measuring 2.4 cm in greatest dimension is present in the upper pole of the left lobe, 5 mm from the posterior surface. Central compartment tissue contains six lymph nodes, the largest 9 mm, one of which is firm and white. The entire central compartment tissue is submitted in cassettes A to D. Representative sections of tumour and all lymph nodes are submitted.",
+    "Microscopic description": "Sections show a solitary tumour composed of papillae with fibrovascular cores, lined by cells with enlarged, overlapping, clear nuclei, nuclear grooves and intranuclear pseudoinclusions, consistent with classic papillary thyroid carcinoma. The tumour measures 24 mm in greatest dimension and is confined within the thyroid parenchyma. No extrathyroidal extension is seen into the perithyroidal soft tissue or strap muscles. Lymphovascular invasion is not identified. Perineural invasion is not identified. Surgical margins are free of tumour; the closest margin is 5 mm (posterior, right lobe). In the central compartment, one of six lymph nodes contains a metastatic deposit of papillary carcinoma measuring 6 mm, without extranodal extension. The remaining five lymph nodes show reactive changes only.",
+    "Diagnosis": "Right thyroid lobe with isthmus, total thyroidectomy and central compartment neck dissection:\n1. Papillary thyroid carcinoma, tall cell subtype, 24 mm, right lobe, confined to the thyroid without extrathyroidal extension (pT2).\n2. Metastatic papillary thyroid carcinoma in one of six central compartment (level VI) lymph nodes, 6 mm deposit, without extranodal extension (pN1a).\n3. Surgical margins free of tumour.\n4. Lymphovascular invasion absent.\nPathological stage (AJCC 8th edition, patient under 55 years): pT2 pN1a, stage I. The M category is not assessed on this specimen; stage I assumes M0.",
+    "Synoptic summary": "Tumour size: 24 mm\nHistologic grade: Not applicable\nMargins: Free of tumour; closest margin 5 mm (posterior, right lobe)\nLymphovascular invasion: Absent\nPerineural invasion: Not identified\nLymph nodes (positive/total): 1/6\npT: pT2\npN: pN1a\nStaging edition: AJCC 8th edition",
+    "Comment": "Classic papillary thyroid carcinoma with a single nodal metastasis in the central compartment. Post-operative management, including thyroglobulin monitoring and any decision regarding radioiodine, should be made by the multidisciplinary team in light of these findings."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-006-E1",
+      "type": "H1",
+      "section": "Gross description",
+      "quoted_sentence": "A firm, ill-defined, grey-white nodule measuring 2.4 cm in greatest dimension is present in the upper pole of the left lobe, 5 mm from the posterior surface.",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The gross description places the nodule in the left lobe; the clinical details, the microscopy and the diagnosis place the tumour in the right lobe.",
+      "rationale": "The side of the tumour must be the same throughout the report.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "Right thyroid lobe with isthmus, total thyroidectomy and central compartment neck dissection:"
+        },
+        {
+          "section": "Microscopic description",
+          "quoted_sentence": "Surgical margins are free of tumour; the closest margin is 5 mm (posterior, right lobe)."
+        },
+        {
+          "section": "Clinical details",
+          "quoted_sentence": "Right thyroid nodule with fine-needle aspiration reported as Bethesda category VI (malignant)."
+        }
+      ]
+    },
+    {
+      "error_id": "H-006-E2",
+      "type": "H2",
+      "section": "Diagnosis",
+      "quoted_sentence": "1. Papillary thyroid carcinoma, tall cell subtype, 24 mm, right lobe, confined to the thyroid without extrathyroidal extension (pT2).",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The diagnosis gives the tall cell subtype; the microscopy describes the classic pattern and the comment calls the tumour classic.",
+      "rationale": "The stated subtype must be supported by the microscopic description.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Microscopic description",
+          "quoted_sentence": "Sections show a solitary tumour composed of papillae with fibrovascular cores, lined by cells with enlarged, overlapping, clear nuclei, nuclear grooves and intranuclear pseudoinclusions, consistent with classic papillary thyroid carcinoma."
+        },
+        {
+          "section": "Comment",
+          "quoted_sentence": "Classic papillary thyroid carcinoma with a single nodal metastasis in the central compartment."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

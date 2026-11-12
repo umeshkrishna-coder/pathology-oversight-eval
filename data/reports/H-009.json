@@ -1,0 +1,72 @@
+{
+  "id": "H-009",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Cervix, radical hysterectomy with pelvic lymphadenectomy",
+  "sections": {
+    "Clinical details": "Woman aged 44 years with a cervical growth identified on speculum examination. Treated by radical hysterectomy with bilateral pelvic lymphadenectomy.",
+    "Specimen": "Radical hysterectomy specimen comprising uterus, cervix, parametrial tissue and a cuff of upper vagina. Bilateral pelvic lymph nodes submitted separately, 20 nodes in total.",
+    "Gross description": "The uterus and cervix are received with an ill-defined, greyish-white cervical lesion measuring 32 mm in greatest dimension. The lesion is centred on the cervix. The vaginal cuff and parametrial tissue are submitted for margin assessment. Twenty pelvic lymph nodes are identified and submitted for histological examination.",
+    "Microscopic description": "Sections show a non-keratinising squamous cell carcinoma with solid sheets and nests of atypical squamous cells showing moderate differentiation. Tumour invades the cervical stroma to a maximum depth of 11 mm, within a cervical stromal width of 15 mm. Lymphovascular invasion is present. No perineural invasion is seen. The vaginal cuff and parametrial margins are free of tumour. Two of 20 pelvic lymph nodes contain metastatic carcinoma.",
+    "Diagnosis": "Radical hysterectomy:\nInvasive non-keratinising squamous cell carcinoma of the cervix, moderately differentiated (G2), measuring 32 mm, with stromal invasion of 11 mm. Confined to the cervix (pT1b1). Lymphovascular invasion present. Perineural invasion absent. Margins clear.\n\nBilateral pelvic lymph nodes:\nMetastatic squamous cell carcinoma in 2 of 20 lymph nodes (pN1).",
+    "Synoptic summary": "Tumour size: 32 mm (greatest dimension)\nHistologic grade: G2 (moderately differentiated)\nMargins: Parametrial margin involved; vaginal cuff clear\nLymphovascular invasion: Present\nPerineural invasion: Absent\nLymph nodes (positive/total): 2/20\npT: pT1b1\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "Metastatic deposits are present in two pelvic lymph nodes. Correlation with the clinical staging and multidisciplinary review is recommended."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-009-E1",
+      "type": "H5",
+      "section": "Synoptic summary",
+      "quoted_sentence": "Margins: Parametrial margin involved; vaginal cuff clear",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The synoptic summary reports the parametrial margin as involved; the microscopy and the diagnosis say the margins are free.",
+      "rationale": "Margin status must agree with the description; an involved parametrial margin changes management.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Microscopic description",
+          "quoted_sentence": "The vaginal cuff and parametrial margins are free of tumour."
+        },
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "Margins clear."
+        }
+      ]
+    },
+    {
+      "error_id": "H-009-E2",
+      "type": "H3",
+      "section": "Synoptic summary",
+      "quoted_sentence": "pN: pN0",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "pN0 is given although two of 20 pelvic lymph nodes contain metastatic carcinoma.",
+      "rationale": "The pN category must follow the node findings.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "Metastatic squamous cell carcinoma in 2 of 20 lymph nodes (pN1)."
+        },
+        {
+          "section": "Synoptic summary",
+          "quoted_sentence": "Lymph nodes (positive/total): 2/20"
+        },
+        {
+          "section": "Microscopic description",
+          "quoted_sentence": "Two of 20 pelvic lymph nodes contain metastatic carcinoma."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-11",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

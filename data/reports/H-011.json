@@ -1,0 +1,55 @@
+{
+  "id": "H-011",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Lymph node, left cervical excision biopsy",
+  "sections": {
+    "Clinical details": "Man aged 57 years with an enlarging left cervical lymph node, clinically measured at 30 mm, accompanied by fever, night sweats and weight loss. Excision biopsy requested to establish a diagnosis and lymphoma subtype.",
+    "Specimen": "Left cervical lymph node, excision biopsy, received fresh and submitted in formalin. Representative sections taken for histology and immunohistochemistry.",
+    "Gross description": "Ovoid fibro-adipose tissue containing a single lymph node measuring 30 x 20 x 15 mm. The cut surface is tan-white and homogeneous with focal haemorrhage. The capsule is intact. No other tissue is present.",
+    "Microscopic description": "The nodal architecture is effaced by diffuse sheets of large atypical lymphoid cells with vesicular nuclei, prominent nucleoli and frequent mitoses. Residual reactive follicles are not identified. Scattered tingible body macrophages are present. Small reactive T-cells are sparse. The capsule and perinodal fat are not involved.",
+    "Immunohistochemistry": "CD20: negative. PAX5: negative. CD3: positive. CD10: positive. BCL6: positive. MUM1: negative. BCL2: positive. Ki-67: approximately 80 percent of tumour cell nuclei.",
+    "Diagnosis": "Left cervical lymph node, excision biopsy:\nDiffuse large B-cell lymphoma, non-germinal centre B-cell-like phenotype (Hans algorithm).",
+    "Synoptic summary": "Tumour size: 30 mm (greatest dimension of excised node)\nHistologic grade: Not applicable\nMargins: Not applicable\nLymphovascular invasion: Not applicable\nPerineural invasion: Not applicable\nLymph nodes (positive/total): 1/1\npT: Not applicable\npN: Not applicable\nStaging edition: AJCC 8th edition",
+    "Comment": "Lymphomas are not staged by pT and pN, so these are recorded as not applicable. Clinical (Ann Arbor) stage should be assigned by the treating team after imaging and bone marrow assessment, with reference to the Lugano classification. Given the high Ki-67 proliferation index and BCL2 expression, MYC and BCL2 fluorescence in situ hybridisation is recommended to exclude a double-hit lymphoma, which may influence management."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-011-E1",
+      "type": "H6",
+      "section": "Immunohistochemistry",
+      "quoted_sentence": "CD20: negative. PAX5: negative. CD3: positive.",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The immunohistochemistry gives a T-cell profile (CD20 and PAX5 negative, CD3 positive); the diagnosis is a B-cell lymphoma.",
+      "rationale": "The immunoprofile must support the diagnosis.",
+      "kind": "statement"
+    },
+    {
+      "error_id": "H-011-E2",
+      "type": "H6",
+      "section": "Diagnosis",
+      "quoted_sentence": "Diffuse large B-cell lymphoma, non-germinal centre B-cell-like phenotype (Hans algorithm).",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The diagnosis gives a non-germinal centre phenotype; CD10 is positive, which is germinal centre B-cell-like by the Hans algorithm.",
+      "rationale": "The cell-of-origin statement must follow the immunoprofile.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Immunohistochemistry",
+          "quoted_sentence": "CD10: positive. BCL6: positive. MUM1: negative."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

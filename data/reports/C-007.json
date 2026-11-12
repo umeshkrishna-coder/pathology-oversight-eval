@@ -1,0 +1,186 @@
+{
+  "id": "C-007",
+  "modality": "cbc",
+  "split": "scored",
+  "scenario": "Marked erythrocytosis",
+  "sections": {
+    "Values": "Hb: 20.4 g/dL (ref 13.0–17.0)\nRBC: 6.80 x10^12/L (ref 4.50–5.50)\nHct: 61.0 % (ref 40.0–50.0)\nMCV: 89.7 fL (ref 83.0–101.0)\nMCH: 30.0 pg (ref 27.0–32.0)\nMCHC: 33.4 g/dL (ref 31.5–34.5)\nRDW: 13.4 % (ref 11.6–14.0)\nWBC: 11.80 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 74.0 % (ref 40.0–80.0)\nNeutrophils absolute: 8.73 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 16.0 % (ref 20.0–40.0)\nLymphocytes absolute: 1.89 x10^9/L (ref 1.00–3.00)\nMonocytes %: 6.0 % (ref 2.0–10.0)\nMonocytes absolute: 0.71 x10^9/L (ref 0.20–1.00)\nEosinophils %: 3.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.35 x10^9/L (ref 0.02–0.50)\nBasophils %: 1.0 % (ref 0.0–2.0)\nBasophils absolute: 0.12 x10^9/L (ref 0.02–0.10)\nPlatelets: 250 x10^9/L (ref 150–410)\nMPV: 9.8 fL (ref 7.5–11.5)",
+    "Interpretation": "Haemoglobin of 20.4 g/dL and haematocrit of 61% indicate marked erythrocytosis. The red-cell indices are reduced, consistent with a microcytic and hypochromic red-cell population. Mild leucocytosis with neutrophil predominance and thrombocytosis, together with headache, plethoric facies and pruritus after bathing, raise suspicion of a myeloproliferative neoplasm such as polycythaemia vera, although secondary causes of erythrocytosis must be excluded. Further assessment should include JAK2 V617F testing, serum erythropoietin level and arterial oxygen saturation.",
+    "Comment/recommendation": "CRITICAL VALUE: Haematocrit 61%. This result is flagged as critical. Urgent haematology referral is recommended. JAK2 testing should be performed, and venesection should be considered to reduce haematocrit and lower thrombotic risk, with clinical review as indicated."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 20.4,
+      "unit": "g/dL",
+      "ref_low": 13.0,
+      "ref_high": 17.0
+    },
+    "RBC": {
+      "value": 6.8,
+      "unit": "x10^12/L",
+      "ref_low": 4.5,
+      "ref_high": 5.5
+    },
+    "Hct": {
+      "value": 61.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 50.0
+    },
+    "MCV": {
+      "value": 89.7,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 30.0,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 33.4,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 13.4,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 11.8,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 74.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 8.73,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 16.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 1.89,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 6.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 0.71,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 3.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.35,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.12,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 250.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 9.8,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "C-007-E1",
+      "type": "C1",
+      "section": "Interpretation",
+      "quoted_sentence": "The red-cell indices are reduced, consistent with a microcytic and hypochromic red-cell population.",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The interpretation says the red-cell indices are reduced; MCV, MCH and MCHC are all within the reference range.",
+      "rationale": "The interpretation must agree with the numbers.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Values",
+          "quoted_sentence": "MCV: 89.7 fL (ref 83.0–101.0)"
+        },
+        {
+          "section": "Values",
+          "quoted_sentence": "MCH: 30.0 pg (ref 27.0–32.0)"
+        },
+        {
+          "section": "Values",
+          "quoted_sentence": "MCHC: 33.4 g/dL (ref 31.5–34.5)"
+        }
+      ]
+    },
+    {
+      "error_id": "C-007-E2",
+      "type": "C1",
+      "section": "Values",
+      "quoted_sentence": "Platelets: 250 x10^9/L (ref 150–410)",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The Values give a platelet count of 250, within the reference range; the interpretation speaks of thrombocytosis.",
+      "rationale": "The interpretation must agree with the numbers.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Interpretation",
+          "quoted_sentence": "Mild leucocytosis with neutrophil predominance and thrombocytosis, together with headache, plethoric facies and pruritus after bathing, raise suspicion of a myeloproliferative neoplasm such as polycythaemia vera, although secondary causes of erythrocytosis must be excluded."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

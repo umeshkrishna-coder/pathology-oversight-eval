@@ -1,0 +1,202 @@
+{
+  "id": "C-004",
+  "modality": "cbc",
+  "split": "scored",
+  "scenario": "Macrocytic anaemia with mild leukopenia and thrombocytopenia",
+  "sections": {
+    "Values": "Hb: 7.8 g/dL (ref 13.0–17.0)\nRBC: 2.00 x10^12/L (ref 4.50–5.50)\nHct: 23.6 % (ref 40.0–50.0)\nMCV: 118.0 fL (ref 83.0–101.0)\nMCH: 29.0 pg (ref 27.0–32.0)\nMCHC: 33.1 g/dL (ref 31.5–34.5)\nRDW: 18.5 % (ref 11.6–14.0)\nWBC: 3.20 x10^9/L (ref 4.00–10.00)\nNeutrophils %: 55.0 % (ref 40.0–80.0)\nNeutrophils absolute: 1.76 x10^9/L (ref 2.00–7.00)\nLymphocytes %: 35.0 % (ref 20.0–40.0)\nLymphocytes absolute: 1.12 x10^9/L (ref 1.00–3.00)\nMonocytes %: 6.0 % (ref 2.0–10.0)\nMonocytes absolute: 0.19 x10^9/L (ref 0.20–1.00)\nEosinophils %: 3.0 % (ref 1.0–6.0)\nEosinophils absolute: 0.10 x10^9/L (ref 0.02–0.50)\nBasophils %: 1.0 % (ref 0.0–2.0)\nBasophils absolute: 0.03 x10^9/L (ref 0.02–0.10)\nPlatelets: 110 x10^9/L (ref 150–410)\nMPV: 11.2 fL (ref 7.5–11.5)",
+    "Interpretation": "Marked anaemia is present with a haemoglobin of 7.8 g/dL and a markedly raised MCV of about 118 fL, indicating a macrocytic anaemia. The MCHC is within the normal range, and the RDW is normal, with no anisocytosis. A normal white cell count and platelet count accompany the anaemia, a pattern that, together with the strict vegetarian diet, fatigue, paraesthesia and glossitis, is suggestive of vitamin B12 deficiency. The findings may also reflect folate deficiency or another cause of ineffective erythropoiesis, and there is no critical value on this report. Serum vitamin B12 and folate levels are recommended, with further assessment as clinically indicated."
+  },
+  "cbc_values": {
+    "Hb": {
+      "value": 7.8,
+      "unit": "g/dL",
+      "ref_low": 13.0,
+      "ref_high": 17.0
+    },
+    "RBC": {
+      "value": 2.0,
+      "unit": "x10^12/L",
+      "ref_low": 4.5,
+      "ref_high": 5.5
+    },
+    "Hct": {
+      "value": 23.6,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 50.0
+    },
+    "MCV": {
+      "value": 118.0,
+      "unit": "fL",
+      "ref_low": 83.0,
+      "ref_high": 101.0
+    },
+    "MCH": {
+      "value": 29.0,
+      "unit": "pg",
+      "ref_low": 27.0,
+      "ref_high": 32.0
+    },
+    "MCHC": {
+      "value": 33.1,
+      "unit": "g/dL",
+      "ref_low": 31.5,
+      "ref_high": 34.5
+    },
+    "RDW": {
+      "value": 18.5,
+      "unit": "%",
+      "ref_low": 11.6,
+      "ref_high": 14.0
+    },
+    "WBC": {
+      "value": 3.2,
+      "unit": "x10^9/L",
+      "ref_low": 4.0,
+      "ref_high": 10.0
+    },
+    "Neutrophils_pct": {
+      "value": 55.0,
+      "unit": "%",
+      "ref_low": 40.0,
+      "ref_high": 80.0
+    },
+    "Neutrophils_abs": {
+      "value": 1.76,
+      "unit": "x10^9/L",
+      "ref_low": 2.0,
+      "ref_high": 7.0
+    },
+    "Lymphocytes_pct": {
+      "value": 35.0,
+      "unit": "%",
+      "ref_low": 20.0,
+      "ref_high": 40.0
+    },
+    "Lymphocytes_abs": {
+      "value": 1.12,
+      "unit": "x10^9/L",
+      "ref_low": 1.0,
+      "ref_high": 3.0
+    },
+    "Monocytes_pct": {
+      "value": 6.0,
+      "unit": "%",
+      "ref_low": 2.0,
+      "ref_high": 10.0
+    },
+    "Monocytes_abs": {
+      "value": 0.19,
+      "unit": "x10^9/L",
+      "ref_low": 0.2,
+      "ref_high": 1.0
+    },
+    "Eosinophils_pct": {
+      "value": 3.0,
+      "unit": "%",
+      "ref_low": 1.0,
+      "ref_high": 6.0
+    },
+    "Eosinophils_abs": {
+      "value": 0.1,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.5
+    },
+    "Basophils_pct": {
+      "value": 1.0,
+      "unit": "%",
+      "ref_low": 0.0,
+      "ref_high": 2.0
+    },
+    "Basophils_abs": {
+      "value": 0.03,
+      "unit": "x10^9/L",
+      "ref_low": 0.02,
+      "ref_high": 0.1
+    },
+    "Platelets": {
+      "value": 110.0,
+      "unit": "x10^9/L",
+      "ref_low": 150.0,
+      "ref_high": 410.0
+    },
+    "MPV": {
+      "value": 11.2,
+      "unit": "fL",
+      "ref_low": 7.5,
+      "ref_high": 11.5
+    }
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "C-004-E1",
+      "type": "C1",
+      "section": "Interpretation",
+      "quoted_sentence": "The MCHC is within the normal range, and the RDW is normal, with no anisocytosis.",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The interpretation says the RDW is normal; the RDW is 18.5, above the reference range.",
+      "rationale": "The interpretation must agree with the numbers.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Values",
+          "quoted_sentence": "RDW: 18.5 % (ref 11.6–14.0)"
+        }
+      ]
+    },
+    {
+      "error_id": "C-004-E2",
+      "type": "C1",
+      "section": "Interpretation",
+      "quoted_sentence": "A normal white cell count and platelet count accompany the anaemia, a pattern that, together with the strict vegetarian diet, fatigue, paraesthesia and glossitis, is suggestive of vitamin B12 deficiency.",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The interpretation says the white cell count and platelet count are normal; WBC is 3.20 and platelets are 110, both below the reference range.",
+      "rationale": "The interpretation must agree with the numbers.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Values",
+          "quoted_sentence": "WBC: 3.20 x10^9/L (ref 4.00–10.00)"
+        },
+        {
+          "section": "Values",
+          "quoted_sentence": "Platelets: 110 x10^9/L (ref 150–410)"
+        }
+      ]
+    },
+    {
+      "error_id": "C-004-E3",
+      "type": "C2",
+      "section": "Values",
+      "quoted_sentence": "MCH: 29.0 pg (ref 27.0–32.0)",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "MCH is given as 29.0 pg; Hb 7.8 g/dL and RBC 2.00 give 39.0 pg.",
+      "rationale": "MCH must follow from Hb and RBC.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Values",
+          "quoted_sentence": "Hb: 7.8 g/dL (ref 13.0–17.0)"
+        },
+        {
+          "section": "Values",
+          "quoted_sentence": "RBC: 2.00 x10^12/L (ref 4.50–5.50)"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

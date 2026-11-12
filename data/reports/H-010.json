@@ -1,0 +1,51 @@
+{
+  "id": "H-010",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Lung, right upper lobectomy with mediastinal lymph node sampling",
+  "sections": {
+    "Clinical details": "66-year-old man and former smoker with a peripheral nodule in the right upper lobe identified on imaging. Right upper lobectomy with systematic mediastinal lymph node sampling performed.",
+    "Specimen": "Right upper lobectomy with systematic mediastinal lymph node sampling. Nodes submitted separately by station.",
+    "Gross description": "Right upper lobe weighing 310 g and measuring 110 x 90 x 60 mm. Pleural surface smooth and glistening. A firm, grey-white, ill-defined solid tumour lies in the posterior segment, measuring 28 mm in greatest dimension. It is 15 mm from the bronchial margin and 12 mm from the vascular margin. The visceral pleura is not involved. Representative sections are taken from the tumour, both vascular and bronchial margins and the nearest pleural surface. Nine lymph nodes are identified, measuring 4 to 15 mm, firm and grey-pink, without focal lesion.",
+    "Microscopic description": "Invasive non-mucinous adenocarcinoma composed predominantly (80%) of acinar glands, with a lepidic component (20%). No solid, micropapillary or complex glandular pattern is identified. Tumour cells show moderate nuclear pleomorphism, and mitoses are present. The visceral pleura is not breached. Bronchial and vascular margins are free of tumour. Lymphovascular invasion and perineural invasion are not identified. Nine lymph nodes from stations 2R, 4R, 7, 10R and 11R contain no metastatic carcinoma.",
+    "Diagnosis": "Right upper lobe, lobectomy: invasive non-mucinous adenocarcinoma, acinar predominant, moderately differentiated (G2), 28 mm.\npT1c pN0 (0/9 lymph nodes), R0 resection.\nPathological stage group IB (AJCC 8th edition).",
+    "Synoptic summary": "Tumour size: 28 mm\nHistologic grade: G2 (moderately differentiated)\nMargins: Clear; closest margin vascular, 12 mm\nLymphovascular invasion: Absent\nPerineural invasion: Absent\nLymph nodes (positive/total): 0/9\npT: pT1c\npN: pN0\nStaging edition: AJCC 8th edition",
+    "Comment": "The acinar predominant pattern with a lepidic component supports a G2 grade. No high-grade histological pattern is identified in the submitted sections."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-010-E1",
+      "type": "H3",
+      "section": "Diagnosis",
+      "quoted_sentence": "Pathological stage group IB (AJCC 8th edition).",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The diagnosis gives stage group IB for pT1c pN0; pT1c pN0 is stage IA3 in AJCC 8th edition.",
+      "rationale": "The stage group must follow the pT and pN categories.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "pT1c pN0 (0/9 lymph nodes), R0 resection."
+        },
+        {
+          "section": "Synoptic summary",
+          "quoted_sentence": "pT: pT1c"
+        },
+        {
+          "section": "Synoptic summary",
+          "quoted_sentence": "pN: pN0"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}

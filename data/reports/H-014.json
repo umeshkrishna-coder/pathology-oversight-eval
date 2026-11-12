@@ -1,0 +1,61 @@
+{
+  "id": "H-014",
+  "modality": "histopathology",
+  "split": "scored",
+  "specimen_type": "Stomach, laparoscopic wedge resection of a gastric wall mass",
+  "sections": {
+    "Clinical details": "54-year-old woman with a submucosal mass of the gastric body. Laparoscopic wedge resection performed.",
+    "Specimen": "Stomach, laparoscopic wedge resection of gastric wall mass. Received fresh, fixed in formalin.",
+    "Gross description": "Wedge of gastric wall measuring 80 x 60 x 25 mm. Serosal surface smooth and intact. Within the wall is a well-circumscribed, lobulated, grey-white submucosal mass measuring 55 mm in greatest dimension. Cut surface is fleshy and whorled with focal haemorrhage. Overlying mucosa is intact. All margins are clear, the closest being 8 mm from the tumour. Sections taken from the tumour, the closest margin and the serosal surface.",
+    "Microscopic description": "Tumour composed of intersecting fascicles of spindle cells with moderate cellularity, elongated nuclei and mild to moderate nuclear atypia. Mitotic figures number 3 per 5 mm2. No tumour necrosis identified. Serosa is intact and not involved. Closest resection margin is free of tumour, 8 mm from the tumour edge. Lymphovascular and perineural invasion not identified.",
+    "Immunohistochemistry": "Tumour cells are negative for CD117 and DOG1 and are positive for CD34. Desmin and smooth muscle actin are diffusely positive; S100 is negative.",
+    "Diagnosis": "Stomach, gastric antrum, laparoscopic wedge resection:\nGastrointestinal stromal tumour (GIST), spindle cell type, 55 mm, mitotic count 3 per 5 mm2.\nResection margins free of tumour; closest margin 8 mm.\nLymphovascular and perineural invasion not identified.\nNo lymph nodes submitted.\npT3 (AJCC 8th edition).",
+    "Synoptic summary": "Tumour size: 55 mm\nHistologic grade: Not applicable\nMargins: Free; closest 8 mm\nLymphovascular invasion: Not identified\nPerineural invasion: Not identified\nLymph nodes (positive/total): Not applicable (none submitted)\npT: pT3\npN: Not applicable\nStaging edition: AJCC 8th edition",
+    "Comment": "In AJCC 8th edition staging of gastric GIST, the T category is assigned by tumour size. A tumour greater than 5 cm and up to 10 cm is pT3 irrespective of serosal status, and the serosa is intact here. Using Miettinen criteria, a gastric tumour of 5.1 to 10 cm with 5 or fewer mitoses per 50 high-power fields (equivalent to 5 mm2) is classified as low risk. Multidisciplinary discussion is advised regarding adjuvant therapy."
+  },
+  "is_clean_control": false,
+  "errors": [
+    {
+      "error_id": "H-014-E1",
+      "type": "H1",
+      "section": "Diagnosis",
+      "quoted_sentence": "Stomach, gastric antrum, laparoscopic wedge resection:",
+      "severity": "major",
+      "severity_reason": null,
+      "description": "The diagnosis places the tumour in the gastric antrum; the clinical details place the mass in the gastric body.",
+      "rationale": "The site of the tumour must be the same throughout the report.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Clinical details",
+          "quoted_sentence": "54-year-old woman with a submucosal mass of the gastric body."
+        }
+      ]
+    },
+    {
+      "error_id": "H-014-E2",
+      "type": "H6",
+      "section": "Immunohistochemistry",
+      "quoted_sentence": "Tumour cells are negative for CD117 and DOG1 and are positive for CD34. Desmin and smooth muscle actin are diffusely positive; S100 is negative.",
+      "severity": "critical",
+      "severity_reason": null,
+      "description": "The immunohistochemistry gives a smooth muscle profile (CD117 and DOG1 negative, desmin and smooth muscle actin positive); the diagnosis is gastrointestinal stromal tumour.",
+      "rationale": "The immunoprofile must support the diagnosis.",
+      "kind": "statement",
+      "other_places": [
+        {
+          "section": "Diagnosis",
+          "quoted_sentence": "Gastrointestinal stromal tumour (GIST), spindle cell type, 55 mm, mitotic count 3 per 5 mm2."
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "drafted_by": "claude-haiku-5-5",
+    "drafted_at": "2026-11-10",
+    "edited_by": "owner",
+    "verified": false,
+    "verified_at": null
+  },
+  "schema_version": "1.0"
+}
