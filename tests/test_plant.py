@@ -1678,3 +1678,19 @@ def test_the_template_with_other_place_lines_still_checks_as_the_empty_template(
     out = capsys.readouterr().out
     assert not any(line.startswith("sheet ") for line in out.splitlines())
     assert "unknown key" not in out
+
+
+# EVAL-14 AA (owner decision, 2026-11-12): the header's first line follows decision 64.
+
+NEW_FIRST_LINE = (
+    "# Planting sheet (decision 37, amended by decision 64). The owner chooses every planted "
+    "error; candidate errors may be drafted by an AI assistant; the owner selects, reads and "
+    "verifies them."
+)
+
+
+def test_the_template_header_first_line_follows_decision_64(tree, capsys):
+    assert plant.TEMPLATE_HEADER.split("\n")[0] == NEW_FIRST_LINE
+    assert cli.main(["plant", "--init"]) == 0
+    assert (tree / SHEET_FILE).read_text(encoding="utf-8").split("\n")[0] == NEW_FIRST_LINE
+    assert "Written by the owner only" not in plant.TEMPLATE_HEADER

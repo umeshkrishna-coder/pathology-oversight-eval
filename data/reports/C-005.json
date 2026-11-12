@@ -140,13 +140,7 @@
       "severity_reason": null,
       "description": "The interpretation calls the neutropenia mild; the absolute neutrophil count is 0.20, which is severe.",
       "rationale": "The interpretation must agree with the numbers.",
-      "kind": "statement",
-      "other_places": [
-        {
-          "section": "Values",
-          "quoted_sentence": "Neutrophils absolute: 0.20 x10^9/L (ref 2.00–7.00)"
-        }
-      ]
+      "kind": "statement"
     },
     {
       "error_id": "C-005-E2",
@@ -164,8 +158,8 @@
     "drafted_by": "claude-haiku-5-5",
     "drafted_at": "2026-11-10",
     "edited_by": "owner",
-    "verified": false,
-    "verified_at": null
+    "verified": true,
+    "verified_at": "2026-11-12"
   },
   "schema_version": "1.0"
 }

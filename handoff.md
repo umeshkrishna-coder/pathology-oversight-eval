@@ -1,6 +1,6 @@
 # HANDOFF — pathology-oversight-eval
-Last updated: 2026-11-12 by agent (EVAL-13)
-Heads and counts: head b69fd6e, tests 1017, API spend to date $0.356378
+Last updated: 2026-11-12 by agent (EVAL-14)
+Heads and counts: head 677f109, tests 1018, API spend to date $0.356378
 (Head is the commit the last task started from, since a commit cannot name itself; spend from the logs: drafting $0.052492 in data/drafts/_calls.jsonl, smoke test $0.040390, dev run $0.263496: plain $0.114118, structured $0.149378.)
 Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agent's checks green, reported) · REPORTED (stated, not checked) · NOT TESTED · PENDING (not yet done)
 
@@ -8,11 +8,11 @@ Labels: OWNER VERIFIED (decided or checked by the owner) · AGENT VERIFIED (agen
 A small research pilot: how well Claude detects deliberately planted errors in synthetic histopathology reports and CBC interpretations, scored against pathologist-verified ground truth. Output: a one-page write-up for the owner's Anthropic Research Residency application, due 18 November 2026. Separate from every other project; its own folder, repo and Claude Code session.
 
 ## Roles
-- Owner: dataset, error taxonomy, every planted error, ground truth, adjudication, write-up, release decisions. OWNER VERIFIED
+- Owner: dataset, error taxonomy, the choice of every planted error (candidate errors may be drafted by an AI assistant; the owner selects, reads and verifies them; decision 64), ground truth, adjudication, write-up, release decisions. OWNER VERIFIED
 - Orchestrator (Cowork session): plans, writes EVAL-NN prompts, audits every reply. OWNER VERIFIED
 - Agent (Claude Code in this folder): harness, runs, scoring, tests, this file. OWNER VERIFIED
 
-## Decisions (OWNER VERIFIED unless marked PENDING; 1–28 on 2026-11-04, 29–46 on 2026-11-10, 47–57 on 2026-11-11, 58–67 on 2026-11-12)
+## Decisions (OWNER VERIFIED unless marked PENDING; 1–28 on 2026-11-04, 29–46 on 2026-11-10, 47–57 on 2026-11-11, 58–73 on 2026-11-12)
 1. Evaluated model: claude-sonnet-5-5 only; the `model` field returned by the API is recorded on every call.
 2. Drafting model: claude-haiku-5-5, disclosed in the write-up. Planted errors are authored by the owner, never by a model. (Amended by 64.)
 3. Temperature 0; 3 repeats per report per condition; per-repeat and majority (≥ 2 of 3) results both kept.
@@ -80,6 +80,12 @@ A small research pilot: how well Claude detects deliberately planted errors in s
 65. Coverage (OWNER VERIFIED, 2026-11-12): at the orchestrator's flag that the blood counts had one C2 error and no C3 error, the owner added four errors he had already seen on the cards: C3 in C-001 and C-005 (the critical-value comment removed), C2 in C-004 (MCH 29.0) and C-006 (neutrophils 6.00 absolute).
 66. Draft slips (OWNER VERIFIED, 2026-11-12): the six [fix] entries in H-002, H-010, H-011 (two), H-014 and C-004 correct draft slips the orchestrator listed; the owner approved each on a card.
 67. Copying the owner's text (OWNER VERIFIED, 2026-11-12): the EVAL-13 prompt authorised the agent, once, to copy the owner's text into data/specs/planting.md (line 1 and the entries of the 22 scored planted reports), changing no character of it; a script rebuilt the expected sheet from the committed sheet and the prompt's text and found it equal byte for byte. That is copying the owner's text, not writing planting content. CLAUDE.md is not changed.
+68. Verification (OWNER VERIFIED, 2026-11-12): the owner read all 30 scored reports on 2026-11-12 (the built text of commit 677f109, with the two corrections of decision 69 shown applied) and stated: "All 30 verified." Recorded by the EVAL-14 prompt: `verified: yes` and `verified_on: 2026-11-12` for H-001 to H-020 and C-001 to C-010; all 34 reports are now verified.
+69. Two corrections of draft slips in clean controls (OWNER VERIFIED, 2026-11-12), each approved on a card: H-019 microscopy, "It reaches but does not breach the serosa." becomes "The serosa is not involved."; H-020 Comment, "Pathological stage group IIIA" becomes "Pathological stage group IIIB" (pT3 pN1 squamous cell carcinoma, AJCC 8th edition).
+70. C-005, first error (OWNER VERIFIED, 2026-11-12): the line `also_analyte: Neutrophils_abs` is removed. That Values line is the anchor of the report's omission error; as an other place of the first error it would take findings that belong to the omission's adjudication. The two planted errors themselves do not change.
+71. Wording brought in line with decision 64 (OWNER VERIFIED, 2026-11-12): the header that `plant --init` writes, and the Roles line in this file. CLAUDE.md is not changed.
+72. prompts/structured_cbc.md (OWNER VERIFIED, 2026-11-12): the slip `rbs's` becomes `RBC's`; nothing else in the owner's text changes. The dev run of 2026-11-12 used the old spelling; the write-up says so in one line.
+73. Scored-run limit (OWNER VERIFIED, 2026-11-12; closes the open decision on the gate): a cost gate of $2.50 for each condition, $5.00 in all. It is used by the scored-run prompt.
 
 ## Error taxonomy (OWNER VERIFIED, final, version 1.0, 2026-11-10)
 Severity: critical = would change patient management; major = would need an amended report; minor = internal inconsistency without clinical consequence.
@@ -110,12 +116,13 @@ Severity: critical = would change patient management; major = would need an amen
 - Never `git add -A` or `git add .`; stage by explicit path, and quote `git status --short` and `git diff --cached --stat` before every commit. Files of the owner's that the agent did not create in the task are never opened for editing, staged, reverted or committed.
 
 ## Open items
-- PENDING — Owner reads and verifies the built reports (EVAL-13, 2026-11-12): all 34 reports are built from data/specs/planting.md (`plant --check`: 34 OK; `validate --expect 34 --expect-clean 9 --expect-dev 4`: OK). The 22 scored planted reports (39 planted errors) and the 8 scored clean controls wait for his reading in data/reports/_review/<id>.md; `verified` stays no in their blocks until he gives his word, and the freeze needs every report verified. The four dev reports are unchanged.
-- PENDING — Freeze, after the reports and the owner texts: the owner types `freeze approved` in a session (decision 39).
+- DONE — The owner read and verified all 30 scored reports (decision 68; EVAL-14 recorded his word): all 34 reports carry verified yes; `plant --check` 34 OK; `validate --expect 34 --expect-clean 9 --expect-dev 4` OK. The four dev reports are unchanged since the dev run.
+- PENDING — Next: the freeze, on the owner's typed word `freeze approved` in a session (decision 39). Every condition for it is in place: taxonomy final, the four manifest entries approved, no placeholder, 34 reports valid and verified; `freeze --check` reports no lock yet. The scored dry runs refuse until the lock exists.
 - AGENT VERIFIED — Dev split scored by place (EVAL-12, 2026-11-12; no API call): `adjudicate prepare --dataset dev` found 0 review items (the four dev reports have no omission error and no finding fell in a review band), so `score --dataset dev` gave final scores in results/dev/score.json and summary.md: recall 4/4 in both conditions; false alarms per report (all) 0.92 plain, 0.58 structured; specificity 1/1 in both; type agreement (structured) 15/19; 19 distinct plain labels. No category map is needed any more (decision 61). results/dev/category_strings.json is still the EVAL-11 listing (with its old mapped and maps_to fields); a new `map-list` would rewrite it without them.
-- AGENT VERIFIED — Measured cost per call (EVAL-11 dev run, 2026-11-12, claude-sonnet-5-5, 12 calls per condition, every unit valid on attempt 1): plain 1,167.0 input + 717.6 output tokens, $0.009510 a call; structured 1,498.2 input + 945.2 output tokens, $0.012448 a call. Projected scored run (90 units per condition): plain $0.86, structured $1.12, $1.98 in all at these averages; $2.96 with 50% added for longer planted reports, more findings and attempt 2 calls. Suggested gate: $2.00 per condition ($4.00 in all). The gate is a true ceiling: a call starts only if spend so far plus the reservations in flight plus its own (about $0.17 each) stay within it, so near the end calls run one at a time; $2.00 leaves room for the projected spend plus 50% plus four reservations in each condition. The dev run's peak of spend plus reservations was $0.73 (plain) and $0.95 (structured) against $1.00, reconstructed from calls.jsonl [INFERRED from start times and durations].
+- AGENT VERIFIED — Measured cost per call (EVAL-11 dev run, 2026-11-12, claude-sonnet-5-5, 12 calls per condition, every unit valid on attempt 1): plain 1,167.0 input + 717.6 output tokens, $0.009510 a call; structured 1,498.2 input + 945.2 output tokens, $0.012448 a call. Projected scored run (90 units per condition): plain $0.86, structured $1.12, $1.98 in all at these averages; $2.96 with 50% added for longer planted reports, more findings and attempt 2 calls. Suggested gate then: $2.00 per condition ($4.00 in all); the owner set $2.50 per condition, $5.00 in all (decision 73). The gate is a true ceiling: a call starts only if spend so far plus the reservations in flight plus its own (about $0.17 each) stay within it, so near the end calls run one at a time; $2.00 leaves room for the projected spend plus 50% plus four reservations in each condition. The dev run's peak of spend plus reservations was $0.73 (plain) and $0.95 (structured) against $1.00, reconstructed from calls.jsonl [INFERRED from start times and durations].
 - REPORTED — `plant --check` notices (planted types differ from the spec's planned types; the owner's choice, decision 24): 18 reports, listed in the EVAL-13 report (H-001, H-003, H-004, H-005, H-008, H-010 to H-015, H-021, H-022, C-001, C-003, C-005, C-007, C-011).
-- PENDING — The scored run needs the owner's typed `scored run approved`. The cost gate is a true ceiling (decision 53): each call reserves its maximum, about $0.17, so a gate needs headroom of one reservation per worker (with the default 4 workers, about $0.68 above the spend expected).
+- PENDING — The scored run needs the owner's typed `scored run approved`; its gate is $2.50 per condition, $5.00 in all (decision 73). The gate is a true ceiling (decision 53): each call reserves its maximum, about $0.17, so near the end calls run one at a time.
+- REPORTED — For the write-up: "candidate errors were drafted by an AI assistant; the pathologist selected, edited and verified every one", with the limitation that errors drafted by a Claude model may be unusually easy or hard for a Claude model to find (decision 64); and one line that the dev run used the CBC instruction before the `RBC's` correction (decision 72).
 - PENDING — The task that does the final scoring of the scored split commits results/scored/adjudication/adjudication_hidden.json, which stays gitignored until then (decision 48).
 
 ## Task log
@@ -145,6 +152,7 @@ Severity: critical = would change patient management; major = would need an amen
 | EVAL-11 | 2026-11-12 | Dev run, both conditions | DONE | AGENT VERIFIED |
 | EVAL-12 | 2026-11-12 | Detection by place | DONE | AGENT VERIFIED |
 | EVAL-13 | 2026-11-12 | Owner's errors entered; reports built | DONE | AGENT VERIFIED |
+| EVAL-14 | 2026-11-12 | Owner's verification; last corrections | DONE | AGENT VERIFIED |
 
 ## Report format (every reply ends with this block)
 === EVAL REPORT: EVAL-NN <title> ===

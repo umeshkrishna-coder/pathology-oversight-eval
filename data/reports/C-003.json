@@ -158,8 +158,8 @@
     "drafted_by": "claude-haiku-5-5",
     "drafted_at": "2026-11-10",
     "edited_by": "owner",
-    "verified": false,
-    "verified_at": null
+    "verified": true,
+    "verified_at": "2026-11-12"
   },
   "schema_version": "1.0"
 }

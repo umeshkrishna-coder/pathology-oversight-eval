@@ -1058,8 +1058,17 @@ def write_outputs(run: PlantRun, root: Path) -> tuple[list[str], list[str]]:
     return lines, not_written
 
 
-TEMPLATE_HEADER = """\
-# Planting sheet (decision 37). Written by the owner only; no model writes planting content.
+# Decision 71 (EVAL-14, AA): the first line follows decision 64. One line in the sheet; built
+# from pieces here only to keep the source lines short.
+TEMPLATE_FIRST_LINE = (
+    "# Planting sheet (decision 37, amended by decision 64). The owner chooses every planted "
+    "error; candidate errors may be drafted by an AI assistant; the owner selects, reads and "
+    "verifies them."
+)
+TEMPLATE_HEADER = (
+    TEMPLATE_FIRST_LINE
+    + "\n"
+    + """\
 # `uv run pathqc-eval plant --check` checks it; `uv run pathqc-eval plant` applies it to the
 # drafts in data/drafts/ (never modified) and writes data/reports/ (never edited by hand).
 #
@@ -1091,6 +1100,7 @@ TEMPLATE_HEADER = """\
 #     also_analyte: <analyte> (CBC only, alone: that analyte's rendered Values line)
 # - Entries apply in sheet order, fixes first, then errors (error ids E1, E2, ... in order).
 """
+)
 
 
 def template(rows: list[SpecRow]) -> str:

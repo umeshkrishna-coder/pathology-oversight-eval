@@ -26,7 +26,8 @@
 
 == H-001 ==
 # scored | planted | planned types: H3, H4
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: the owner's own, dictated on 2026-11-12.
 [error]
 type: H3
@@ -79,7 +80,8 @@ rationale: The node count must agree across sections; four positive nodes would 
 
 == H-002 ==
 # scored | planted | planned types: H1, H3
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [fix]
 section: Gross description
@@ -125,7 +127,8 @@ rationale: The pN category must follow the number of positive lymph nodes.
 
 == H-003 ==
 # scored | planted | planned types: H4, H5
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H5
@@ -154,7 +157,8 @@ rationale: Margin status must agree with the description; an involved circumfere
 
 == H-004 ==
 # scored | planted | planned types: H2, H3, H4
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H2
@@ -197,7 +201,8 @@ rationale: The stage group must follow the pT and pN categories.
 
 == H-005 ==
 # scored | planted | planned types: H3, H5
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H5
@@ -226,7 +231,8 @@ rationale: Perineural invasion is a required element and its status must agree a
 
 == H-006 ==
 # scored | planted | planned types: H1, H2
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H1
@@ -270,7 +276,8 @@ rationale: The stated subtype must be supported by the microscopic description.
 
 == H-007 ==
 # scored | planted | planned types: H1, H5
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H1
@@ -308,7 +315,8 @@ rationale: Lymphovascular invasion is a required element of the synoptic summary
 
 == H-008 ==
 # scored | planted | planned types: H2, H4
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H4
@@ -337,7 +345,8 @@ rationale: The node count in the text must agree with the synoptic count.
 
 == H-009 ==
 # scored | planted | planned types: H3, H5
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H5
@@ -379,7 +388,8 @@ rationale: The pN category must follow the node findings.
 
 == H-010 ==
 # scored | planted | planned types: H1, H3
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [fix]
 section: Synoptic summary
@@ -414,7 +424,8 @@ rationale: The stage group must follow the pT and pN categories.
 
 == H-011 ==
 # scored | planted | planned types: H2, H6
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [fix]
 section: Comment
@@ -461,7 +472,8 @@ rationale: The cell-of-origin statement must follow the immunoprofile.
 
 == H-012 ==
 # scored | planted | planned types: H1, H5, H6
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H5
@@ -488,7 +500,8 @@ rationale: Margin status must agree with the description; an involved deep margi
 
 == H-013 ==
 # scored | planted | planned types: H2, H6
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H2
@@ -513,7 +526,8 @@ rationale: The diagnosis must be supported by the microscopic description.
 
 == H-014 ==
 # scored | planted | planned types: H1, H5, H6
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [fix]
 section: Comment
@@ -555,7 +569,8 @@ rationale: The immunoprofile must support the diagnosis.
 
 == H-015 ==
 # scored | planted | planned types: H4, H6
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: H4
@@ -584,23 +599,38 @@ rationale: The node count in the synoptic summary must agree with the text.
 
 == H-016 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
 
 == H-017 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
 
 == H-018 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
 
 == H-019 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
+[fix]
+section: Microscopic description
+find: It reaches but does not breach the serosa.
+replace: The serosa is not involved.
+note: "Reaches the serosa" could be read as serosal involvement; the diagnosis says there is none (approved by the owner, 2026-11-12).
 
 == H-020 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
+[fix]
+section: Comment
+find: Pathological stage group IIIA
+replace: Pathological stage group IIIB
+note: pT3 pN1 squamous cell carcinoma is stage group IIIB in AJCC 8th edition (approved by the owner, 2026-11-12).
 
 == H-021 ==
 # dev | planted | planned types: H3, H6
@@ -653,7 +683,8 @@ verified_on: 2026-11-11
 
 == C-001 ==
 # scored | planted | planned types: C1, C2, C3
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: C1
@@ -690,7 +721,8 @@ rationale: A critical value needs a flag and a recommendation for urgent review.
 
 == C-002 ==
 # scored | planted | planned types: C1, C2
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: C1
@@ -722,7 +754,8 @@ rationale: The differential must add up to 100 and each absolute count must foll
 
 == C-003 ==
 # scored | planted | planned types: C1, C3
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: C1
@@ -747,7 +780,8 @@ rationale: The interpretation must agree with the numbers.
 
 == C-004 ==
 # scored | planted | planned types: C1, C2
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [fix]
 section: Interpretation
@@ -798,7 +832,8 @@ rationale: MCH must follow from Hb and RBC.
 
 == C-005 ==
 # scored | planted | planned types: C2, C3
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: C1
@@ -807,7 +842,6 @@ section: Interpretation
 find: This is severe neutropenia.
 replace: This is mild neutropenia.
 quote: This is mild neutropenia.
-also_analyte: Neutrophils_abs
 description: The interpretation calls the neutropenia mild; the absolute neutrophil count is 0.20, which is severe.
 rationale: The interpretation must agree with the numbers.
 
@@ -832,7 +866,8 @@ rationale: A critical value needs a flag and a recommendation for urgent review.
 
 == C-006 ==
 # scored | planted | planned types: C1, C2
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: C1
@@ -878,7 +913,8 @@ rationale: Each absolute count must follow from the percentage and the white cel
 
 == C-007 ==
 # scored | planted | planned types: C1, C3
-verified: no
+verified: yes
+verified_on: 2026-11-12
 # Errors: selected by the owner on 2026-11-12 from candidate errors drafted by an AI assistant.
 [error]
 type: C1
@@ -913,15 +949,18 @@ rationale: The interpretation must agree with the numbers.
 
 == C-008 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
 
 == C-009 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
 
 == C-010 ==
 # scored | clean control | planned types: none
-verified: no
+verified: yes
+verified_on: 2026-11-12
 
 == C-011 ==
 # dev | planted | planned types: C1
